@@ -8,6 +8,6 @@ int main(){
         printf("%d",1 & (input>>i));
     }
 
-    system("pause");
+    getchar();
     return 0;
 }

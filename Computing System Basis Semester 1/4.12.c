@@ -13,6 +13,6 @@ int main(){
             pi-=4.0/(2*i-1);
     }
     printf("\n pi=%f \n",pi);
-    system("pause");
+    getchar();
     return 0;
 }

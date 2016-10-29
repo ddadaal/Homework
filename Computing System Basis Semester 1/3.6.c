@@ -12,6 +12,6 @@ int main(){
 
     printf("\n%d seconds equal to %d hour %d minute %d second.",originalSecond,hour,minute,second);
 
-    system("pause");
+    getchar();
     return 0;
 }

@@ -19,6 +19,6 @@ int main(){
             day=30;
     printf("\nThere are %d days in that month. \n",day);
 
-    system("pause");
+    getchar();
     return 0;
 }

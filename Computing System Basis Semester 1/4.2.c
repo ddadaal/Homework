@@ -9,6 +9,6 @@ int main(){
         printf("%d can divide 7.",i);
     else
         printf("%d can not divide 7.",i);
-    system("pause");
+    getchar();
     return 0;
 }

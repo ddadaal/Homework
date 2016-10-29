@@ -8,6 +8,6 @@ int main(){
     scanf("%d",&b);
     printf("\nThe bigger question is %c which is %d."a<b?"b":"a",a<b?b:a )
 
-    system("pause");
+    getchar();
     return 0;
 }

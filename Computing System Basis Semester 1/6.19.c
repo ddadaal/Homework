@@ -17,6 +17,6 @@ int main(){
 
     } while (nextChar != '\n');
 
-    system("pause");
+    getchar();
     return 0;
 }

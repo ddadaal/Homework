@@ -43,6 +43,6 @@ int main(){
     } while (nextChar != '\n');
 	
 	printf("Number of \"int\": %d\n",counter);
-    system("pause");
+    getchar();
     return 0;
 }

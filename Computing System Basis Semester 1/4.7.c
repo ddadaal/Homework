@@ -8,7 +8,7 @@ int main(){
         i--;
     }
     printf("9!=%d\n",result);
-    system("pause");
+    getchar();
     return 0;
 }
 

@@ -13,6 +13,6 @@ int main(){
         }
         printf("\n");
     }
-    system("pause");
+    getchar();
     return 0;
 }

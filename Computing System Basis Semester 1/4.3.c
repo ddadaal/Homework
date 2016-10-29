@@ -14,6 +14,6 @@ int main(){
         printf("a=b=%d",a);
     else if(a<b)
         printf("The bigger one is b which is %d\n",b);
-    system("pause");
+    getchar();
     return 0;
 }

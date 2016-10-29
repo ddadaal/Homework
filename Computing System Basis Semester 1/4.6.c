@@ -24,7 +24,7 @@ int main(){
     flag=!flag; // loop has ended, and flag should be point to the variable which has just been changed, not to be changed.
     printf("f(%d)=%d\n",n, flag==0?a:b);
 
-    system("pause");
+    getchar();
     return 0;
 }
 
