@@ -2,11 +2,11 @@
 
 int main(){
     int a,b;
-    printf("Input a please:")
+    printf("Input a please:");
     scanf("%d",&a);
-    printf("\nInput b please:")
+    printf("\nInput b please:");
     scanf("%d",&b);
-    printf("\nThe bigger question is %c which is %d."a<b?"b":"a",a<b?b:a )
+    printf("\nThe bigger question is %c which is %d.",a<b?"b":"a",a<b?b:a );
 
     getchar();
     return 0;
