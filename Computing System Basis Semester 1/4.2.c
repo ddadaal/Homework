@@ -6,9 +6,9 @@ int main(){
     scanf("%d",&i);
     printf("\n");
     if (!(i%7))
-        printf("%d can divide 7.",i);
+        printf("%d can divide 7.\n",i);
     else
-        printf("%d can not divide 7.",i);
+        printf("%d can not divide 7.\n",i);
     getchar();
     return 0;
 }
