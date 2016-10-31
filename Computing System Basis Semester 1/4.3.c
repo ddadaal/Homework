@@ -11,7 +11,7 @@ int main(){
     if (a>b)
         printf("The bigger one is a which is %d\n",a);
     else if(a==b)
-        printf("a=b=%d",a);
+        printf("a=b=%d\n",a);
     else if(a<b)
         printf("The bigger one is b which is %d\n",b);
     getchar();

@@ -4,6 +4,7 @@
 // minus 32
 
 int main(){
+    printf("Input the string:");
     char nextChar;
     
     do {

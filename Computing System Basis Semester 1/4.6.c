@@ -23,11 +23,10 @@ int main(){
     for (i=2;i<=n;i++){
         if (flag==1){
             b=a+b;
-            flag=0;
         } else {
             a=a+b;
-            flag=1;
         }
+        flag=!flag;
     }
     flag=!flag; // loop has ended, and flag should be point to the variable which has just been changed, not to be changed.
     printf("f(%d)=%d\n",n, flag==0?a:b);

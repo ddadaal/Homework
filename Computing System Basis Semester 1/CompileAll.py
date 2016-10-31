@@ -12,6 +12,6 @@ for i in os.listdir():
         extension=""
         if platform.system()=="Windows":
             extension=".exe"
-        exe_path = os.path.join(exe_dir,i+extension)
+        exe_path = os.path.join(exe_dir,i.replace(".c",""))
         c_path = os.path.join(current_dir,i)
-        os.system("gcc \"{0}\" -o \"{1}\"".format(c_path,exe_path))
+        os.system("gcc \"{0}\" -o \"{1}\"".format(c_path,exe_path+extension))
