@@ -1,0 +1,23 @@
+            .DATA	x30000000
+NUMBERS :   .WORD   #10, #1, #2, #9, #-1
+            .TEXT   x00100000
+            .GLOBAL  MAIN
+MAIN :      ADDI    R1, R0, #0
+            ADDI    R2, R0, #0
+            LHI     R3, X3000
+LOOP :      LW      R4, 0(R3)
+            SLTI    R5, R4, #0
+            BNEZ    R5, EXIT
+CHECK :     ANDI    R6, R4, #1
+            BEQZ    R6, EVEN
+ODD :       ADDI    R1, R1, #1
+            ADDI    R3, R3, #4
+            J       LOOP
+EVEN :      ADDI    R2, R2, #1
+            ADDI    R3, R3, #4
+            J       LOOP
+
+EXIT :      TRAP    #0
+
+
+

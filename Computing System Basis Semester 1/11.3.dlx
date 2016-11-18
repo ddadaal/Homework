@@ -1,0 +1,25 @@
+            .DATA	x30000000
+DATA :      .ASCIIZ  "aaaasdfafsa"
+            .TEXT   x00100000
+            .GLOBAL  MAIN
+MAIN :      TRAP    #6
+            ADDI    R16, R4, #0
+            ADDI    R21, R0, #0
+            LHI     R17, x3000
+            LB      R18, #0(R17)
+LOOP :      SEQI    R19, R18, #0
+            BNEZ    R19, ALLDONE
+            SEQ     R20, R16, R18
+            BEQZ    R20, GETCHAR
+ADDONE :    ADDI    R21, R21, #1
+
+GETCHAR :   ADDI    R17, R17, #1
+            LB      R18, #0(R17)
+            J       LOOP
+ALLDONE :   ADDI    R4, R21, #0
+            ADDI    R4, R4, #48
+            TRAP    #7
+
+EXIT :      TRAP    #0
+
+
