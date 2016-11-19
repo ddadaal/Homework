@@ -1,0 +1,32 @@
+            .DATA
+            .TEXT   
+            .GLOBAL  MAIN
+MAIN :      ADDI    R4, R0, #0
+            TRAP    #6
+            SUBI    R4, R4, #48
+            ADDI    R2, R0, #0
+            ADDI    R6, R0, L1
+LOOP :      SEQI    R5, R2, #3
+
+MLOOP: 
+            BNEZ    R5, L4
+            BEQZ    R4, JUMP
+            SUBI    R4, R4, #1
+            ADDI    R6, R6, #8
+            ADDI    R2, R2, #1
+            J       LOOP
+
+JUMP :      JR      R6
+
+L1 :        ADDI    R10, R0, #1
+            J       END
+L2 :        ADDI    R10, R0, #2
+            J       END
+L3 :        ADDI    R10, R0, #3
+            J       END
+L4 :        ADDI    R10, R0, #4
+END :       TRAP    #0
+
+
+
+
