@@ -1,0 +1,21 @@
+            .DATA
+            .TEXT   
+            .GLOBAL  MAIN
+MAIN :      ADDI    R6, R0, L0
+            SLTI    R5, R16, #3
+            BEQZ    R5, L3
+            SLTI    R5, R16, #0
+            BNEZ    R5, L3
+            SLLI    R16, R16, #3
+            ADD     R6, R6, R16
+
+JUMP :      JR      R6
+
+L0 :        ADD     R19, R18, R17
+            J       END
+L1 :        SUB     R19, R18, R17
+            J       END
+L2 :        ADD     R19, R16, R18
+            J       END
+L3 :        SUB     R19, R16, R18
+END :       TRAP    #0

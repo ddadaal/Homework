@@ -1,0 +1,14 @@
+            .DATA
+            .TEXT   
+            .GLOBAL  MAIN
+MAIN :      ADDI    R4, R0, #0
+            ADDI    R3, R0, #65
+LOOP :      SEQI    R5, R3, #91
+            BNEZ    R5, EXIT
+            ADDI    R4, R3, #0
+            TRAP    #7
+            ADDI    R3, R3, #1
+            J       LOOP
+EXIT :      TRAP    #0
+
+

@@ -6,15 +6,10 @@ MAIN :      ADDI    R4, R0, #0
             SUBI    R4, R4, #48
             ADDI    R2, R0, #0
             ADDI    R6, R0, L1
-LOOP :      SEQI    R5, R2, #3
-
-MLOOP: 
-            BNEZ    R5, L4
-            BEQZ    R4, JUMP
-            SUBI    R4, R4, #1
-            ADDI    R6, R6, #8
-            ADDI    R2, R2, #1
-            J       LOOP
+            SLEI    R5, R4, #3
+            BEQZ    R5, L4
+            SLLI    R4, R4, #3
+            ADD     R6, R6, R4
 
 JUMP :      JR      R6
 
