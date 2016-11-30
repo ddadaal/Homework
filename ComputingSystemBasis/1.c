@@ -2,13 +2,9 @@
 #include <stdio.h>
 
 int main(){
-    int i;
-    int sum=0;
-    for(i=1;i<=50;i+=2){
-        if(!(i%7))
-            sum+=i;
-    }
-    printf("%d\n",sum);
-    getchar();
+    char a='1', b='C';
+    int x=0, y=20;
+    printf("%d%d%c%c",x,y,a,b);
+    system("pause");
     return 0;
 }

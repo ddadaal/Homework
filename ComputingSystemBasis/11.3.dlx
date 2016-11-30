@@ -1,5 +1,5 @@
             .DATA	x30000000
-DATA :      .ASCIIZ  "aaaasdfafsa"
+DATA :      .ASCIIZ "aaaasdfafsa"
             .TEXT   x00100000
             .GLOBAL  MAIN
 MAIN :      TRAP    #6
@@ -7,7 +7,7 @@ MAIN :      TRAP    #6
             ADDI    R21, R0, #0
             LHI     R17, x3000
             LB      R18, #0(R17)
-LOOP :      SEQI    R19, R18, #0
+LOOP :      SEQI    R19, R18, x04
             BNEZ    R19, ALLDONE
             SEQ     R20, R16, R18
             BEQZ    R20, GETCHAR

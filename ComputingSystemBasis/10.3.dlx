@@ -1,6 +1,7 @@
             .DATA
             .TEXT   
             .GLOBAL  MAIN
+;display a-z
 MAIN :      ADDI    R4, R0, #0
             ADDI    R3, R0, #65
 LOOP :      SEQI    R5, R3, #91

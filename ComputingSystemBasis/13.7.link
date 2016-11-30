@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<DLXObject>
+<Data>
+	<DataTable Base='805306368' Length='17'>
+		<Symbol name='CHAR' isGlobal='False' isExtern='False' >0</Symbol>
+		<Symbol name='HELLOWORLD' isGlobal='False' isExtern='False' >4</Symbol>
+	</DataTable>
+	<DataContent>6162636448656C6C6F2C576F726C642100</DataContent>
+</Data>
+<Text>
+
+	<TextTable Base='1073741824' Length='44'>
+		<Symbol name='MAIN' isGlobal='True' isExtern='False' >0</Symbol>
+	</TextTable>
+	<TextContent>1 1 0 #0 1 4 0 CHAR 0 28 1 4 #4 35 #8 35 #0 </TextContent>
+</Text>
+</DLXObject>
