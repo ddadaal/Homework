@@ -1,0 +1,65 @@
+            .DATA
+SAVER4 :    .SPACE  4
+SAVER2 :    .SPACE  4
+SAVER5 :    .SPACE  4
+SAVER3 :    .SPACE  4
+SAVER31 :   .SPACE  4
+            .TEXT   
+            .GLOBAL  MAIN
+MAIN :      SW      SAVER2(R0), R2
+            SW      SAVER4(R0), R4
+            SW      SAVER5(R0), R5
+
+            TRAP    x09
+            JAL     STC
+            TRAP    X07
+
+            JAL     CHECK
+            ADDI    R5, R4, #0
+            TRAP    X09
+            JAL     STC
+            TRAP    X07
+
+            JAL     CHECK
+            ADD     R5, R4, R5
+		;OUTPUT
+            ADDI    R4, R0, #10
+            TRAP    x07
+            SLTI    R2, R5, #10
+            BEQZ    R2, OGT10
+OST10 :     ADDI    R4, R5, #48
+            TRAP    x07
+            J       EXIT
+OGT10 :     ADDI    R4, R5, #55
+            TRAP    x07
+            J       EXIT
+
+EXIT :      LW      R2, SAVER2(R0)
+            LW      R4, SAVER4(R0)
+            LW      R5, SAVER5(R0)
+            TRAP    x00
+
+
+CHECK :     SLTI    R2, R4, #48
+            BNEZ    R2, EXIT
+            SLTI    R2, R4, #91
+            BEQZ    R2, EXIT
+            SLTI    R2, R4, #58
+            BNEZ    R2, ST10
+            SLTI    R2, R4, #64
+            BEQZ    R2, GT10
+            J       EXIT
+ST10 :      SUBI    R4, R4, #48		; <10
+            RET     
+GT10 :      SUBI    R4, R4, #55		; >10
+            RET     
+
+STC :       SW      SAVER3(R0), R3
+            SLTI    R3, R4, #123
+            BEQZ    R3, RETURN
+            SLTI    R3, R4, #96
+            BNEZ    R3, RETURN
+            SUBI    R4, R4, #32
+RETURN :    LW      R3, SAVER3(R0)
+            RET     
+

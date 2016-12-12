@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <DLXObject>
 <Data>
-	<DataTable Base='4294967295' Length='0'>
+	<DataTable Base='805306368' Length='37'>
+		<Symbol name='STACK' isGlobal='False' isExtern='False' >0,1,2,3,4,5,6,7,8,9</Symbol>
+		<Symbol name='PROMPT' isGlobal='False' isExtern='False' >10</Symbol>
 	</DataTable>
-	<DataContent></DataContent>
+	<DataContent>00000000000000000000506C6561534C4520656E74657220796F757220737472696E673A00</DataContent>
 </Data>
 <Text>
 
-	<TextTable Base='4294967295' Length='96'>
+	<TextTable Base='65536' Length='148'>
 		<Symbol name='MAIN' isGlobal='True' isExtern='False' >0</Symbol>
-		<Symbol name='JUMP' isGlobal='False' isExtern='False' >60</Symbol>
-		<Symbol name='L1' isGlobal='False' isExtern='False' >64</Symbol>
-		<Symbol name='L2' isGlobal='False' isExtern='False' >72</Symbol>
-		<Symbol name='L3' isGlobal='False' isExtern='False' >80</Symbol>
-		<Symbol name='L4' isGlobal='False' isExtern='False' >88</Symbol>
-		<Symbol name='END' isGlobal='False' isExtern='False' >92</Symbol>
+		<Symbol name='INPUT' isGlobal='False' isExtern='False' >68</Symbol>
+		<Symbol name='OUTPUT' isGlobal='False' isExtern='False' >100</Symbol>
+		<Symbol name='DONE' isGlobal='False' isExtern='False' >120</Symbol>
+		<Symbol name='PUSH' isGlobal='False' isExtern='False' >124</Symbol>
+		<Symbol name='POP' isGlobal='False' isExtern='False' >136</Symbol>
 	</TextTable>
-	<TextContent>1 4 0 #0 35 #6 3 4 4 #48 1 2 0 #0 1 6 0 L1 0 19 5 4 #3 29 5 L4 11 4 4 #3 0 6 6 4 33 6 1 10 0 #1 31 END 1 10 0 #2 31 END 1 10 0 #3 31 END 1 10 0 #4 35 #0 </TextContent>
+	<TextContent>1 4 0 PROMPT 0 35 #8 1 3 0 STACK 0 1 5 3 #10 1 29 5 #0 20 2 29 3 30 2 OUTPUT 35 #6 35 #7 21 2 4 #10 30 2 OUTPUT 32 PUSH 31 INPUT 20 2 29 5 30 2 DONE 32 POP 35 #7 31 OUTPUT 35 #0 3 29 29 #1 26 4 29 #0 33 31 25 4 29 #0 1 29 29 #1 33 31 </TextContent>
 </Text>
 </DLXObject>

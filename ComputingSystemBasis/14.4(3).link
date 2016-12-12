@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<DLXObject>
+<Data>
+	<DataTable Base='805306368' Length='19'>
+		<Symbol name='STRING1' isGlobal='False' isExtern='False' >0</Symbol>
+		<Symbol name='STRING2' isGlobal='False' isExtern='False' >7</Symbol>
+		<Symbol name='SAVER6' isGlobal='False' isExtern='False' >15,16,17,18</Symbol>
+	</DataTable>
+	<DataContent>78314146354200313332313235310000000000</DataContent>
+</Data>
+<Text>
+
+	<TextTable Base='1048576' Length='288'>
+		<Symbol name='MAIN' isGlobal='True' isExtern='False' >0</Symbol>
+		<Symbol name='LOOP' isGlobal='False' isExtern='False' >52</Symbol>
+		<Symbol name='HEX' isGlobal='False' isExtern='False' >80</Symbol>
+		<Symbol name='LOOP2' isGlobal='False' isExtern='False' >84</Symbol>
+		<Symbol name='EXIT' isGlobal='False' isExtern='False' >112</Symbol>
+		<Symbol name='MUL10' isGlobal='False' isExtern='False' >116</Symbol>
+		<Symbol name='HEXTODEC' isGlobal='False' isExtern='False' >200</Symbol>
+		<Symbol name='HEXTODEC_DEC' isGlobal='False' isExtern='False' >248</Symbol>
+		<Symbol name='RETURN' isGlobal='False' isExtern='False' >252</Symbol>
+	</TextTable>
+	<TextContent>1 1 0 STRING1 0 25 2 1 #0 21 3 2 #120 30 3 HEX 3 1 1 #1 1 4 1 #0 1 5 0 #0 1 1 1 #1 25 2 1 #0 29 2 EXIT 3 2 2 #48 32 MUL10 0 5 5 2 31 LOOP 1 5 0 #0 1 1 1 #1 25 2 1 #0 29 2 EXIT 32 HEXTODEC 11 5 5 #4 0 5 5 2 31 LOOP2 35 #0 28 6 0 SAVER6 0 1 6 5 #0 11 5 5 #3 0 5 5 6 0 5 5 6 27 6 0 SAVER6 0 33 31 28 6 0 SAVER6 0 17 6 2 #58 30 6 HEXTODEC_DEC 3 2 2 #55 31 RETURN 3 2 2 #48 27 6 0 SAVER6 0 33 31 </TextContent>
+</Text>
+</DLXObject>
