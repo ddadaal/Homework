@@ -1,42 +1,39 @@
 #include <stdio.h>
+#include <limits.h>
 #define LENGTH 10
-#define REPEATINGSYMBOL -32768
+#define REPEATINGSYMBOL INT_MIN
 
-void BubbleSort(int[]);
 int Find(int[],int);
 void RemoveTheFirst(int[],int);
 void InitiateArray(int[],int);
 
 int main(){
     int array[]={1,2,2,3,1,5,2,5,6,3};
-    int i=0,j=0,currentLength=0,temp=0;
+    int i=0,j=0,currentLength=LENGTH,currentIndex=0;
 
     int existing[LENGTH];
-    InitiateArray(existing,REPEATINGSYMBOL);
+    InitiateArray(existing,INT_MIN);
 
-    for(i=0;i<LENGTH;i++){
+    for(i=0;i<currentLength;i++){
         if (Find(existing,array[i])){
-            array[i]=REPEATINGSYMBOL;
-        }else{
-            existing[currentLength]=array[i];
-            currentLength++;
-        }
-    }
-
-    currentLength=LENGTH;
-
-    for(i=0;i<LENGTH-1;i++){
-        for(j=0;j<LENGTH-1-i;j++){
-            if (array[j]==REPEATINGSYMBOL){
-                temp=array[j];
+            // array[i]=REPEATINGSYMBOL;
+            for(j=i;j<currentLength-1;j++){
                 array[j]=array[j+1];
-                array[j+1]=temp;
             }
+            i--;
+            currentLength--;
+        }else{
+            existing[currentIndex++]=array[i];
         }
-        
     }
-    system("pause");
 
+
+    for(i=0;i<currentLength;i++){
+        printf("%d ",array[i]);
+    }
+
+    system("pause");
+    return 0;
 }
 
 void InitiateArray(int array[],int n){

@@ -2,8 +2,15 @@
 char firstLetter(int);
 
 int main(){
-    int n=27;
+
     
+
+    int n=27;
+    printf("Input n:");
+    scanf("%d",&n);
+
+
+
     int ten=n/10;
     int one=n%10;
 
@@ -20,6 +27,7 @@ int main(){
         }
     }
     system("pause");
+    return 0;
 
 }
 
