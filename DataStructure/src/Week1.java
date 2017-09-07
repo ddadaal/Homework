@@ -1,3 +1,6 @@
+import java.util.HashMap;
+import java.util.Stack;
+
 public class Week1 {
 	public static void main(String[] args){
 		System.out.println(work1(3));
@@ -8,6 +11,8 @@ public class Week1 {
 		System.out.println(palindromes("asdfdsa",0));
 		String sentence = "Madam, I'm Adam";
 		System.out.println(palindromes(sentence.toLowerCase(), 0, sentence.length()-1));
+		
+		hanoi(3,0,2,1);
 	}
 	
 	public static int work1(int n){
@@ -91,4 +96,17 @@ public class Week1 {
 			return (sentence.charAt(low)==sentence.charAt(high)) && palindromes(sentence, low+1, high-1);
 		}
 	}
+	
+	public static void hanoi(int disk, int from, int to, int other){
+		
+		if (disk==1){
+			System.out.println(String.format("Move disk %d from %d to %d", disk, from, to));
+		}else{
+			hanoi(disk-1, from, other, to);
+			System.out.println(String.format("Move disk %d from %d to %d", disk, from, to));
+			hanoi(disk-1, other, to, from);
+		}
+	}
+
+	
 }
