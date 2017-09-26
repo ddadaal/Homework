@@ -5,17 +5,19 @@ import util.*;
 public class Chapter3 {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		Chapter3 c = new Chapter3();
 		JosephusArraySolution.solve(8, 3);
+		polynomialSum();
 	}
 	
 	public static void polynomialSum(){
 		Polynomial p = new Polynomial();
-		
+
 		p.add(3, 2);
 		p.add(4, 1);
 		p.add(5, 0);
+		
+		System.out.println(p.toString());
 		
 		System.out.println(p.sum(2)); //25
 	}

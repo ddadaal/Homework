@@ -22,8 +22,6 @@ public class CircularLinkedList {
 		return this;
 	}
 	
-
-//	
 	public LinkedListNode remove(LinkedListNode node){
 		findPrevious(node).next = node.next;
 		if (node == start){
@@ -49,14 +47,20 @@ public class CircularLinkedList {
 		return current;
 	}
 	
-	
-	public void displayAll(){
+	@Override
+	public String toString(){
+		StringBuilder output= new StringBuilder();
 		LinkedListNode current=  start;
 		for(int i=0;i<count;i++){
-			System.out.print(current.number+", ");
+			output.append(", "+current.number);
 			current = current.next;
 		}
-		System.out.println();
+		return output.indexOf(",")==-1 ? "" : output.substring(2);
+	}
+	
+	
+	public void displayAll(){
+		System.out.println(toString());
 	}
 
 }

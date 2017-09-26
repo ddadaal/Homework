@@ -8,6 +8,11 @@ public class LinkedListNode{
 		this.number = number;
 		this.next = next;
 	}
+	
+	@Override
+	public String toString(){
+		return number+"";
+	}
 
 	@Override
 	public int hashCode() {
