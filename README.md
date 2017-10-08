@@ -1,3 +1,9 @@
 # Homework
 
-This is a collection of **all my coding homework** for backup. 
+This is a collection of all my homework.
+
+## Includes
+
+- Computer System Basis
+- Data Structure
+- Cpp Assignments
