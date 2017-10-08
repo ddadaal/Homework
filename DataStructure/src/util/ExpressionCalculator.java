@@ -6,7 +6,7 @@ public class ExpressionCalculator {
 
 	public static void main(String[] args){
 		ExpressionCalculator c = new ExpressionCalculator();
-		System.out.println(c.calculateAtOnce("30*(19.1+7+6*2)"));
+		System.out.println(c.calculateAtOnce("30/6"));
 	}
 	
 	public double calculate(String infixExpression){
@@ -46,6 +46,9 @@ public class ExpressionCalculator {
 			}else{
 				operate(numbers, c);
 			}
+		}
+		if (numberBuffer.length()>0){
+			numbers.push(Double.parseDouble(numberBuffer.toString()));
 		}
 		while(!operators.empty()){
 			operate(numbers, operators.pop());
@@ -137,7 +140,7 @@ public class ExpressionCalculator {
 			result= operator1*operator2;
 			break;
 		case '/':
-			result= operator1/operator2;
+			result= operator2/operator1;
 			 break;
 			default:
 				result = operator1;
