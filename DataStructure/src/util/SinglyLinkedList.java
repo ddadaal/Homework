@@ -1,16 +1,12 @@
 package util;
 
-import java.util.Iterator;
-
-public class SinglyLinkedList implements Iterable<Integer>, Iterator<Integer> {
-	public LinkedListNode start;
+public class SinglyLinkedList {
+	public LinkedListNode start; //head
 	public LinkedListNode end;
-	private LinkedListNode current;
 	
 	public SinglyLinkedList(){
 		start = new LinkedListNode(0, null);
 		end = start;
-		current = start;
 	}
 	
 	public SinglyLinkedList(int...values){
@@ -42,24 +38,5 @@ public class SinglyLinkedList implements Iterable<Integer>, Iterator<Integer> {
 			current = current.next;
 		}
 		return result.toString();
-	}
-
-	@Override
-	public Iterator<Integer> iterator() {
-		// TODO Auto-generated method stub
-		return this;
-	}
-
-	@Override
-	public boolean hasNext() {
-		// TODO Auto-generated method stub
-		return current.next!=null;
-	}
-
-	@Override
-	public Integer next() {
-		// TODO Auto-generated method stub
-		current = current.next;
-		return current.number;
 	}
 }

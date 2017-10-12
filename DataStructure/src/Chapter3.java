@@ -6,8 +6,13 @@ public class Chapter3 {
 
 	public static void main(String[] args) {
 		Chapter3 c = new Chapter3();
-		JosephusArraySolution.solve(8, 3);
-		polynomialSum();
+		SinglyLinkedList list1 = new SinglyLinkedList(2,3);
+
+
+		c.betterReverse(list1);
+		
+		System.out.println(list1);
+		
 	}
 	
 	public static void polynomialSum(){
@@ -85,6 +90,15 @@ public class Chapter3 {
 
 	
 	public SinglyLinkedList union(SinglyLinkedList list1, SinglyLinkedList list2){
+		
+		if (list1.start.number==0){
+			return list2;
+		}
+		
+		if (list2.start.number==0){
+			return list1;
+		}
+		
 		SinglyLinkedList result = new SinglyLinkedList();
 		
 		LinkedListNode current1= list1.start.next;
@@ -142,6 +156,27 @@ public class Chapter3 {
 		
 		nodes.pop().next=null;
 		
+	}
+	
+	public void betterReverse(SinglyLinkedList list){
+		if (list.start.number<=1){
+			return;
+		}
+		LinkedListNode current = list.start.next;
+		LinkedListNode previous = current;
+		LinkedListNode after = list.start.next.next;
+		current.next = null;
+		current = after;
+		after = current.next;
+		while(after!=null){
+			current.next = previous;
+			previous = current;
+			current = after;
+			after = after.next;
+			
+		}
+		current.next = previous;
+		list.start.next = current;
 	}
 
 }
