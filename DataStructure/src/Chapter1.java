@@ -1,17 +1,11 @@
-
+import java.util.Arrays;
+import java.util.Stack;
+import java.util.stream.Collectors;
 
 public class Chapter1 {
 	public static void main(String[] args){
-		System.out.println(work1(3));
-		
-		System.out.println(work31(new int[] {1,4,2,5,8,2,8,9,0,-1},0));
-		System.out.println(work32(new int[] {1,4,2,5,8,2,8,9,0,-1},0));
-		permute("abc");
-		System.out.println(palindromes("asdfdsa",0));
-		String sentence = "Madam, I'm Adam";
-		System.out.println(palindromes(sentence.toLowerCase(), 0, sentence.length()-1));
-		
-		hanoi(3,0,2,1);
+		combination(new int[] {1,2,3,4,5}, 3,0,new Stack<Integer>());
+		hanoi(3,'A','C','B');
 	}
 	
 	public static int work1(int n){
@@ -19,6 +13,24 @@ public class Chapter1 {
 			return n;
 		}else{
 			return n%2 + work1(n/2);
+		}
+	}
+	
+	public static void combination(int[] array, int r, int start, Stack<Integer> stack){
+		int length = array.length;
+		if (r==1){
+			for(int i=start;i<length;i++){
+				stack.forEach(x->System.out.print(x+" "));
+				System.out.println(array[i]);
+			}
+		}else if (length-start==r){ 
+			stack.forEach(x->System.out.print(x+" "));
+			System.out.println(Arrays.stream(array).skip(start).mapToObj(x->x+"").collect(Collectors.joining(" ")));
+		}else{
+			stack.push(array[start]);
+			combination(array, r-1, start+1, stack);
+			stack.pop();
+			combination(array, r, start+1, stack);
 		}
 	}
 	
@@ -96,16 +108,17 @@ public class Chapter1 {
 		}
 	}
 	
-	public static void hanoi(int disk, int from, int to, int other){
+	public static void hanoi(int disk, char from, char to, char other){
 		
-		if (disk==1){
-			System.out.println(String.format("Move disk %d from %d to %d", disk, from, to));
+		if (disk==1){ 
+			System.out.println(String.format("Move disk %d from %c to %c", disk, from, to));
 		}else{
 			hanoi(disk-1, from, other, to);
-			System.out.println(String.format("Move disk %d from %d to %d", disk, from, to));
+			System.out.println(String.format("Move disk %d from %c to %c", disk, from, to));
 			hanoi(disk-1, other, to, from);
 		}
 	}
+
 
 	
 }

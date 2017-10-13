@@ -6,7 +6,7 @@ public class ExpressionCalculator {
 
 	public static void main(String[] args){
 		ExpressionCalculator c = new ExpressionCalculator();
-		System.out.println(c.calculateAtOnce("30/6"));
+		System.out.println(c.infixToPostfix("1+2*(3+4)"));
 	}
 	
 	public double calculate(String infixExpression){

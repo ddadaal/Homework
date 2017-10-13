@@ -5,13 +5,14 @@ import util.*;
 public class Chapter3 {
 
 	public static void main(String[] args) {
-		Chapter3 c = new Chapter3();
-		SinglyLinkedList list1 = new SinglyLinkedList(2,3);
-
-
-		c.betterReverse(list1);
+		Polynomial p = new Polynomial();
+		p.add(3, 2).add(3,1).add(3,0);
 		
-		System.out.println(list1);
+		Polynomial p2 = new Polynomial();
+		p2.add(4,3).add(3,2).add(4,0);
+		
+		p.add(p2);
+		System.out.println(p);
 		
 	}
 	

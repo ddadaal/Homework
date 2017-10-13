@@ -126,6 +126,9 @@ public class Polynomial {
 				}
 				nodeOther = nodeOther.next;
 				node1previous = newNode;
+			}else{
+				node1previous = node1current;
+				node1current=node1current.next;
 			}
 			
 			if (nodeOther==null){
