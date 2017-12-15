@@ -85,7 +85,7 @@ public class Graph<T> {
 			}
 			
 			for (int i=0;i<c.points.size();i++) {
-				if (!points.get(i).equals(c.points.get(j % c.points.size()))) {
+				if (!points.get(i).equals(c.points.get((j++) % c.points.size()))) {
 					return false;
 				}
 			}
