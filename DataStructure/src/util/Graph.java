@@ -9,7 +9,6 @@ public class Graph<T> {
 	ArrayList<T> nodes = new ArrayList<>();
 	
 	ArrayList<LinkedList<Integer>> edges = new ArrayList<>();
-	Comparator<Integer> comparator = (x,y) -> x-y;
 	
 	public int addNode(T node) {
 		nodes.add(node);
@@ -59,7 +58,6 @@ public class Graph<T> {
 		public ArrayList<Integer> points;
 		public Cycle(ArrayList<Integer> points) {
 			this.points = new ArrayList<>(points);
-			this.points.sort(comparator);
 		}
 		
 		@Override
@@ -79,8 +77,15 @@ public class Graph<T> {
 			if (c.points.size()!= this.points.size()) {
 				return false;
 			}
+			int j=0;
+			for (;j<c.points.size();j++) {
+				if (c.points.get(j).equals(points.get(0))) {
+					break;
+				}
+			}
+			
 			for (int i=0;i<c.points.size();i++) {
-				if (!points.get(i).equals(c.points.get(i))) {
+				if (!points.get(i).equals(c.points.get(j % c.points.size()))) {
 					return false;
 				}
 			}
@@ -109,7 +114,12 @@ public class Graph<T> {
 			return;
 		} else {
 			stack.add(ci);
-			for (int i : edges.get(ci)) {
+			L1: for (int i : edges.get(ci)) {
+				for (int j=0;j<stack.size()-1;j++) {
+					if (stack.get(j).equals(ci) && stack.get(j+1).equals(i)) {
+						continue L1;
+					}
+				}
 				checkCycle(si, i, stack, cl);
 			}
 			stack.remove(stack.size()-1);

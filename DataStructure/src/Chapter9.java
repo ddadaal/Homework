@@ -12,7 +12,7 @@ public class Chapter9 {
 		graph.addEdge(1, 2);
 		graph.addEdge(2, 3);
 		graph.addEdge(3, 1);
-		graph.addEdge(3, 0);
+		graph.addEdge(1, 0);
 		Graph<String>.CycleList cl = graph.outputCycles();
 		if (cl.size()==0){
 			System.out.println("no graph detected.");
