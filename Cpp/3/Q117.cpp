@@ -43,7 +43,7 @@ public:
 			last = Chess::X;
 		}
 		set(x, y, last);
-		printBoard();
+		//printBoard();
 		return judge();
 	}
 
@@ -84,7 +84,7 @@ public:
 
 		//judge row
 		for (int i = 0; i < n; i++){
-			for (int j = 0; j <= n-2; j++){
+			for (int j = 0; j <= n-m; j++){
 				Chess& chess = get(i, j);
 				if (chess == Chess::N) {
 					continue;
@@ -125,7 +125,7 @@ public:
 		//judge abnormal diag
 		for (int i = 0; i <= n - m; i++) {
 			for (int j = 0; j <= n - m; j++){
-				Chess& chess = get(i, j);
+				Chess& chess = get(n-i, j);
 				if (chess == Chess::N) {
 					continue;
 				}
