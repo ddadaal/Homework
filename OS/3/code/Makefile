@@ -43,6 +43,10 @@ all : realclean everything
 
 image : realclean everything clean buildimg
 
+run:
+	make image
+	bochs
+
 clean :
 	rm -f $(OBJS)
 
