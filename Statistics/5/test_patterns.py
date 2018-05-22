@@ -15,11 +15,12 @@ print(set(pattern2.keys())-set(pattern1.keys()))
 
 if len(pattern1) != len(pattern2):
   print("Length not match. expected: %s, actual: %s" % (len(pattern1),len(pattern2)))
+  
 
 for key in pattern2:
   if not key in pattern1:
     print("%s not found in pattern1!" % key)
-  if pattern2[key] != pattern1[key]:
+  elif pattern2[key] != pattern1[key]:
     print("value of %s not match. expected: %s, actual: %s" %(key,pattern1[key],pattern2[key]))
 
 print("OK")

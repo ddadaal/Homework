@@ -30,6 +30,35 @@ PRIVATE	int	column;
 
 PRIVATE u8	get_byte_from_kbuf();
 
+PRIVATE void kb_wait() {
+	u8 kb_stat;
+	do {
+		kb_stat = in_byte(KB_CMD);
+	} while (kb_stat & 0x02);
+}
+
+PRIVATE void kb_ack() {
+	u8 kb_read;
+	do {
+		kb_read = in_byte(KB_DATA);
+	} while (kb_read = ! KB_ACK);
+}
+
+PUBLIC void set_leds() {
+	u8 leds = (caps_lock<<2) | (num_lock<<1) | scroll_lock;
+
+	// wait for available
+	kb_wait();
+	// write in led
+	out_byte(KB_DATA, LED_CODE);
+	// wait for ack
+	kb_ack();
+
+	kb_wait();
+	out_byte(KB_DATA, leds);
+	kb_ack();
+}
+
 /*======================================================================*
                             keyboard_handler
  *======================================================================*/
@@ -59,6 +88,12 @@ PUBLIC void init_keyboard()
 	shift_l	= shift_r = 0;
 	alt_l	= alt_r   = 0;
 	ctrl_l	= ctrl_r  = 0;
+
+	num_lock = 1;
+	caps_lock = 0;
+	scroll_lock =0;
+
+	set_leds();
 
         put_irq_handler(KEYBOARD_IRQ, keyboard_handler);/*设定键盘中断处理程序*/
         enable_irq(KEYBOARD_IRQ);                       /*开键盘中断*/
@@ -134,7 +169,21 @@ PUBLIC void keyboard_read()
 			keyrow = &keymap[(scan_code & 0x7F) * MAP_COLS];
 			
 			column = 0;
-			if (shift_l || shift_r) {
+
+			int is_cap = shift_l || shift_r;
+
+			if (caps_lock) {
+				// caps_lock activated
+				// switch cap for a-z
+				u8 key = keyrow[0];
+				if (key >='a' && key <= 'z') {
+					is_cap = !is_cap;
+				}
+			}
+
+
+
+			if (is_cap) {
 				column = 1;
 			}
 			if (code_with_E0) {
@@ -162,6 +211,24 @@ PUBLIC void keyboard_read()
 				break;
 			case ALT_R:
 				alt_l = make;
+				break;
+			case NUM_LOCK:
+				if (make) {
+					num_lock = !num_lock;
+					set_leds();
+				}
+				break;
+			case CAPS_LOCK:
+				if (make) {
+					caps_lock = !caps_lock;
+					set_leds();
+				}
+				break;
+			case SCROLL_LOCK:
+				if (make) {
+					scroll_lock = !scroll_lock;
+					set_leds();
+				}
 				break;
 			default:
 				break;

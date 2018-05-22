@@ -40,6 +40,7 @@ PUBLIC void init_keyboard();
 /* tty.c */
 PUBLIC void task_tty();
 PUBLIC void in_process(u32 key);
+PUBLIC void task_timely_clear_screen();
 
 /* 以下是系统调用相关 */
 
