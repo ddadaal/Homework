@@ -230,8 +230,6 @@ PUBLIC void keyboard_read()
 					set_leds();
 				}
 				break;
-			default:
-				break;
 			}
 
 			if (make) { /* 忽略 Break Code */

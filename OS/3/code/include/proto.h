@@ -24,7 +24,7 @@ void restart();
 /* main.c */
 void TestA();
 void TestB();
-void TestC();
+
 
 /* i8259.c */
 PUBLIC void put_irq_handler(int irq, irq_handler handler);

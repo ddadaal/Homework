@@ -22,12 +22,10 @@
 #define TAB_WIDTH 8
 #define DEFAULT_CHAR_COLOR 0x07
 
-#define CLEAR_SCREEN_INTERVAL 20*1000
-
+#define CLEAR_SCREEN_INTERVAL (20*1000)
 
 
 // search mode stuff
-#define MAX_INPUT SCREEN_WIDTH
 #define HIGHLIGHT_COLOR 0x04
 
 /*
@@ -37,19 +35,24 @@ search mode
 2 enter occurred. highlighting keyword. only esc is allowed.
 */
 PRIVATE int search_mode = 0;
-PRIVATE char input_text[MAX_INPUT]; // accept maximum of a line
-PRIVATE u32 input_text_pointer =0;
-PRIVATE u32 prev_cursor=0; 
+PRIVATE u32 base_cursor=0; 
 
-PRIVATE void reset_search_mode() {
-    search_mode =0;
-    input_text_pointer =0;
-}
-
+/* search mode complete */
 
 PRIVATE u32 cursor = 0;
 PRIVATE u32 current_start_addr = 0;
 PRIVATE v_mem_limit = 0;
+
+PUBLIC u8* get_pointer_at_cursor() {
+    return (u8 *)(V_MEM_BASE + cursor * 2);
+}
+
+PUBLIC void set_char_at_cursor(u8 ch, u8 color) {
+    u8 *p_vmem = get_pointer_at_cursor();
+    p_vmem[0]=ch;
+    p_vmem[1]=color;
+}
+
 
 
 /* console part */
@@ -73,7 +76,7 @@ PRIVATE void set_video_start_addr(u32 addr)
     enable_int();
 }
 
-PRIVATE void refresh()
+PRIVATE void sync_video()
 {
     set_cursor(cursor);
     set_video_start_addr(current_start_addr);
@@ -95,35 +98,36 @@ PUBLIC void scroll_screen(int direction)
             current_start_addr += SCREEN_WIDTH;
         }
     }
-    refresh();
+    sync_video();
 }
 
-PUBLIC void out_char(char ch)
+PUBLIC void out_char(char ch, u8 default_color)
 {
-    u8 *p_vmem = (u8 *)(V_MEM_BASE + cursor * 2);
     switch (ch)
     {
     case '\t':
-        p_vmem[0] = '\t';
-        p_vmem[1] = 0x0;
+        set_char_at_cursor('\t', 0x0);
         cursor = TAB_WIDTH * (cursor/TAB_WIDTH + 1);
         break;
     case '\n':
-        p_vmem[0] = '\n';
-        p_vmem[1] = 0x0; // black background and foreground
+        set_char_at_cursor('\n', 0x0);
         cursor = SCREEN_WIDTH * (cursor / SCREEN_WIDTH + 1);
         break;
     case '\b': {
+        u32 row = cursor/SCREEN_WIDTH;
         int found = 0; // a \n or a \t is found
         if (cursor % SCREEN_WIDTH==0) {
-            // cursor at the beginning of a row. attempting to find a \n or \t in the previous row
+            // cursor at the beginning of a row. attempting to find a \n in the previous row
 
-            u32 previous_start=SCREEN_WIDTH * (cursor/SCREEN_WIDTH-1); // the start of the previous row
+            u32 previous_start= (row == 0) ? 0 :SCREEN_WIDTH * (row-1); // the start of the previous row. if it's in row 1, assign 0
+            u32 previous_cursor=cursor;
 
-
-            for (;cursor>=previous_start;cursor--) {
-                u8 *p = (u8 *)(V_MEM_BASE + cursor * 2);
-                if (p[0]== '\n' || p[0] == '\t') {
+            u32 move_count = 0;
+            while (cursor>0 && move_count<=SCREEN_WIDTH) {
+                cursor--;
+                move_count++;
+                u8 *p = get_pointer_at_cursor();
+                if (p[0]== '\n') {
                     // a \n or \t is found. move the cursor to it and break;
                     found = 1;
 
@@ -132,42 +136,57 @@ PUBLIC void out_char(char ch)
                     break;
                 }
             }
+            // no \n is found. move the cursor back to the beginning of next row
+            if (!found) {
+                cursor = previous_cursor;
+            }
         } else if (cursor % TAB_WIDTH==0) {
             u32 previous_start = TAB_WIDTH * (cursor/TAB_WIDTH - 1); // move the cursor to the previous column
             // cursor at the beginning of a column. attempting to find a \t in the previous TAB_SIZE pixels
-            for (;cursor>=previous_start;cursor--) {
-                u8 *p = (u8 *)(V_MEM_BASE + cursor * 2);
-                if (p[0] == '\t') {
-                    // a \t is found. move the cursor to it and break;
+            u32 previous_cursor=cursor;
+            u32 move_count = 0;
+
+            while (cursor>0 && move_count<=TAB_WIDTH) {
+                cursor--;
+                move_count++;
+                u8 *p = get_pointer_at_cursor();
+                if (p[0]== '\t') {
+                    // a \n or \t is found. move the cursor to it and break;
                     found = 1;
-                    
-                    p[0] = ' ';
+
+                    p[0]= ' ';
                     p[1] = DEFAULT_CHAR_COLOR;
                     break;
                 }
             }
+
+            // no \t is found. move the cursor back to the beginning of current column 
+            if (!found) {
+                cursor = previous_cursor;
+            }
         }
-        if (!found) {
+        if (!found && cursor>0) {
             cursor--;
-            *(p_vmem - 2) = ' ';
-            *(p_vmem - 1) = DEFAULT_CHAR_COLOR;
+            set_char_at_cursor(' ', DEFAULT_CHAR_COLOR);
         }
         break;
     }
     default:
-        p_vmem[0] = ch;
-        p_vmem[1] = DEFAULT_CHAR_COLOR;
+        set_char_at_cursor(ch, default_color);
         cursor++;
     }
     while (cursor >= current_start_addr + SCREEN_SIZE)
     {
         scroll_screen(SCREEN_SCROLL_DOWN);
     }
-    refresh();
+    sync_video();
 }
 
 PUBLIC void clear_screen()
 {
+    if (search_mode != 0) {
+        return;
+    }
     u8 *base = (u8 *)V_MEM_BASE;
     for (int i = 0; i < V_MEM_SIZE; i += 2)
     {
@@ -175,7 +194,7 @@ PUBLIC void clear_screen()
         base[i + 1] = DEFAULT_CHAR_COLOR;
     }
     cursor = 0;
-    refresh();
+    sync_video();
 }
 
 PUBLIC void init_screen()
@@ -185,6 +204,9 @@ PUBLIC void init_screen()
     current_start_addr = 0;
     cursor = 0;
     disp_pos = 0;
+
+    search_mode = 0;
+
     set_cursor(cursor);
 }
 
@@ -217,17 +239,34 @@ PUBLIC void in_process(u32 key)
 
     if (search_mode == 2) {
         if ((key & MASK_RAW) == ESC) {
-            reset_search_mode();
+            // search complete. restore cursor and remove all input
+
+            // remove keyword
+            while(cursor>=base_cursor) {
+                set_char_at_cursor(' ', DEFAULT_CHAR_COLOR);
+                cursor--;
+            }
+
+            // clear all colors
+            for(cursor=0;cursor<=base_cursor;cursor++) {
+                u8* p = get_pointer_at_cursor();
+                if (p[1] == HIGHLIGHT_COLOR) {
+                    p[1] = DEFAULT_CHAR_COLOR;
+                }
+            }
+            cursor--;
+            sync_video();
+            // restore state
+            search_mode = 0;
+
         }
+        return;
     }
 
 
     if (!(key & FLAG_EXT))
     {
-        if (search_mode == 1){
-            out_char(key,)
-        }
-        out_char(key);
+        out_char(key, search_mode==1 ? HIGHLIGHT_COLOR : DEFAULT_CHAR_COLOR);
     }
     else
     {
@@ -239,22 +278,52 @@ PUBLIC void in_process(u32 key)
             if (search_mode == 1) {
                 // enter occurred. jump to mode 2
                 search_mode =2;
+
+                // search the screen and highlight all keywords
+                u32 length = cursor-base_cursor;
+                u32 cursor_start=0, cursor_end=length;
+
+                u8* vp = V_MEM_BASE;
+
+                while(cursor_end<=base_cursor) {
+                    // check whether cursor_start - cursor_end matches cursor-base_cursor
+                    int match = 1;
+                    for (u32 i=0;i<length;i++){
+                        if (vp[(cursor_start+i)*2] != vp[(base_cursor+i)*2]) {
+                            match = 0;;
+                            break;
+                        }
+                    }
+                    if (match ==0) {
+                        cursor_start++;
+                        cursor_end++;
+                    } else {
+                        // string matched. highlight the text
+                        for (u32 i=cursor_start;i<cursor_end;i++) {
+                            vp[i*2+1] = HIGHLIGHT_COLOR;
+                        }
+                        cursor_start+=length;
+                        cursor_end+=length;
+                    }
+                }
+
             } else {
-                out_char('\n');
+                // normal
+                out_char('\n', DEFAULT_CHAR_COLOR);
             }
 
             break;
         case BACKSPACE:
-            out_char('\b');
+            out_char('\b',DEFAULT_CHAR_COLOR);
             break;
         case TAB:
-            out_char('\t');
+            out_char('\t',DEFAULT_CHAR_COLOR);
             break;
         case ESC:
             if (search_mode == 0) {
+                // start search mode
                 search_mode = 1;
-            } else if (search_mode ==2) {
-                search_mode =0 ;
+                base_cursor = cursor;
             }
             break;
         case PAGEUP:
