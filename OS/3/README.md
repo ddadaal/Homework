@@ -14,4 +14,10 @@ Xubuntu 18.04 x86
 
 ## References
 
-Code is based on Orange's chapter 7 h
+Code is based on Orange's 7h
+
+## Run
+
+under code directory
+
+`make run`
