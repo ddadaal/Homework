@@ -141,7 +141,7 @@ PUBLIC void out_char(char ch, u8 default_color)
                 cursor = previous_cursor;
             }
         } 
-        if (cursor % TAB_WIDTH==0) {
+        if (!found && cursor % TAB_WIDTH==0) {
             u32 previous_start = TAB_WIDTH * (cursor/TAB_WIDTH - 1); // move the cursor to the previous column
             // cursor at the beginning of a column. attempting to find a \t in the previous TAB_SIZE pixels
             u32 previous_cursor=cursor;
