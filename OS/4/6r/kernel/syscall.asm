@@ -7,11 +7,16 @@
 
 %include "sconst.inc"
 
+extern disp_str
+
 _NR_get_ticks       equ 0 ; 要跟 global.c 中 sys_call_table 的定义相对应！
+_NR_disp_str_with_syscall       equ 1 ; 要跟 global.c 中 sys_call_table 的定义相对应！
 INT_VECTOR_SYS_CALL equ 0x90
 
 ; 导出符号
 global	get_ticks
+global disp_str_with_syscall
+global sys_disp_str
 
 bits 32
 [section .text]
@@ -24,3 +29,16 @@ get_ticks:
 	int	INT_VECTOR_SYS_CALL
 	ret
 
+disp_str_with_syscall:
+	mov eax, _NR_disp_str_with_syscall
+	push ebx
+	mov ebx, [esp+8]
+	int INT_VECTOR_SYS_CALL
+	pop ebx
+	ret
+
+sys_disp_str:
+	push ebx
+	call disp_str
+	pop ebx
+	ret

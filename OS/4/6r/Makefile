@@ -44,8 +44,8 @@ image : realclean everything clean buildimg
 
 
 run : 
-make image 
-bochs
+	make image 
+	bochs
 
 clean :
 	rm -f $(OBJS)
