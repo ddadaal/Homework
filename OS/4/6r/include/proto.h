@@ -37,6 +37,7 @@ PUBLIC void clock_handler(int irq);
 
 /* proc.c */
 PUBLIC int sys_get_ticks(); /* sys_call */
+PUBLIC void do_sys_process_sleep(int);
 
 
 /* syscall.asm */
@@ -44,3 +45,5 @@ PUBLIC void sys_call(); /* int_handler */
 PUBLIC int get_ticks();
 PUBLIC void disp_str_with_syscall(char *);
 PUBLIC void sys_disp_str(char*);
+PUBLIC void sys_process_sleep(int);
+PUBLIC void process_sleep(int);

@@ -8,15 +8,21 @@
 %include "sconst.inc"
 
 extern disp_str
+extern do_sys_process_sleep
 
 _NR_get_ticks       equ 0 ; 要跟 global.c 中 sys_call_table 的定义相对应！
 _NR_disp_str_with_syscall       equ 1 ; 要跟 global.c 中 sys_call_table 的定义相对应！
+_NR_process_sleep equ 2;
+
+
 INT_VECTOR_SYS_CALL equ 0x90
 
 ; 导出符号
 global	get_ticks
 global disp_str_with_syscall
 global sys_disp_str
+global process_sleep
+global sys_process_sleep
 
 bits 32
 [section .text]
@@ -40,5 +46,19 @@ disp_str_with_syscall:
 sys_disp_str:
 	push ebx
 	call disp_str
+	pop ebx
+	ret
+
+process_sleep:
+	mov eax, _NR_process_sleep
+	push ebx
+	mov ebx, [esp+8]
+	int INT_VECTOR_SYS_CALL
+	pop ebx
+	ret
+
+sys_process_sleep:
+	push ebx
+	call do_sys_process_sleep
 	pop ebx
 	ret

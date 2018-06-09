@@ -27,6 +27,7 @@ PUBLIC	irq_handler		irq_table[NR_IRQ];
 
 PUBLIC	system_call		sys_call_table[NR_SYS_CALL] = {
     sys_get_ticks,
-    sys_disp_str
+    sys_disp_str,
+    sys_process_sleep
     };
 

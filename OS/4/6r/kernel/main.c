@@ -55,15 +55,17 @@ PUBLIC int kernel_main()
 		p_proc->regs.esp = (u32)p_task_stack;
 		p_proc->regs.eflags = 0x1202; /* IF=1, IOPL=1 */
 
+		p_proc->wake_tick=0;
+
 		p_task_stack -= p_task->stacksize;
 		p_proc++;
 		p_task++;
 		selector_ldt += 1 << 3;
 	}
 
-	proc_table[0].ticks = proc_table[0].priority = 15;
-	proc_table[1].ticks = proc_table[1].priority =  5;
-	proc_table[2].ticks = proc_table[2].priority =  3;
+	proc_table[0].ticks = 1;
+	proc_table[1].ticks = 1;
+	proc_table[2].ticks = 1;
 
 	k_reenter = 0;
 	ticks = 0;
@@ -90,8 +92,8 @@ void TestA()
 {
 	int i = 0;
 	while (1) {
-		disp_str_with_syscall("A.");
-		milli_delay(10);
+		// disp_str_with_syscall("A.");
+		// process_sleep(1000);
 	}
 }
 
@@ -103,7 +105,7 @@ void TestB()
 	int i = 0x1000;
 	while(1){
 		disp_str_with_syscall("B.");
-		milli_delay(10);
+		process_sleep(1000);
 	}
 }
 
@@ -115,6 +117,6 @@ void TestC()
 	int i = 0x2000;
 	while(1){
 		disp_str_with_syscall("C.");
-		milli_delay(10);
+		process_sleep(3000);
 	}
 }

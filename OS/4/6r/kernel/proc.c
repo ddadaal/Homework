@@ -18,21 +18,18 @@
  *======================================================================*/
 PUBLIC void schedule()
 {
-	PROCESS* p;
-	int	 greatest_ticks = 0;
+	int t = get_ticks();
+	while (1)
+	{
 
-	while (!greatest_ticks) {
-		for (p = proc_table; p < proc_table+NR_TASKS; p++) {
-			if (p->ticks > greatest_ticks) {
-				greatest_ticks = p->ticks;
-				p_proc_ready = p;
-			}
+		p_proc_ready++;
+		if (p_proc_ready >= proc_table + NR_TASKS)
+		{
+			p_proc_ready = proc_table;
 		}
-
-		if (!greatest_ticks) {
-			for (p = proc_table; p < proc_table+NR_TASKS; p++) {
-				p->ticks = p->priority;
-			}
+		if (p_proc_ready->wake_tick==0 || p_proc_ready->wake_tick <= t) {
+			p_proc_ready->wake_tick = 0;
+			break;
 		}
 	}
 }
@@ -48,3 +45,9 @@ PUBLIC int sys_get_ticks()
 // PUBLIC void sys_disp_str(char* str) {
 // 	disp_str(str);
 // }
+
+PUBLIC void do_sys_process_sleep(int ms)
+{
+	p_proc_ready->wake_tick = get_ticks() + ms / (1000 /HZ);
+	schedule();
+}

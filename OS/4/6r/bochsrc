@@ -23,3 +23,5 @@ mouse: enabled=0
 
 # enable key mapping, using US layout as default.
 keyboard_mapping: enabled=1, map=/usr/share/bochs/keymaps/x11-pc-us.map
+
+clock: sync=realtime, time0=938581955   # Wed Sep 29 07:12:35 1999
