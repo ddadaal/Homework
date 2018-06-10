@@ -61,7 +61,15 @@
 #define	PRINTER_IRQ	7
 #define	AT_WINI_IRQ	14	/* at winchester */
 
+/* VGA */
+#define	V_MEM_BASE	0xB8000	/* base of color video memory */
+#define	V_MEM_SIZE	0x8000	/* 32K: B8000H -> BFFFFH */
+#define DEFAULT_CHAR_COLOR 0x07
+
 /* system call */
-#define NR_SYS_CALL     3
+#define NR_SYS_CALL     5
+
+/* proc */
+#define TIME_SLICE 5
 
 #endif /* _ORANGES_CONST_H_ */
