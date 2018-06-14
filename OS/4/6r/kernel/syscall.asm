@@ -54,9 +54,12 @@ disp_str_with_syscall:
 	ret
 
 sys_disp_str:
+	; disp_str corrupts some registries. Protect them all before calling
+	pusha
 	push ebx
 	call disp_str
 	pop ebx
+	popa
 	ret
 
 process_sleep:

@@ -29,6 +29,8 @@ disp_str:
 	push	ebp
 	mov	ebp, esp
 
+	; protect
+
 	mov	esi, [ebp + 8]	; pszInfo
 	mov	edi, [disp_pos]
 	mov	ah, 0Fh

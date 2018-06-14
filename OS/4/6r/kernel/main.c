@@ -13,7 +13,13 @@
 #include "proc.h"
 #include "global.h"
 
-SEMOPHORE customers, barbers, mutex;
+SEMOPHORE customers, mutex;
+SEMOPHORE barber_available;
+SEMOPHORE cut_ready, cut_start, cut_end;
+SEMOPHORE customer_leave;
+
+int in_cutting_session;
+
 int waiting;
 #define CHAIRS 3
 
@@ -79,8 +85,12 @@ PUBLIC int kernel_main()
 	ticks = 0;
 
 	init_semophore(&customers, 0);
-	init_semophore(&barbers, 0);
 	init_semophore(&mutex, 1);
+	init_semophore(&barber_available, 1);
+	init_semophore(&cut_ready,0);
+	init_semophore(&cut_end, 0);
+	init_semophore(&customer_leave,0);
+	init_semophore(&cut_start, 0);
 	waiting = 0;
 
 	// clear screen and reset cursor
@@ -110,12 +120,12 @@ PUBLIC int kernel_main()
 	}
 }
 
-PUBLIC void put_char(u8 ch, u8 color) {
-    char str[2] = {'\0','\0'};
-	str[0]=ch;
+PUBLIC void put_char(u8 ch, u8 color)
+{
+	char str[2] = {'\0', '\0'};
+	str[0] = ch;
 	disp_color_str(str, color);
 }
-
 
 /*======================================================================*
                                TestA
@@ -123,12 +133,19 @@ PUBLIC void put_char(u8 ch, u8 color) {
 void TestA()
 {
 	int i = 0;
-
+	disp_str_with_syscall("Common process: output\n");
 	while (1)
 	{
-
-		// process_sleep(1000);
+		
 	}
+}
+
+
+void barber_output(char* content) {
+	int color=0x0A;
+	disp_color_str("Barber: ", color);
+	disp_color_str(content, color);
+	disp_str("\n");
 }
 
 /*======================================================================*
@@ -138,19 +155,22 @@ void barber()
 {
 	while (1)
 	{
-		disp_str_with_syscall("Barber: Waiting for customer\n");
+		barber_output("Waiting for customer");
 		sem_p(&customers);
+
 		sem_p(&mutex);
 		// disp_str_with_syscall("Barber: alive\n");
 		waiting--;
 
-		sem_v(&barbers);
 		sem_v(&mutex);
-
+		sem_p(&cut_ready);
 		// cut hair
-		disp_str_with_syscall("Barber: Cutting hair\n");
-		process_sleep(2 * 1000 / HZ);
-
+		barber_output("Cutting hair");
+		sem_v(&cut_start);
+		milli_delay(2* 1000 /HZ);
+		sem_v(&cut_end);
+		sem_p(&customer_leave);
+		sem_v(&barber_available);
 		// disp_int()
 	}
 }
@@ -159,7 +179,7 @@ void print_customer_log(int i, char *content)
 {
 	int color = customer_color[i - 1];
 	disp_color_str("Customer", color);
-	put_char(i+'0', color);
+	put_char(i + '0', color);
 	disp_color_str(": ", color);
 	disp_color_str(content, color);
 	disp_str("\n");
@@ -171,29 +191,30 @@ void print_customer_log(int i, char *content)
 void customer(int i)
 {
 	// while (1)
+	sem_p(&mutex);
+	if (waiting < CHAIRS)
 	{
-		sem_p(&mutex);
-		if (waiting < CHAIRS)
-		{
-			waiting++;
-			print_customer_log(i, "Come and waiting");
-			sem_v(&customers);
-			sem_v(&mutex);
-			sem_p(&barbers);
+		waiting++;
+		print_customer_log(i, "Come and wait");
+		sem_v(&customers);
+		sem_v(&mutex);
+		sem_p(&barber_available);
 
-			// be hair cut
-			print_customer_log(i, "Being cut");
-			// milli_delay(2 * 1000 / HZ);
-
-			print_customer_log(i, "Done hair cut and leave");
-		}
-		else
-		{
-			print_customer_log(i, "Leave directly");
-			sem_v(&mutex);
-		}
-		// milli_delay(3000);
+		// be hair cut
+		print_customer_log(i, "Come in");
+		sem_v(&cut_ready);
+		sem_p(&cut_start);
+		print_customer_log(i,"Being cut");
+		sem_p(&cut_end);
+		print_customer_log(i, "Done hair cut and leave");
+		sem_v(&customer_leave);
 	}
+	else
+	{
+		print_customer_log(i, "Leave directly");
+		sem_v(&mutex);
+	}
+	// milli_delay(3000);
 	while (1)
 	{
 	}
