@@ -21,7 +21,7 @@ SEMOPHORE customer_leave;
 int in_cutting_session;
 
 int waiting;
-#define CHAIRS 3
+#define CHAIRS 2
 
 int customer_color[3] = {
 	0x0C,
@@ -133,7 +133,9 @@ PUBLIC void put_char(u8 ch, u8 color)
 void TestA()
 {
 	int i = 0;
-	disp_str_with_syscall("Common process: output\n");
+	disp_str_with_syscall("Common process: output. sleep 5 seconds\n");
+	process_sleep(5000);
+	disp_str_with_syscall("COmmon process: awake");
 	while (1)
 	{
 		
