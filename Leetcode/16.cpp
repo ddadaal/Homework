@@ -4,13 +4,10 @@
 #include <iostream>
 using namespace std;
 
-#include <vector>
-#include <algorithm>
-using namespace std;
 class Solution {
 public:
-	vector<vector<int>> threeSum(vector<int>& nums) {
-		vector<vector<int>> result;
+	int threeSumClosest(vector<int>& nums, int target) {
+		int result = (nums[0] + nums[1] + nums[2]);
 		int len = nums.size();
 		sort(nums.begin(), nums.end());
 
@@ -18,26 +15,24 @@ public:
 			int left = i + 1, right = len - 1;
 			while (left < right) {
 				int sum = nums[i] + nums[left] + nums[right];
-				if (sum == 0) {
-					vector<int> r;
-					r.push_back(nums[i]);
-					r.push_back(nums[left]);
-					r.push_back(nums[right]);
-					result.push_back(r);
-					
-					while (left < right && nums[left] == nums[left + 1]) {
+				int diff = sum - target;
+				if (abs(diff) < abs(result - target)) {
+					result = sum;
+				}
+				if (diff > 0) {
+					right--;
+				} 
+				if (diff < 0) {
+					left++;
+				}
+				if (diff == 0) {
+					while (left < right && nums[left + 1] == nums[left]) {
 						left++;
 					}
 					while (left < right && nums[right - 1] == nums[right]) {
 						right--;
 					}
 					left++;
-					right--;
-				}
-				else if (sum < 0) {
-					left++;
-				}
-				else {
 					right--;
 				}
 			}
