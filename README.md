@@ -6,6 +6,8 @@ This is a collection of all my homework.
 
 - Computer System Basis
 - Data Structure
-- Cpp Assignments
+- C++ Assignments
 - Operating System
 - Statistics Python
+- Database Design
+- Leetcode (ha)
