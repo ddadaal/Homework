@@ -84,5 +84,10 @@
     </insert>
 
     <insert id="insertAPlan">
+        insert into plan(name, cost, callMinutes, callExceedingCost, sms, smsExceedingCost, localData, localDataExceedingCost, domesticData, domesticDataExceedingCost) VALUE ('测试套餐', 20, 100, 0.5, NULL, NULL, NULL, NULL, NULL, NULL);
     </insert>
+
+    <delete id="dropAllTables">
+        drop table plan, user, userplan, userplantransaction, datausage, callusage, basiccost;
+    </delete>
 </mapper>

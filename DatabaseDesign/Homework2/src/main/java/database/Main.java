@@ -18,6 +18,8 @@ public class Main {
         CreatorMapper creatorMapper = sqlSession.getMapper(CreatorMapper.class);
         creatorMapper.createAllTables();
 
+        creatorMapper.insertAPlan();
+
 
         MainMapper mapper = sqlSession.getMapper(MainMapper.class);
         System.out.println(mapper.getAllPlans());
