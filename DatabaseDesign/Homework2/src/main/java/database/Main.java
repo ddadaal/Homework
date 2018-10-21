@@ -1,9 +1,11 @@
 package database;
 
+import database.mapper.CreatorMapper;
 import database.mapper.MainMapper;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import sun.font.CreatedFontTracker;
 
 import java.io.InputStream;
 
@@ -13,7 +15,13 @@ public class Main {
         InputStream inputStream = Main.class.getResourceAsStream(resource);
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
         SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        CreatorMapper creatorMapper = sqlSession.getMapper(CreatorMapper.class);
+        creatorMapper.createAllTables();
+
+
         MainMapper mapper = sqlSession.getMapper(MainMapper.class);
-        System.out.println(mapper.selectTest());
+        System.out.println(mapper.getAllPlans());
+
     }
 }
