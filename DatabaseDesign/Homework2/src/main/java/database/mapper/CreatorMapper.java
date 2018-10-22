@@ -5,6 +5,8 @@ public interface CreatorMapper {
 
     void insertAPlan();
 
+    void insertAUser();
+
     void dropAllTables();
 
     default void reset() {

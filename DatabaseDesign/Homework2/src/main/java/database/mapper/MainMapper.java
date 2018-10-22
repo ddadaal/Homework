@@ -3,6 +3,7 @@ package database.mapper;
 import database.model.Bill;
 import database.model.DataUsageType;
 import database.model.Plan;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -11,13 +12,27 @@ public interface MainMapper {
 
     List<Plan> getAllPlans();
 
-    void orderPlan(String userId, String planId, boolean activateImmediately);
+    void orderPlan(@Param("userId") int userId,
+                   @Param("planId") int planId,
+                   @Param("activateImmediately") boolean activateImmediately
+    );
 
-    void cancelPlan(String userId, String planId);
+    void cancelPlan(@Param("userId") int userId,
+                    @Param("planId") int planId
+    );
 
-    void generateCallUsage(String userId, Date startDate, Date endDate, double quantity);
+    void addCallUsage(@Param("userId") int userId,
+                      @Param("startDate") Date startDate,
+                      @Param("endDate") Date endDate,
+                      @Param("quantity") double quantity
+    );
 
-    void generateDataUsage(String userId, Date startDate, Date endDate, double quantity, DataUsageType type);
+    void addDataUsage(@Param("userId") int userId,
+                      @Param("startDate") Date startDate,
+                      @Param("endDate") Date endDate,
+                      @Param("quantity") double quantity,
+                      @Param("dataType") DataUsageType dataType
+    );
 
     Bill generateBill();
 

@@ -7,4 +7,50 @@
     <select id="getAllPlans" resultType="Plan">
       select * from plan;
     </select>
+
+    <insert id="orderPlan">
+        set @now = NOW();
+        insert into userplantransaction(userId, planId, time, action)
+        values (#{userId}, #{planId}, @now,
+        <choose>
+            <when test="activateImmediately == true">
+                'ORDER_IMMEDIATELY'
+            </when>
+            <otherwise>
+                'ORDER_NEXT_MONTH'
+            </otherwise>
+        </choose>
+        );
+
+        insert into userplan(userId, planId, activateTime, orderTime)
+        values (#{userId}, #{planId},
+        <choose>
+            <when test="activateImmediately == true">
+                @now
+            </when>
+            <otherwise>
+                adddate(last_day(@now), 1)
+            </otherwise>
+        </choose>,
+        @now);
+    </insert>
+    <insert id="cancelPlan">
+        set @now = NOW();
+        insert into userplantransaction(userId, planId, time, action)
+        values (#{userId}, #{planId}, @now, 'CANCEL');
+
+        delete from userplan where userId=#{userId} and planId=#{planId};
+    </insert>
+
+    <insert id="addCallUsage">
+        insert into callusage(userId, quantity, startTime, endTime)
+        values (#{userId}, #{quantity}, #{startTime}, #{endTime});
+    </insert>
+
+    <insert id="addDataUsage">
+        insert into datausage(userId, quantity, startTime, endTime, dataType)
+        values (#{userId}, #{quantity}, #{startTime}, #{endTime}, #{dataType});
+    </insert>
+
+
 </mapper>

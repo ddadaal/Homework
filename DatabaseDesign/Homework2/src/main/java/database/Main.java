@@ -16,13 +16,22 @@ public class Main {
         SqlSession sqlSession = sqlSessionFactory.openSession();
 
         CreatorMapper creatorMapper = sqlSession.getMapper(CreatorMapper.class);
-        creatorMapper.createAllTables();
+        creatorMapper.reset();
 
-        creatorMapper.insertAPlan();
+//        creatorMapper.insertAPlan();
+
+        sqlSession.commit();
+
+//
+//        MainMapper mapper = sqlSession.getMapper(MainMapper.class);
+//        System.out.println(mapper.getAllPlans());
+//
+//        mapper.orderPlan(1, 1, true);
+//        mapper.orderPlan(1,1,false);
+
+        sqlSession.commit();
 
 
-        MainMapper mapper = sqlSession.getMapper(MainMapper.class);
-        System.out.println(mapper.getAllPlans());
 
     }
 }

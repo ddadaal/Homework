@@ -3,15 +3,15 @@ package database.model;
 public class Plan {
     private int planId;
     private String name;
-    private long cost;
+    private double cost;
     private int callMinutes;
-    private long callExceedingCost;
+    private double callExceedingCost;
     private int sms;
-    private long smsExceedingCost;
+    private double smsExceedingCost;
     private double localData;
-    private long localDataExceedingCost;
+    private double localDataExceedingCost;
     private double domesticData;
-    private long domesticDataExceedingCost;
+    private double domesticDataExceedingCost;
 
     @Override
     public String toString() {
@@ -46,11 +46,11 @@ public class Plan {
         this.name = name;
     }
 
-    public long getCost() {
+    public double getCost() {
         return cost;
     }
 
-    public void setCost(long cost) {
+    public void setCost(double cost) {
         this.cost = cost;
     }
 
@@ -62,11 +62,11 @@ public class Plan {
         this.callMinutes = callMinutes;
     }
 
-    public long getCallExceedingCost() {
+    public double getCallExceedingCost() {
         return callExceedingCost;
     }
 
-    public void setCallExceedingCost(long callExceedingCost) {
+    public void setCallExceedingCost(double callExceedingCost) {
         this.callExceedingCost = callExceedingCost;
     }
 
@@ -78,11 +78,11 @@ public class Plan {
         this.sms = sms;
     }
 
-    public long getSmsExceedingCost() {
+    public double getSmsExceedingCost() {
         return smsExceedingCost;
     }
 
-    public void setSmsExceedingCost(long smsExceedingCost) {
+    public void setSmsExceedingCost(double smsExceedingCost) {
         this.smsExceedingCost = smsExceedingCost;
     }
 
@@ -94,11 +94,11 @@ public class Plan {
         this.localData = localData;
     }
 
-    public long getLocalDataExceedingCost() {
+    public double getLocalDataExceedingCost() {
         return localDataExceedingCost;
     }
 
-    public void setLocalDataExceedingCost(long localDataExceedingCost) {
+    public void setLocalDataExceedingCost(double localDataExceedingCost) {
         this.localDataExceedingCost = localDataExceedingCost;
     }
 
@@ -110,11 +110,11 @@ public class Plan {
         this.domesticData = domesticData;
     }
 
-    public long getDomesticDataExceedingCost() {
+    public double getDomesticDataExceedingCost() {
         return domesticDataExceedingCost;
     }
 
-    public void setDomesticDataExceedingCost(long domesticDataExceedingCost) {
+    public void setDomesticDataExceedingCost(double domesticDataExceedingCost) {
         this.domesticDataExceedingCost = domesticDataExceedingCost;
     }
 }
