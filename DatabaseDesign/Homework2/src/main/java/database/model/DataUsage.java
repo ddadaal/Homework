@@ -1,18 +1,20 @@
 package database.model;
+import java.time.Instant;
 import java.util.Date;
 
 public class DataUsage {
-    private String userId;
+    private int userId;
     private DataUsageType dataType;
-    private double quantity;
-    private Date startTime;
-    private Date endTime;
+    private double amount
+        ;
+    private Instant startTime;
+    private Instant endTime;
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
@@ -24,27 +26,27 @@ public class DataUsage {
         this.dataType = dataType;
     }
 
-    public double getQuantity() {
-        return quantity;
+    public double getAmount() {
+        return amount;
     }
 
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
-    public Date getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(Instant startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public Instant getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(Instant endTime) {
         this.endTime = endTime;
     }
 }

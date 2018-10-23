@@ -1,12 +1,13 @@
 package database.model;
 
+import java.time.Instant;
 import java.util.Date;
 
 public class SmsUsage {
     private int userId;
-    private Date time;
+    private Instant time;
 
-    public SmsUsage(int userId, Date time) {
+    public SmsUsage(int userId, Instant time) {
         this.userId = userId;
         this.time = time;
     }
@@ -22,11 +23,11 @@ public class SmsUsage {
         this.userId = userId;
     }
 
-    public Date getTime() {
+    public Instant getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(Instant time) {
         this.time = time;
     }
 }

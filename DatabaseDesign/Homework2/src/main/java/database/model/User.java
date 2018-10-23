@@ -1,7 +1,7 @@
 package database.model;
 
 public class User {
-    private String userId;
+    private int userId;
     private String name;
     private int basicCost;
 
@@ -21,11 +21,11 @@ public class User {
         this.basicCost = basicCost;
     }
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 

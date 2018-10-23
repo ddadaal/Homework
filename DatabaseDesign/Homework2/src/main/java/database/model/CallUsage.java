@@ -1,18 +1,36 @@
 package database.model;
+
+import java.time.Instant;
+import java.time.temporal.TemporalField;
 import java.util.Date;
 
 public class CallUsage {
-    private String userId;
+    private int userId;
     private int duration;
-    private Date startTIme;
-    private Date endTime;
+    private Instant startTime;
+    private Instant endTime;
+
+    public CallUsage() {
+    }
+
+    public CallUsage(int userId, Instant startTime, Instant endTime) {
+        this.userId = userId;
+        this.startTime = startTime;
+        this.endTime = endTime;
 
 
-    public String getUserId() {
+        double diffInSeconds = endTime.getEpochSecond() - startTime.getEpochSecond();
+        if (diffInSeconds < 0) {
+            throw new IllegalArgumentException("End time must be after start time.");
+        }
+        this.duration = (int) (diffInSeconds /60) + 1;
+    }
+
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
@@ -24,19 +42,19 @@ public class CallUsage {
         this.duration = duration;
     }
 
-    public Date getStartTIme() {
-        return startTIme;
+    public Instant getStartTime() {
+        return startTime;
     }
 
-    public void setStartTIme(Date startTIme) {
-        this.startTIme = startTIme;
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public Instant getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(Instant endTime) {
         this.endTime = endTime;
     }
 }

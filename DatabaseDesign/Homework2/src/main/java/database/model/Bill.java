@@ -1,22 +1,23 @@
 package database.model;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Bill {
     // basic information
-    private String userId;
+    private int userId;
     private String name;
 
     // bill date range
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     // applied basic cost
     private BasicCost basicCost;
 
-    // ordered plans
-    private List<Plan> planList;
+    // active plans
+    private List<Plan> activePlanList;
 
     // total usage
     private double totalLocalDataUsage;
@@ -24,7 +25,7 @@ public class Bill {
     private int totalCallUsage;
     private int totalSmsUsage;
 
-    // extra usage, aka usage outside plans
+    // extra usage, aka usage outside of plans
     private double extraLocalDataUsage;
     private double extraDomesticDataUsage;
     private int extraCallUsage;
@@ -37,39 +38,43 @@ public class Bill {
     private double extraDomesticFee;
 
     // total fees
-    private double totalFee;
+    public double getTotalFee() {
+        return extraCallFee + extraSmsFee + extraLocalDataFee + extraDomesticFee;
+    }
 
     public String getName() {
         return name;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
-    public Date getStartDate() {
-        return startDate;
-    }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
 
     public BasicCost getBasicCost() {
         return basicCost;
@@ -79,12 +84,12 @@ public class Bill {
         this.basicCost = basicCost;
     }
 
-    public List<Plan> getPlanList() {
-        return planList;
+    public List<Plan> getActivePlanList() {
+        return activePlanList;
     }
 
-    public void setPlanList(List<Plan> planList) {
-        this.planList = planList;
+    public void setActivePlanList(List<Plan> activePlanList) {
+        this.activePlanList = activePlanList;
     }
 
     public double getTotalLocalDataUsage() {
@@ -183,11 +188,6 @@ public class Bill {
         this.extraDomesticFee = extraDomesticFee;
     }
 
-    public double getTotalFee() {
-        return totalFee;
-    }
 
-    public void setTotalFee(double totalFee) {
-        this.totalFee = totalFee;
-    }
+
 }

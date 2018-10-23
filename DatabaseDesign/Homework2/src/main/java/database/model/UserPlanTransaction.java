@@ -1,13 +1,23 @@
 package database.model;
 
+import java.time.Instant;
 import java.util.Date;
 
 public class UserPlanTransaction {
     private String transactionId;
     private String userId;
     private String planId;
-    private Date time;
+    private String userPlanId;
+    private Instant time;
     private PlanAction action;
+
+    public String getUserPlanId() {
+        return userPlanId;
+    }
+
+    public void setUserPlanId(String userPlanId) {
+        this.userPlanId = userPlanId;
+    }
 
     public String getTransactionId() {
         return transactionId;
@@ -33,11 +43,11 @@ public class UserPlanTransaction {
         this.planId = planId;
     }
 
-    public Date getTime() {
+    public Instant getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(Instant time) {
         this.time = time;
     }
 

@@ -4,16 +4,27 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="database.data.MainMapper">
+
+    <sql id="isPlanActivated">
+        (ISNULL(up.deactivateTime) or up.deactivateTime > @today)
+    </sql>
+
     <select id="getAllPlans" resultType="Plan">
       select * from plan;
     </select>
 
-    <insert id="orderPlan">
+    <select id="getActivePlans" resultType="Plan">
+        select p.* from plan p, userplan up
+        where up.userId = #{userId} and p.planId = up.planId and <include refid="isPlanActivated"/>;
+    </select>
+
+    <select id="orderPlan" resultType="int">
         set @now = NOW();
+
         insert into userplantransaction(userId, planId, time, action)
         values (#{userId}, #{planId}, @now,
         <choose>
-            <when test="activateImmediately == true">
+            <when test="activateImmediately">
                 'ORDER_IMMEDIATELY'
             </when>
             <otherwise>
@@ -22,10 +33,12 @@
         </choose>
         );
 
-        insert into userplan(userId, planId, activateTime, orderTime)
-        values (#{userId}, #{planId},
+        set @transactionId = last_insert_id();
+
+        insert into userplan(transactionId, userId, planId, activateTime, orderTime)
+        values (@transactionId, #{userId}, #{planId},
         <choose>
-            <when test="activateImmediately == true">
+            <when test="activateImmediately">
                 @now
             </when>
             <otherwise>
@@ -33,23 +46,44 @@
             </otherwise>
         </choose>,
         @now);
-    </insert>
-    <insert id="cancelPlan">
+
+
+
+        select @transactionId;
+
+
+    </select>
+    <select id="cancelPlan" >
         set @now = NOW();
+
+        select userId, planId into @userId, @planId from userplantransaction
+        where transactionId=#{transactionId};
+
         insert into userplantransaction(userId, planId, time, action)
-        values (#{userId}, #{planId}, @now,
+        values (@userId, @planId, @now,
         <choose>
-            <when test="activateImmediately == true">
+            <when test="activateImmediately">
                 'CANCEL_IMMEDIATELY'
             </when>
             <otherwise>
                 'CANCEL_NEXT_MONTH'
             </otherwise>
         </choose>
-                       );
+        );
 
-        delete from userplan where userId=#{userId} and planId=#{planId};
-    </insert>
+        update userplan set deactivateTime =
+        <choose>
+          <when test="activateImmediately">
+            @now
+          </when>
+          <otherwise>
+            adddate(last_day(@now), 1)
+          </otherwise>
+        </choose>
+        where transactionId=#{transactionId};
+
+    </select>
+
 
     <insert id="addCallUsage">
         insert into callusage(userId, duration, startTime, endTime)
@@ -57,8 +91,8 @@
     </insert>
 
     <insert id="addDataUsage">
-        insert into datausage(userId, duration, startTime, endTime, dataType)
-        values (#{userId}, #{duration}, #{startTime}, #{endTime}, #{dataType});
+        insert into datausage(userId, amount, startTime, endTime, dataType)
+        values (#{userId}, #{amount}, #{startTime}, #{endTime}, #{dataType});
     </insert>
 
     <insert id="addSmsUsage">
@@ -66,9 +100,64 @@
         values (#{userId}, #{time});
     </insert>
 
-    <select id="getRemainingFreeLimit">
-        set @now = NOW();
+    <sql id="first, today, last">
+        set @today = curdate();
+        set @firstDayOfMonth = DATE_ADD(@today,interval -day(@today)+1 day);
+        set @lastDayOfMonth = last_day(@today);
+    </sql>
 
+
+
+    <select id="getCallUsage" resultType="Usage">
+        <include refid="first, today, last"/>
+        select sum(duration) into @total from callusage
+        where userId=#{userId} and startTime between @firstDayOfMonth and @lastDayOfMonth;
+
+        select sum(p.callMinutes) into @limit from plan p, userplan up
+        where up.userId=#{userId} and p.planId = up.planId and <include refid="isPlanActivated"/>;
+
+        select @limit as limit, @total as total;
+
+    </select>
+
+    <select id="getSmsUsage" resultType="Usage">
+        <include refid="first, today, last"/>
+        select count(*) into @total from smsusage
+        where userId=#{userId} and time between @firstDayOfMonth and @lastDayOfMonth;
+
+        select sum(p.sms) into @limit from plan p, userplan up
+        where up.userId=#{userId} and p.planId = up.planId and <include refid="isPlanActivated"/>;
+
+        select @limit as limit, @total as total;
+
+    </select>
+
+    <select id="getLocalDataUsage" resultType="Usage">
+        <include refid="first, today, last"/>
+        select sum(amount) into @total from datausage
+        where userId=#{userId} and dataType='LOCAL' and startTime between @firstDayOfMonth and @lastDayOfMonth;
+
+        select sum(p.localData) into @limit from plan p, userplan up
+        where up.userId=#{userId} and p.planId = up.planId and <include refid="isPlanActivated"/>;
+
+        select @limit as limit, @total as total;
+    </select>
+
+    <select id="getDomesticDataUsage" resultType="Usage">
+        <include refid="first, today, last"/>
+        select sum(amount) into @total from datausage
+        where userId=#{userId} and dataType='DOMESTIC' and startTime between @firstDayOfMonth and @lastDayOfMonth;
+
+        select sum(p.domesticData) into @limit from plan p, userplan up
+        where up.userId=#{userId} and p.planId = up.planId and <include refid="isPlanActivated"/>;
+
+        select @limit as limit, @total as total;
+
+    </select>
+
+    <select id="getBasicUsage" resultType="BasicCost">
+        select basicCost into @basicCostId from user where userId = #{userId};
+        select * from basiccost where id = @basicCostId;
     </select>
 
 </mapper>
