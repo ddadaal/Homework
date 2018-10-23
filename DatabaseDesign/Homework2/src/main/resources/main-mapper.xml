@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="database.mapper.MainMapper">
+<mapper namespace="database.data.MainMapper">
     <select id="getAllPlans" resultType="Plan">
       select * from plan;
     </select>
@@ -37,20 +37,38 @@
     <insert id="cancelPlan">
         set @now = NOW();
         insert into userplantransaction(userId, planId, time, action)
-        values (#{userId}, #{planId}, @now, 'CANCEL');
+        values (#{userId}, #{planId}, @now,
+        <choose>
+            <when test="activateImmediately == true">
+                'CANCEL_IMMEDIATELY'
+            </when>
+            <otherwise>
+                'CANCEL_NEXT_MONTH'
+            </otherwise>
+        </choose>
+                       );
 
         delete from userplan where userId=#{userId} and planId=#{planId};
     </insert>
 
     <insert id="addCallUsage">
-        insert into callusage(userId, quantity, startTime, endTime)
-        values (#{userId}, #{quantity}, #{startTime}, #{endTime});
+        insert into callusage(userId, duration, startTime, endTime)
+        values (#{userId}, #{duration}, #{startTime}, #{endTime});
     </insert>
 
     <insert id="addDataUsage">
-        insert into datausage(userId, quantity, startTime, endTime, dataType)
-        values (#{userId}, #{quantity}, #{startTime}, #{endTime}, #{dataType});
+        insert into datausage(userId, duration, startTime, endTime, dataType)
+        values (#{userId}, #{duration}, #{startTime}, #{endTime}, #{dataType});
     </insert>
 
+    <insert id="addSmsUsage">
+        insert into smsusage(userId, time)
+        values (#{userId}, #{time});
+    </insert>
+
+    <select id="getRemainingFreeLimit">
+        set @now = NOW();
+
+    </select>
 
 </mapper>

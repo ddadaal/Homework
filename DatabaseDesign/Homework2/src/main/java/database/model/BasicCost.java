@@ -4,11 +4,20 @@ import java.util.Date;
 
 public class BasicCost {
     private int id;
-    private long callCost;
-    private long smsCost;
-    private long localDataCost;
-    private long domesticDataCost;
-    private Date activateTime;
+    private double callCost;
+    private double smsCost;
+    private double localDataCost;
+    private double domesticDataCost;
+
+    public BasicCost() {
+    }
+
+    public BasicCost(double callCost, double smsCost, double localDataCost, double domesticDataCost) {
+        this.callCost = callCost;
+        this.smsCost = smsCost;
+        this.localDataCost = localDataCost;
+        this.domesticDataCost = domesticDataCost;
+    }
 
     public int getId() {
         return id;
@@ -18,43 +27,35 @@ public class BasicCost {
         this.id = id;
     }
 
-    public long getCallCost() {
+    public double getCallCost() {
         return callCost;
     }
 
-    public void setCallCost(long callCost) {
+    public void setCallCost(double callCost) {
         this.callCost = callCost;
     }
 
-    public long getSmsCost() {
+    public double getSmsCost() {
         return smsCost;
     }
 
-    public void setSmsCost(long smsCost) {
+    public void setSmsCost(double smsCost) {
         this.smsCost = smsCost;
     }
 
-    public long getLocalDataCost() {
+    public double getLocalDataCost() {
         return localDataCost;
     }
 
-    public void setLocalDataCost(long localDataCost) {
+    public void setLocalDataCost(double localDataCost) {
         this.localDataCost = localDataCost;
     }
 
-    public long getDomesticDataCost() {
+    public double getDomesticDataCost() {
         return domesticDataCost;
     }
 
-    public void setDomesticDataCost(long domesticDataCost) {
+    public void setDomesticDataCost(double domesticDataCost) {
         this.domesticDataCost = domesticDataCost;
-    }
-
-    public Date getActivateTime() {
-        return activateTime;
-    }
-
-    public void setActivateTime(Date activateTime) {
-        this.activateTime = activateTime;
     }
 }

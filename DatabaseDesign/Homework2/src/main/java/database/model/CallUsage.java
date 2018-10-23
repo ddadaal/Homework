@@ -2,19 +2,11 @@ package database.model;
 import java.util.Date;
 
 public class CallUsage {
-    private String id;
     private String userId;
-    private int quantity;
+    private int duration;
     private Date startTIme;
     private Date endTime;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getUserId() {
         return userId;
@@ -24,12 +16,12 @@ public class CallUsage {
         this.userId = userId;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getDuration() {
+        return duration;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     public Date getStartTIme() {

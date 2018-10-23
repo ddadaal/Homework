@@ -1,6 +1,5 @@
-package database.mapper;
+package database.data;
 
-import database.model.Bill;
 import database.model.DataUsageType;
 import database.model.Plan;
 import org.apache.ibatis.annotations.Param;
@@ -18,7 +17,8 @@ public interface MainMapper {
     );
 
     void cancelPlan(@Param("userId") int userId,
-                    @Param("planId") int planId
+                    @Param("planId") int planId,
+                    @Param("activateImmediately") boolean activateImmediately
     );
 
     void addCallUsage(@Param("userId") int userId,
@@ -34,6 +34,8 @@ public interface MainMapper {
                       @Param("dataType") DataUsageType dataType
     );
 
-    Bill generateBill();
+    void addSmsUsage(@Param("userId") int userId,
+                     @Param("time") Date time
+    );
 
 }

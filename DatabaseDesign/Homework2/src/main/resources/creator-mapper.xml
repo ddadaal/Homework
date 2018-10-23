@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="database.mapper.CreatorMapper">
+<mapper namespace="database.data.CreatorMapper">
 
     <sql id="createPlan">
         create table if not exists plan (
@@ -11,19 +11,16 @@
             `name` varchar(30),
             `cost` decimal(11,3),
             `callMinutes` int,
-            `callExceedingCost` decimal(11,3),
             `sms` int,
-            `smsExceedingCost` decimal(11,3),
             `localData` float,
-            `localDataExceedingCost` decimal(11,3),
-            `domesticData` float,
-            `domesticDataExceedingCost` decimal(11,3)
+            `domesticData` float
         );
     </sql>
     <sql id="createUser">
         create table if not exists user (
             `userId` int primary key auto_increment,
-            `name` varchar(30)
+            `name` varchar(30),
+            `basicCost` int
         );
     </sql>
     <sql id="createUserPlan">
@@ -40,14 +37,14 @@
             `userId` int,
             `planId` int,
             `time` datetime,
-            `action` enum('ORDER_IMMEDIATELY', 'ORDER_NEXT_MONTH', 'CANCEL')
+            `action` enum('ORDER_IMMEDIATELY', 'ORDER_NEXT_MONTH', 'CANCEL_IMMEDIATELY', 'CANCEL_NEXT_MONTH')
         );
     </sql>
     <sql id="createDataUsage">
         create table if not exists datausage (
             `userId` int,
             `dataType` enum('LOCAL','DOMESTIC'),
-            `quantity` float,
+            `duration` float,
             `startTime` datetime,
             `endTime` datetime
         );
@@ -55,10 +52,16 @@
     <sql id="createCallUsage">
       create table if not exists callusage (
           `userId` int,
-          `quantity` int,
+          `duration` int,
           `startTime` datetime,
           `endTime` datetime
       );
+    </sql>
+    <sql id="createSmsUsage">
+        create table if not exists smsusage (
+            `userId` int,
+            `time` datetime
+        );
     </sql>
     <sql id="createBasicCost">
         create table if not exists basiccost (
@@ -66,13 +69,10 @@
             `callCost` decimal(11,3),
             `smsCost` decimal(11,3),
             `localDataCost` decimal(11, 3),
-            `domesticDataCost` decimal(11, 3),
-            `activateTime` datetime
+            `domesticDataCost` decimal(11, 3)
         );
     </sql>
-    <insert id="insertBasicCost">
-      insert into basiccost(callCost, smsCost, localDataCost, domesticDataCost, activateTime) VALUES (0.5, 0.1, 2, 5, now());
-    </insert>
+
     <insert id="createAllTables">
         <include refid="createPlan"/>
         <include refid="createUser"/>
@@ -80,18 +80,21 @@
         <include refid="createUserPlanTransaction"/>
         <include refid="createDataUsage"/>
         <include refid="createCallUsage"/>
+        <include refid="createSmsUsage"/>
         <include refid="createBasicCost"/>
     </insert>
 
-    <insert id="insertAPlan">
-        insert into plan(name, cost, callMinutes, callExceedingCost, sms, smsExceedingCost, localData, localDataExceedingCost, domesticData, domesticDataExceedingCost) VALUE ('测试套餐', 20, 100, 0.5, NULL, NULL, NULL, NULL, NULL, NULL);
+    <insert id="insertPlan" parameterType="Plan" useGeneratedKeys="true" keyProperty="planId">
+        insert into plan(name, cost, callMinutes, sms, localData, domesticData) VALUE (#{name}, #{cost}, #{callMinutes}, #{sms}, #{localData}, #{domesticData});
     </insert>
-
-    <insert id="insertAUser">
-        insert into user(name) VALUES ('测试用户1');
+    <insert id="insertBasicCost" parameterType="BasicCost" useGeneratedKeys="true" keyProperty="id">
+        insert into basiccost(callCost, smsCost, localDataCost, domesticDataCost) VALUES (#{callCost}, #{smsCost}, #{localDataCost}, #{domesticDataCost});
+    </insert>
+    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="userId">
+        insert into user(name, basicCost) VALUES (#{name}, #{basicCost});
     </insert>
 
     <delete id="dropAllTables">
-        drop table plan, user, userplan, userplantransaction, datausage, callusage, basiccost;
+        drop table if exists plan, user, userplan, userplantransaction, datausage, callusage, smsusage, basiccost;
     </delete>
 </mapper>
