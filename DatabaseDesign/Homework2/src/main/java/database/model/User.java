@@ -1,32 +1,32 @@
 package database.model;
 
 public class User {
-    private int userId;
+    private int id;
     private String name;
-    private int basicCost;
+    private int basicCostId;
 
-    public User(String name, int basicCost) {
+    public User(String name, int basicCostId) {
         this.name = name;
-        this.basicCost = basicCost;
+        this.basicCostId = basicCostId;
     }
 
     public User() {
     }
 
-    public int getBasicCost() {
-        return basicCost;
+    public int getBasicCostId() {
+        return basicCostId;
     }
 
-    public void setBasicCost(int basicCost) {
-        this.basicCost = basicCost;
+    public void setBasicCostId(int basicCostId) {
+        this.basicCostId = basicCostId;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getId() {
+        return id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

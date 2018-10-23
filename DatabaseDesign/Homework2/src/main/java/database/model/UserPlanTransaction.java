@@ -7,17 +7,8 @@ public class UserPlanTransaction {
     private String transactionId;
     private String userId;
     private String planId;
-    private String userPlanId;
     private Instant time;
     private PlanAction action;
-
-    public String getUserPlanId() {
-        return userPlanId;
-    }
-
-    public void setUserPlanId(String userPlanId) {
-        this.userPlanId = userPlanId;
-    }
 
     public String getTransactionId() {
         return transactionId;

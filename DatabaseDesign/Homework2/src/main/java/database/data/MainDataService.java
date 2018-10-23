@@ -3,7 +3,7 @@ package database.data;
 import database.model.*;
 import org.apache.ibatis.session.SqlSession;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class MainDataService {
 
     /**
      * 增加短信使用。
-     * 资费都是实时计算的，因为没有人会细致到看每一条短信/每一通电话/每一次流量使用需要花费多少钱！
+     * 资费都是实时计算，不保存的，因为没有人会细致到看每一条短信/每一通电话/每一次流量使用需要花费多少钱！
      * @param usage 短信使用对象
      * @return 产生的资费
      */
@@ -34,12 +34,12 @@ public class MainDataService {
 
             BasicCost basicCost = mapper.getBasicCost(usage.getUserId());
 
+            double remaining = mapper.getSmsUsage(usage.getUserId()).getRemaining();
 
             mapper.addSmsUsage(usage.getUserId(), usage.getTime());
 
-            double extra = mapper.getSmsUsage(usage.getUserId()).getExtra();
 
-            if (extra < 0){
+            if (remaining <= 1) {
                 return basicCost.getSmsCost() * 1;
             } else {
                 return 0;
@@ -51,7 +51,7 @@ public class MainDataService {
 
     /**
      * 增加打电话使用
-     * 资费都是实时计算的，因为没有人会细致到看每一条短信/每一通电话/每一次流量使用需要花费多少钱！
+     * 资费都是实时计算，不保存的，因为没有人会细致到看每一条短信/每一通电话/每一次流量使用需要花费多少钱！
      * @param usage 电话使用对象
      * @return 产生的资费
      */
@@ -63,12 +63,12 @@ public class MainDataService {
 
 
             BasicCost basicCost = mapper.getBasicCost(usage.getUserId());
-            double extra = mapper.getCallUsage(usage.getUserId()).getExtra();
+            double remaining = mapper.getCallUsage(usage.getUserId()).getRemaining();
 
             mapper.addCallUsage(usage.getUserId(), usage.getStartTime(), usage.getEndTime(), usage.getDuration());
 
-            if (extra < usage.getDuration()){
-                return basicCost.getCallCost() * Math.max(usage.getDuration(), usage.getDuration() - extra);
+            if (remaining < usage.getDuration()){
+                return basicCost.getCallCost() * (usage.getDuration() - remaining);
             } else {
                 return  0;
             }
@@ -77,7 +77,7 @@ public class MainDataService {
 
     /**
      * 增加流量使用
-     * 资费都是实时计算的，因为没有人会细致到看每一条短信/每一通电话/每一次流量使用需要花费多少钱！
+     * 资费都是实时计算，不保存的，因为没有人会细致到看每一条短信/每一通电话/每一次流量使用需要花费多少钱！
      * @param usage 流量使用
      * @return 产生的资费
      */
@@ -91,25 +91,32 @@ public class MainDataService {
             BasicCost basicCost = mapper.getBasicCost(usage.getUserId());
 
             if (usage.getDataType().equals(DataUsageType.LOCAL)) {
-                double extra = mapper.getLocalDataUsage(usage.getUserId()).getExtra();
+                double remaining = mapper.getLocalDataUsage(usage.getUserId()).getRemaining();
 
                 mapper.addDataUsage(usage.getUserId(), usage.getStartTime(), usage.getEndTime(), usage.getAmount(), usage.getDataType());
 
 
-                if (extra < usage.getAmount()) {
-                    return basicCost.getLocalDataCost() * Math.max(usage.getAmount(), usage.getAmount() - extra);
+                if (remaining < usage.getAmount()) {
+                    // 省内流量用光，使用全国流量
+                    double remainingDomestic = mapper.getDomesticDataUsage(usage.getUserId()).getRemaining();
+                    if (remainingDomestic < usage.getAmount() - remaining) {
+                        // 都用光，计算流量费
+                        return basicCost.getLocalDataCost() * (usage.getAmount() - remaining - remainingDomestic);
+                    } else {
+                        return 0;
+                    }
                 } else {
                     return 0;
                 }
             } else {
-                double extra = mapper.getLocalDataUsage(usage.getUserId()).getExtra();
+                double remaining = mapper.getDomesticDataUsage(usage.getUserId()).getRemaining();
 
 
                 mapper.addDataUsage(usage.getUserId(), usage.getStartTime(), usage.getEndTime(), usage.getAmount(), usage.getDataType());
 
 
-                if (extra < usage.getAmount()) {
-                    return basicCost.getDomesticDataCost() * Math.max(usage.getAmount(), usage.getAmount() - extra);
+                if (remaining < usage.getAmount()) {
+                    return basicCost.getDomesticDataCost() * (usage.getAmount() - remaining);
                 } else {
                     return 0;
                 }
@@ -154,7 +161,7 @@ public class MainDataService {
      * @param endDate 日期。只会使用date的年和月部分。
      * @return 账单
      */
-    public Bill generateBill(int userId, LocalDate endDate) {
+    public Bill generateBill(int userId, LocalDateTime endDate) {
         try (SqlSession sqlSession = MapperFactory.getSession()) {
             MainMapper mapper = sqlSession.getMapper(MainMapper.class);
 
@@ -169,7 +176,7 @@ public class MainDataService {
 
             // set basic cost
 
-            BasicCost basicCost = mapper.getBasicCost(user.getBasicCost());
+            BasicCost basicCost = mapper.getBasicCost(user.getBasicCostId());
 
             bill.setBasicCost(basicCost);
 
@@ -184,12 +191,12 @@ public class MainDataService {
 
             YearMonth today = YearMonth.now();
 
-            LocalDate startDate = month.atDay(1);
+            LocalDateTime startDate = month.atDay(1).atStartOfDay();
 
             if (month.isBefore(today)) {
                 // queried month is not this month
                 // end the end date to the last day of that month
-                endDate = month.atEndOfMonth();
+                endDate = month.atEndOfMonth().atStartOfDay();
             }
             bill.setStartDate(startDate);
 
@@ -205,22 +212,54 @@ public class MainDataService {
 
             Usage domesticDataUsage = mapper.getDomesticDataUsage(userId);
 
+            bill.setCallUsage(BillUsage.fromUsage(callUsage, basicCost.getCallCost()));
 
-            bill.setTotalCallUsage((int)callUsage.getTotal());
-            bill.setExtraCallUsage((int)callUsage.getExtra());
-            bill.setExtraCallFee(basicCost.getCallCost() * callUsage.getExtra());
+            bill.setSmsUsage(BillUsage.fromUsage(smsUsage, basicCost.getSmsCost()));
 
-            bill.setTotalSmsUsage((int)smsUsage.getTotal());
-            bill.setExtraSmsUsage((int)smsUsage.getExtra());
-            bill.setExtraSmsFee(basicCost.getSmsCost() * smsUsage.getExtra());
 
-            bill.setTotalLocalDataUsage(localDataUsage.getTotal());
-            bill.setExtraLocalDataUsage(localDataUsage.getExtra());
-            bill.setExtraLocalDataFee(basicCost.getLocalDataCost() * localDataUsage.getExtra());
+            // 计算流量费用
+            if (localDataUsage.getRemaining() > 0) {
+                // 本地流量还剩余，说明本地流量还没有使用完全，不会有本地流量使用全国流量的情况
+                bill.setLocalDataUsage(BillUsage.fromUsage(localDataUsage, basicCost.getLocalDataCost()));
+                bill.setDomesticDataUsage(BillUsage.fromUsage(domesticDataUsage, basicCost.getDomesticDataCost()));
 
-            bill.setTotalDomesticDataUsage(domesticDataUsage.getTotal());
-            bill.setExtraDomesticDataUsage(domesticDataUsage.getExtra());
-            bill.setExtraDomesticFee(basicCost.getDomesticDataCost() * domesticDataUsage.getExtra());
+            } else {
+                // 本地流量使用完毕，接下来会继续使用全国流量
+
+                // 多使用的全国流量
+                double extraLocalData = localDataUsage.getTotal() - localDataUsage.getLimit();
+                if (extraLocalData > domesticDataUsage.getRemaining()) {
+                    // 剩余的全国流量也不够用，那么剩下来的流量会按照国内流量的标准支付
+                    double extraData = extraLocalData - domesticDataUsage.getRemaining();
+                    bill.setLocalDataUsage(new BillUsage(
+                        localDataUsage.getTotal(),
+                        extraData,
+                        extraData* basicCost.getLocalDataCost()
+                    ));
+                    // 全国流量的使用多增加extraData，但是在计算超出部分时，不计算这个数值，根据真正超出的全国流量的量计算全国流量的总额
+                    double extraDomesticData = domesticDataUsage.getTotal() - domesticDataUsage.getLimit();
+                    bill.setDomesticDataUsage(new BillUsage(
+                        domesticDataUsage.getTotal() + extraData,
+                        extraDomesticData,
+                        extraDomesticData * basicCost.getDomesticDataCost()
+                    ));
+
+                } else {
+                    // 剩余的全国流量够用
+                    bill.setLocalDataUsage(new BillUsage(
+                        localDataUsage.getLimit(),
+                        0,
+                        0
+                    ));
+                    bill.setDomesticDataUsage(new BillUsage(
+                        domesticDataUsage.getTotal() + extraLocalData,
+                        0,
+                        0
+                    ));
+                }
+
+            }
+
 
 
             return bill;

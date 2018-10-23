@@ -13,6 +13,8 @@ public class Main {
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
         SqlSession sqlSession = sqlSessionFactory.openSession();
 
+        System.out.println("请使用");
+
 
 
 

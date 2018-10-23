@@ -7,7 +7,7 @@
 
     <sql id="createPlan">
         create table if not exists plan (
-            `planId` int primary key auto_increment,
+            `id` int primary key auto_increment,
             `name` varchar(30),
             `cost` decimal(11,3),
             `callMinutes` int,
@@ -18,9 +18,9 @@
     </sql>
     <sql id="createUser">
         create table if not exists user (
-            `userId` int primary key auto_increment,
+            `id` int primary key auto_increment,
             `name` varchar(30),
-            `basicCost` int
+            `basicCostId` int
         );
     </sql>
     <sql id="createUserPlan">
@@ -86,14 +86,14 @@
         <include refid="createBasicCost"/>
     </insert>
 
-    <insert id="insertPlan" parameterType="Plan" useGeneratedKeys="true" keyProperty="planId">
+    <insert id="insertPlan" parameterType="Plan" useGeneratedKeys="true" keyProperty="id">
         insert into plan(name, cost, callMinutes, sms, localData, domesticData) VALUE (#{name}, #{cost}, #{callMinutes}, #{sms}, #{localData}, #{domesticData});
     </insert>
     <insert id="insertBasicCost" parameterType="BasicCost" useGeneratedKeys="true" keyProperty="id">
         insert into basiccost(callCost, smsCost, localDataCost, domesticDataCost) VALUES (#{callCost}, #{smsCost}, #{localDataCost}, #{domesticDataCost});
     </insert>
-    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="userId">
-        insert into user(name, basicCost) VALUES (#{name}, #{basicCost});
+    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        insert into user(name, basicCostId) VALUES (#{name}, #{basicCostId});
     </insert>
 
     <delete id="dropAllTables">

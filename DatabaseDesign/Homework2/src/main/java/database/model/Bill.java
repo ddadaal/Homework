@@ -1,6 +1,5 @@
 package database.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,8 +9,8 @@ public class Bill {
     private String name;
 
     // bill date range
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     // applied basic cost
     private BasicCost basicCost;
@@ -19,46 +18,35 @@ public class Bill {
     // active plans
     private List<Plan> activePlanList;
 
-    // total usage
-    private double totalLocalDataUsage;
-    private double totalDomesticDataUsage;
-    private int totalCallUsage;
-    private int totalSmsUsage;
 
-    // extra usage, aka usage outside of plans
-    private double extraLocalDataUsage;
-    private double extraDomesticDataUsage;
-    private int extraCallUsage;
-    private int extraSmsUsage;
-
-    // extra fees
-    private double extraCallFee;
-    private double extraSmsFee;
-    private double extraLocalDataFee;
-    private double extraDomesticFee;
+    // usages
+    private BillUsage localDataUsage;
+    private BillUsage domesticDataUsage;
+    private BillUsage callUsage;
+    private BillUsage smsUsage;
 
     // total fees
-    public double getTotalFee() {
-        return extraCallFee + extraSmsFee + extraLocalDataFee + extraDomesticFee;
+    public double getTotalCharge() {
+        return localDataUsage.getCharge() + domesticDataUsage.getCharge() + callUsage.getCharge() + smsUsage.getCharge();
     }
 
     public String getName() {
         return name;
     }
 
-    public LocalDate getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
 
@@ -92,102 +80,35 @@ public class Bill {
         this.activePlanList = activePlanList;
     }
 
-    public double getTotalLocalDataUsage() {
-        return totalLocalDataUsage;
+    public BillUsage getLocalDataUsage() {
+        return localDataUsage;
     }
 
-    public void setTotalLocalDataUsage(double totalLocalDataUsage) {
-        this.totalLocalDataUsage = totalLocalDataUsage;
+    public void setLocalDataUsage(BillUsage localDataUsage) {
+        this.localDataUsage = localDataUsage;
     }
 
-    public double getTotalDomesticDataUsage() {
-        return totalDomesticDataUsage;
+    public BillUsage getDomesticDataUsage() {
+        return domesticDataUsage;
     }
 
-    public void setTotalDomesticDataUsage(double totalDomesticDataUsage) {
-        this.totalDomesticDataUsage = totalDomesticDataUsage;
+    public void setDomesticDataUsage(BillUsage domesticDataUsage) {
+        this.domesticDataUsage = domesticDataUsage;
     }
 
-    public int getTotalCallUsage() {
-        return totalCallUsage;
+    public BillUsage getCallUsage() {
+        return callUsage;
     }
 
-    public void setTotalCallUsage(int totalCallUsage) {
-        this.totalCallUsage = totalCallUsage;
+    public void setCallUsage(BillUsage callUsage) {
+        this.callUsage = callUsage;
     }
 
-    public int getTotalSmsUsage() {
-        return totalSmsUsage;
+    public BillUsage getSmsUsage() {
+        return smsUsage;
     }
 
-    public void setTotalSmsUsage(int totalSmsUsage) {
-        this.totalSmsUsage = totalSmsUsage;
+    public void setSmsUsage(BillUsage smsUsage) {
+        this.smsUsage = smsUsage;
     }
-
-    public double getExtraLocalDataUsage() {
-        return extraLocalDataUsage;
-    }
-
-    public void setExtraLocalDataUsage(double extraLocalDataUsage) {
-        this.extraLocalDataUsage = extraLocalDataUsage;
-    }
-
-    public double getExtraDomesticDataUsage() {
-        return extraDomesticDataUsage;
-    }
-
-    public void setExtraDomesticDataUsage(double extraDomesticDataUsage) {
-        this.extraDomesticDataUsage = extraDomesticDataUsage;
-    }
-
-    public int getExtraCallUsage() {
-        return extraCallUsage;
-    }
-
-    public void setExtraCallUsage(int extraCallUsage) {
-        this.extraCallUsage = extraCallUsage;
-    }
-
-    public int getExtraSmsUsage() {
-        return extraSmsUsage;
-    }
-
-    public void setExtraSmsUsage(int extraSmsUsage) {
-        this.extraSmsUsage = extraSmsUsage;
-    }
-
-    public double getExtraCallFee() {
-        return extraCallFee;
-    }
-
-    public void setExtraCallFee(double extraCallFee) {
-        this.extraCallFee = extraCallFee;
-    }
-
-    public double getExtraSmsFee() {
-        return extraSmsFee;
-    }
-
-    public void setExtraSmsFee(double extraSmsFee) {
-        this.extraSmsFee = extraSmsFee;
-    }
-
-    public double getExtraLocalDataFee() {
-        return extraLocalDataFee;
-    }
-
-    public void setExtraLocalDataFee(double extraLocalDataFee) {
-        this.extraLocalDataFee = extraLocalDataFee;
-    }
-
-    public double getExtraDomesticFee() {
-        return extraDomesticFee;
-    }
-
-    public void setExtraDomesticFee(double extraDomesticFee) {
-        this.extraDomesticFee = extraDomesticFee;
-    }
-
-
-
 }

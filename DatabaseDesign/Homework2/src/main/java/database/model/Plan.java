@@ -1,7 +1,7 @@
 package database.model;
 
 public class Plan {
-    private int planId;
+    private int id;
     private String name;
     private double cost;
     private int callMinutes;
@@ -21,12 +21,12 @@ public class Plan {
     public Plan() {
     }
 
-    public int getPlanId() {
-        return planId;
+    public int getId() {
+        return id;
     }
 
-    public void setPlanId(int planId) {
-        this.planId = planId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

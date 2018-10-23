@@ -4,8 +4,6 @@ import database.model.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 public interface MainMapper {
@@ -46,14 +44,14 @@ public interface MainMapper {
     );
 
     void addCallUsage(@Param("userId") int userId,
-                      @Param("startDate") Instant startDate,
-                      @Param("endDate") Instant endDate,
-                      @Param("quantity") double quantity
+                      @Param("startTime") Instant startTime,
+                      @Param("endTime") Instant endTime,
+                      @Param("duration") double duration
     );
 
     void addDataUsage(@Param("userId") int userId,
-                      @Param("startDate") Instant startDate,
-                      @Param("endDate") Instant endDate,
+                      @Param("startTime") Instant startTime,
+                      @Param("endTime") Instant endTime,
                       @Param("amount") double amount,
                       @Param("dataType") DataUsageType dataType
     );

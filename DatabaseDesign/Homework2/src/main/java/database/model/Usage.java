@@ -20,7 +20,11 @@ public class Usage {
         this.total = total;
     }
 
-    public double getExtra() {
-        return total - limit;
+    /**
+     * 获得可用量。若无，返回0
+     * @return 剩余可用量
+     */
+    public double getRemaining() {
+        return Math.max(limit - total, 0);
     }
 }
