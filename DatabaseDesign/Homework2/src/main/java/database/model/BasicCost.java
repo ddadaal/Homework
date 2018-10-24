@@ -56,12 +56,4 @@ public class BasicCost {
     public void setDomesticDataCost(double domesticDataCost) {
         this.domesticDataCost = domesticDataCost;
     }
-
-    public double getDataCost(DataType type) {
-        if (type == DataType.LOCAL) {
-            return localDataCost;
-        } else {
-            return domesticDataCost;
-        }
-    }
 }

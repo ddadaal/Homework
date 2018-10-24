@@ -18,14 +18,14 @@ public class BillUsage {
     public BillUsage() {
     }
 
-    public static BillUsage fromUsage(Usage usage, double chargePerUnit) {
-        BillUsage billUsage = new BillUsage();
-        billUsage.total = usage.getTotal();
-        billUsage.extra = usage.getTotal() > usage.getLimit() ? usage.getTotal() - usage.getLimit() : 0;
-        billUsage.charge = billUsage.extra * chargePerUnit;
-        billUsage.limit = usage.getLimit();
-        return billUsage;
-    }
+//    public static BillUsage fromUsage(Usage usage, double chargePerUnit) {
+//        BillUsage billUsage = new BillUsage();
+//        billUsage.total = usage.getTotal();
+//        billUsage.extra = usage.getTotal() > usage.getLimit() ? usage.getTotal() - usage.getLimit() : 0;
+//        billUsage.charge = billUsage.extra * chargePerUnit;
+//        billUsage.limit = usage.getLimit();
+//        return billUsage;
+//    }
 
     public double getLimit() {
         return limit;
@@ -52,15 +52,13 @@ public class BillUsage {
         BillUsage billUsage = (BillUsage) o;
         return Double.compare(billUsage.getTotal(), getTotal()) == 0 &&
             Double.compare(billUsage.getExtra(), getExtra()) == 0 &&
-            Double.compare(billUsage.getCharge(), getCharge()) == 0;
+            Double.compare(billUsage.getCharge(), getCharge()) == 0 &&
+            Double.compare(billUsage.getLimit(), getLimit()) == 0;
     }
-
-
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(getTotal(), getExtra(), getCharge());
+        return Objects.hash(getTotal(), getExtra(), getCharge(), getLimit());
     }
 
     public double getTotal() {

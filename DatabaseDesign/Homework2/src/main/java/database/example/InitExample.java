@@ -4,13 +4,13 @@ import database.data.CreatorMapper;
 import database.data.MainMapper;
 import database.data.MapperFactory;
 import database.model.BasicCost;
-import database.model.DataType;
 import database.model.Plan;
 import database.model.User;
+import database.model.usage.ServiceType;
 import org.apache.ibatis.session.SqlSession;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
 
 public class InitExample {
     /**
@@ -64,10 +64,10 @@ public class InitExample {
 
 
             // 用户1打了300秒电话，算7分钟；发了一条短信；用了3G省内流量，1.5G国内流量
-            mainMapper.addCallUsage(user1.getId(), Instant.now(), Instant.now().plus(300, ChronoUnit.SECONDS), 7);
-            mainMapper.addSmsUsage(user1.getId(), Instant.now());
-            mainMapper.addDataUsage(user1.getId(), Instant.now(), Instant.now().plus(300, ChronoUnit.MINUTES), 3072, DataType.LOCAL);
-            mainMapper.addDataUsage(user1.getId(), Instant.now(), Instant.now().plus(300, ChronoUnit.MINUTES), (1024+512), DataType.DOMESTIC);
+            mainMapper.addUsage(user1.getId(), LocalDateTime.now(), 7, ServiceType.CALL);
+            mainMapper.addUsage(user1.getId(), LocalDateTime.now(), 1, ServiceType.SMS);
+            mainMapper.addUsage(user1.getId(), LocalDateTime.now(), 3*1024, ServiceType.LOCAL_DATA);
+            mainMapper.addUsage(user1.getId(), LocalDateTime.now(), 1.5*1024, ServiceType.DOMESTIC_DATA);
 
 
         }

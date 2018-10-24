@@ -1,17 +1,27 @@
 package database.model;
 
 public class UsageCharge {
-    private double fee;
+    private double extraAmount;
+    private double charge;
 
-    public UsageCharge(double fee) {
-        this.fee = fee;
+    public UsageCharge(double extraAmount, double charge) {
+        this.extraAmount = extraAmount;
+        this.charge = charge;
     }
 
-    public double getFee() {
-        return fee;
+    public double getCharge() {
+        return charge;
     }
 
-    public void setFee(double fee) {
-        this.fee = fee;
+    public void setCharge(double charge) {
+        this.charge = charge;
+    }
+
+    public double getExtraAmount() {
+        return extraAmount;
+    }
+
+    public void setExtraAmount(double extraAmount) {
+        this.extraAmount = extraAmount;
     }
 }

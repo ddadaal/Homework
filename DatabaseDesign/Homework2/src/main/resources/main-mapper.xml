@@ -9,6 +9,10 @@
         (@time >= userplan.activateTime and (ISNULL(userplan.deactivateTime) or userplan.deactivateTime > @time))
     </sql>
 
+    <select id="getPlan" resultType="Plan">
+        select * from plan
+        where id = #{planId};
+    </select>
 
     <sql id="first, today, last">
         set @time = #{datetime};
@@ -21,9 +25,10 @@
       select * from plan;
     </select>
 
-    <select id="getMyPlans" resultType="Plan">
+    <select id="getActivePlans" resultType="Plan">
+        set @time = #{datetime};
         select plan.* from plan, userplan
-        where userplan.userId = #{userId} and plan.id = userplan.planId;
+        where userplan.userId = #{userId} and plan.id = userplan.planId and <include refid="isPlanActivated"/>;
     </select>
 
     <select id="orderPlan" resultType="int">
@@ -93,79 +98,26 @@
     </select>
 
 
-    <insert id="addCallUsage">
-        insert into callusage(userId, duration, startTime, endTime)
-        values (#{userId}, #{duration}, #{startTime}, #{endTime});
-    </insert>
-
-    <insert id="addDataUsage">
-        insert into datausage(userId, amount, startTime, endTime, dataType)
-        values (#{userId}, #{amount}, #{startTime}, #{endTime}, #{dataType});
-    </insert>
-
-    <insert id="addSmsUsage">
-        insert into smsusage(userId, time)
-        values (#{userId}, #{time});
-    </insert>
-
-
     <sql id="insideTheMonth">
         between @firstDayOfMonth and @firstDayOfNextMonth
+    </sql>
+
+    <sql id="fromStartToNow">
+        between @firstDayOfMonth and @time;
+    </sql>
+
+
+    <sql id="getUsages">
+        <include refid="first, today, last"/>
+        select * from `usage`
+        where userId = #{userId} and serviceType = #{serviceType} and startTime <include refid="fromStartToNow"/>
+        order by startTime;
+
     </sql>
 
     <sql id="returnsUsage">
         select @limit as `limit`, @total as `total`;
     </sql>
-
-    <select id="getCallUsage" resultType="Usage">
-        <include refid="first, today, last"/>
-        select sum(duration) into @total from callusage
-        where userId=#{userId} and startTime <include refid="insideTheMonth"/>;
-
-        select sum(plan.callMinutes) into @limit from plan, userplan
-        where userplan.userId=#{userId} and plan.id = userplan.planId and <include refid="isPlanActivated"/>;
-
-        <include refid="returnsUsage"/>
-
-    </select>
-
-    <select id="getSmsUsage" resultType="Usage">
-        <include refid="first, today, last"/>
-        select count(*) into @total from smsusage
-        where userId=#{userId} and time <include refid="insideTheMonth"/>;
-
-        select sum(plan.sms) into @limit from plan, userplan
-        where userplan.userId=#{userId} and plan.id = userplan.planId and <include refid="isPlanActivated"/>;
-
-        <include refid="returnsUsage"/>
-
-
-    </select>
-
-    <select id="getLocalDataUsage" resultType="Usage">
-        <include refid="first, today, last"/>
-        select sum(amount) into @total from datausage
-        where userId=#{userId} and dataType='LOCAL' and startTime <include refid="insideTheMonth"/>;
-
-        select sum(plan.localData) into @limit from plan, userplan
-        where userplan.userId=#{userId} and plan.id = userplan.planId and <include refid="isPlanActivated"/>;
-
-        <include refid="returnsUsage"/>
-
-    </select>
-
-    <select id="getDomesticDataUsage" resultType="Usage">
-        <include refid="first, today, last"/>
-        select sum(amount) into @total from datausage
-        where userId=#{userId} and dataType='DOMESTIC' and startTime <include refid="insideTheMonth"/>;
-
-        select sum(plan.domesticData) into @limit from plan, userplan
-        where userplan.userId=#{userId} and plan.id = userplan.planId and <include refid="isPlanActivated"/>;
-
-        <include refid="returnsUsage"/>
-
-
-    </select>
 
     <select id="getBasicCost" resultType="BasicCost">
         select basicCostId into @basicCostId from user where id = #{userId};

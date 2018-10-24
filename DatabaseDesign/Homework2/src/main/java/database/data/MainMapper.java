@@ -1,6 +1,8 @@
 package database.data;
 
 import database.model.*;
+import database.model.usage.ServiceType;
+import database.model.usage.Usage;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.Instant;
@@ -16,11 +18,11 @@ public interface MainMapper {
     List<Plan> getAllPlans();
 
     /**
-     * 获得某个人的套餐
+     * 获得某个人目前生效的套餐
      * @param userId 用户ID
      * @return 正在使用的套餐
      */
-    List<Plan> getMyPlans(@Param("userId") int userId);
+    List<Plan> getActivePlans(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
 
     /**
      * 订阅套餐
@@ -44,32 +46,20 @@ public interface MainMapper {
                     @Param("activateImmediately") boolean activateImmediately
     );
 
-    void addCallUsage(@Param("userId") int userId,
-                      @Param("startTime") Instant startTime,
-                      @Param("endTime") Instant endTime,
-                      @Param("duration") double duration
-    );
-
-    void addDataUsage(@Param("userId") int userId,
-                      @Param("startTime") Instant startTime,
-                      @Param("endTime") Instant endTime,
+    void addUsage(@Param("userId") int userId,
+                      @Param("startTime") LocalDateTime startTime,
                       @Param("amount") double amount,
-                      @Param("dataType") DataType dataType
+                      @Param("serviceType") ServiceType serviceType
     );
 
-    void addSmsUsage(@Param("userId") int userId,
-                     @Param("time") Instant time
+    List<Usage> getUsages(@Param("userId") int userId,
+                          @Param("datetime") LocalDateTime datetime,
+                          @Param("serviceType")ServiceType serviceType
     );
-
-    Usage getCallUsage(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
-
-    Usage getSmsUsage(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
-
-    Usage getLocalDataUsage(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
-
-    Usage getDomesticDataUsage(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
 
     BasicCost getBasicCost(@Param("userId") int userId);
 
     User getUser(@Param("userId") int userId);
+
+    Plan getPlan(@Param("planId") int planId);
 }

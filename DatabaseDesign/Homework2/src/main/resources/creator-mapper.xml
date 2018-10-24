@@ -42,36 +42,22 @@
             `action` enum('ORDER_IMMEDIATELY', 'ORDER_NEXT_MONTH', 'CANCEL_IMMEDIATELY', 'CANCEL_NEXT_MONTH')
         );
     </sql>
-    <sql id="createDataUsage">
-        create table if not exists datausage (
+    <sql id="createUsage">
+        create table if not exists `usage` (
             `userId` int,
-            `dataType` enum('LOCAL','DOMESTIC'),
             `amount` float,
             `startTime` datetime,
-            `endTime` datetime
+            `serviceType` enum('CALL', 'SMS', 'LOCAL_DATA', 'DOMESTIC_DATA')
         );
     </sql>
-    <sql id="createCallUsage">
-      create table if not exists callusage (
-          `userId` int,
-          `duration` int,
-          `startTime` datetime,
-          `endTime` datetime
-      );
-    </sql>
-    <sql id="createSmsUsage">
-        create table if not exists smsusage (
-            `userId` int,
-            `time` datetime
-        );
-    </sql>
+
     <sql id="createBasicCost">
         create table if not exists basiccost (
             `id` int primary key auto_increment,
-            `callCost` decimal(11,3),
-            `smsCost` decimal(11,3),
-            `localDataCost` decimal(11, 3),
-            `domesticDataCost` decimal(11, 3)
+            `callCost` int,
+            `smsCost` int,
+            `localDataCost` int,
+            `domesticDataCost` int
         );
     </sql>
 
@@ -80,9 +66,7 @@
         <include refid="createUser"/>
         <include refid="createUserPlan"/>
         <include refid="createUserPlanTransaction"/>
-        <include refid="createDataUsage"/>
-        <include refid="createCallUsage"/>
-        <include refid="createSmsUsage"/>
+        <include refid="createUsage"/>
         <include refid="createBasicCost"/>
     </insert>
 
@@ -97,6 +81,6 @@
     </insert>
 
     <delete id="dropAllTables">
-        drop table if exists plan, user, userplan, userplantransaction, datausage, callusage, smsusage, basiccost;
+        drop table if exists plan, user, userplan, userplantransaction, `usage`, basiccost;
     </delete>
 </mapper>
