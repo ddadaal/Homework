@@ -20,6 +20,13 @@ public class Usage {
     public Usage() {
     }
 
+    public Usage(int userId, double amount, LocalDateTime startTime, ServiceType serviceType) {
+        this.userId = userId;
+        this.amount = amount;
+        this.startTime = startTime;
+        this.serviceType = serviceType;
+    }
+
     public int getUserId() {
         return userId;
     }

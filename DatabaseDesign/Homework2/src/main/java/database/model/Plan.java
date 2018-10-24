@@ -1,5 +1,9 @@
 package database.model;
 
+import database.model.usage.ServiceType;
+
+import java.time.LocalDateTime;
+
 public class Plan {
     private int id;
     private String name;
@@ -76,4 +80,20 @@ public class Plan {
     public void setDomesticData(double domesticData) {
         this.domesticData = domesticData;
     }
+
+    public double getLimitByServiceType(ServiceType serviceType) {
+        switch (serviceType) {
+            case SMS:
+                return sms;
+            case CALL:
+                return callMinutes;
+            case LOCAL_DATA:
+                return localData;
+            case DOMESTIC_DATA:
+                return domesticData;
+        }
+        return 0;
+    }
+
+
 }

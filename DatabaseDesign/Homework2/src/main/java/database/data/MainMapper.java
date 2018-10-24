@@ -22,27 +22,31 @@ public interface MainMapper {
      * @param userId 用户ID
      * @return 正在使用的套餐
      */
-    List<Plan> getActivePlans(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
+    List<ActivePlan> getActivePlans(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
 
     /**
      * 订阅套餐
      * @param userId 用户ID
      * @param planId 套餐ID
+     * @param datetime 订阅时间
      * @param activateImmediately 立即生效？若为false，则为下月生效
      * @return 交易ID
      */
     int orderPlan(@Param("userId") int userId,
                    @Param("planId") int planId,
+                   @Param("datetime") LocalDateTime datetime,
                    @Param("activateImmediately") boolean activateImmediately
     );
 
     /**
      * 取消套餐
      * @param transactionId 订阅此套餐的交易ID
+     * @param datetime 取消订阅时间
      * @param activateImmediately 立即生效？若为false，则为下月生效
      */
 
     void cancelPlan(@Param("transactionId") int transactionId,
+                    @Param("datetime") LocalDateTime datetime,
                     @Param("activateImmediately") boolean activateImmediately
     );
 
@@ -54,7 +58,7 @@ public interface MainMapper {
 
     List<Usage> getUsages(@Param("userId") int userId,
                           @Param("datetime") LocalDateTime datetime,
-                          @Param("serviceType")ServiceType serviceType
+                          @Param("serviceTypes") ServiceType... serviceTypes
     );
 
     BasicCost getBasicCost(@Param("userId") int userId);

@@ -1,6 +1,5 @@
 package database.data;
 
-import database.Main;
 import database.model.*;
 import database.model.usage.ServiceType;
 import database.model.usage.Usage;
@@ -9,47 +8,134 @@ import org.apache.ibatis.session.SqlSession;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class MainDataService {
 
+
     /**
-     * 计算插入的usage所需要支付的钱。
-     * usage在调用此方法前不应该插入数据库。
-     * 由于套餐可能会变化，此数据将不会被插入数据库。
-     *
-     * @param usage          参数
-     * @param basicCost      基础消费
-     * @return 花费的钱
+     * 获得某个服务项目的服务账单
+     * @param serviceType 服务项目
+     * @param userId 用户ID
+     * @param endDate 终止时间
+     * @param activePlans 生效的套餐
+     * @param basicCost 基础资费
+     * @return 使用情况
      */
-    private UsageCharge calculateUsageCharge(Usage usage,
-                                             BasicCost basicCost
+    private ServiceBill getBillUsageByServiceType(ServiceType serviceType,
+                                                  int userId,
+                                                  LocalDateTime endDate,
+                                                  List<ActivePlan> activePlans,
+                                                  double basicCost
     ) {
-        // existingUsage是按startTime从早到晚排序
         try (SqlSession session = MapperFactory.getSession()) {
 
 
             MainMapper mainMapper = session.getMapper(MainMapper.class);
-            List<Plan> activePlans= mainMapper.getActivePlans(usage.getUserId(), usage.getStartTime());
 
+            if (serviceType.equals(ServiceType.CALL) || serviceType.equals(ServiceType.SMS)) {
 
-            if (usage.getServiceType().equals(ServiceType.CALL)) {
+                List<Usage> usages = mainMapper.getUsages(userId, endDate, serviceType);
 
-                List<Usage> usages = mainMapper.getUsages(usage.getUserId(), usage.getStartTime(), ServiceType.CALL);
-                List<Plan> activePlansWithCalling = activePlans.stream().filter(x -> x.getCallMinutes() > 0).collect(Collectors.toList());
+                double limit = activePlans.stream().mapToDouble(x -> x.getPlan().getLimitByServiceType(serviceType)).sum();
 
-
-
-
-                double limit = 0;
+                double remaining = 0;
                 double extra = 0;
+                double totalUsed = 0;
+
+                int planIndex = 0;
                 for (Usage u : usages) {
-                    limit = activePlans.stream().mapToInt(Plan::getCallMinutes).sum();
+                    while (planIndex < activePlans.size() && activePlans.get(planIndex).isActivatedAt(u.getStartTime())) {
+                        ActivePlan plan = activePlans.get(planIndex);
+                        remaining += plan.getPlan().getLimitByServiceType(serviceType);
+                        planIndex++;
+                    }
+                    double amount = u.getAmount();
+                    totalUsed += amount;
+                    if (amount > remaining) {
+                        extra += amount - remaining;
+                        remaining = 0;
+                    } else {
+                        remaining -= amount;
+                    }
                 }
+
+                double charge = extra * basicCost;
+                return new ServiceBill(totalUsed, extra, charge, limit);
+            } else {
+                List<Usage> usages = mainMapper.getUsages(
+                    userId,
+                    endDate,
+                    ServiceType.LOCAL_DATA,
+                    ServiceType.DOMESTIC_DATA
+                );
+
+                double localDataRemaining = 0;
+                double domesticDataRemaining = 0;
+
+                double localDataLimit = activePlans.stream().mapToDouble(x -> x.getPlan().getLocalData()).sum();
+                double domesticDataLimit = activePlans.stream().mapToDouble(x -> x.getPlan().getDomesticData()).sum();
+
+                double localDataExtra = 0;
+                double domesticDataExtra = 0;
+
+                double localDataTotal = 0;
+                double domesticDataTotal = 0;
+
+                int planIndex = 0;
+                for (Usage u : usages) {
+                    while (planIndex < activePlans.size() && activePlans.get(planIndex).isActivatedAt(u.getStartTime())) {
+                        ActivePlan plan = activePlans.get(planIndex);
+
+                        localDataRemaining += plan.getPlan().getLocalData();
+
+                        domesticDataRemaining += plan.getPlan().getDomesticData();
+                        planIndex++;
+                    }
+                    double amount = u.getAmount();
+
+                    if (u.getServiceType().equals(ServiceType.LOCAL_DATA)) {
+                        localDataTotal += amount;
+                        // 这个usage是本地流量，先检测localDataLimit是否够用
+                        if (amount > localDataRemaining) {
+                            // localDataLimit不够用，先扣除所有localDataLimit，再检测domesticDataLimit是否够用
+                            double extraAmount = amount - localDataRemaining;
+                            localDataRemaining = 0;
+                            if (extraAmount > domesticDataRemaining) {
+                                // domesticDataLimit也不够用。将多余的流量加到localDataExtra中，扣除所有的domesticDataLimit。
+                                localDataExtra += extraAmount - domesticDataRemaining;
+                                domesticDataRemaining = 0;
+                            } else {
+                                // domesticData够用，去除响应的domesticDataLimit
+                                domesticDataRemaining -= extraAmount;
+                            }
+                        } else {
+                            // localData够用。只去除localDataLimit
+                            localDataRemaining -= amount;
+                        }
+                    } else {
+                        domesticDataTotal += amount;
+                        // 这个usage是国内流量。直接检测domesticDataLimit是否够用。
+                        if (amount > domesticDataRemaining) {
+                            // 国内流量限额不够用。将多余的流量加到domesticDataExtra中，扣除所有的domesticDataLimit，
+                            domesticDataExtra += amount - domesticDataRemaining;
+                            domesticDataRemaining = 0;
+                        } else {
+                            // 国内流量够用。去除domesticDataLimit
+                            domesticDataRemaining -= amount;
+                        }
+                    }
+
+                }
+
+                if (serviceType.equals(ServiceType.LOCAL_DATA)) {
+                    return new ServiceBill(localDataTotal, localDataExtra, localDataExtra * basicCost, localDataLimit);
+                } else {
+                    return new ServiceBill(domesticDataTotal, domesticDataExtra, domesticDataExtra * basicCost, domesticDataLimit);
+                }
+
+
             }
         }
 
@@ -58,21 +144,24 @@ public class MainDataService {
     /**
      * 插入Usage
      *
-     * @param usage
+     * @param usage Usage
      * @return 本Usage所花费的话费。
      */
     public double addUsage(Usage usage) {
         try (SqlSession sqlSession = MapperFactory.getSession()) {
             MainMapper mapper = sqlSession.getMapper(MainMapper.class);
 
-            List<Plan> plans = mapper.getActivePlans(usage.getUserId(), usage.getStartTime());
-            List<Usage> existingUsages = mapper.getUsages(usage.getUserId(), usage.getStartTime(), usage.getServiceType());
             BasicCost basicCost = mapper.getBasicCost(usage.getUserId());
-            UsageCharge charge = calculateUsageCharge(usage, basicCost);
+
+            List<ActivePlan> activePlans = mapper.getActivePlans(usage.getUserId(), usage.getStartTime());
+
+            ServiceBill serviceBill1 = getBillUsageByServiceType(usage.getServiceType(), usage.getUserId(), usage.getStartTime(), activePlans, basicCost.getCostByServiceType(usage.getServiceType()));
 
             mapper.addUsage(usage.getUserId(), usage.getStartTime(), usage.getAmount(), usage.getServiceType());
 
-            return charge.getCharge();
+            ServiceBill serviceBill2 = getBillUsageByServiceType(usage.getServiceType(), usage.getUserId(), usage.getStartTime().plusSeconds(1), activePlans, basicCost.getCostByServiceType(usage.getServiceType()));
+
+            return serviceBill2.getCharge() - serviceBill1.getCharge();
         }
     }
 
@@ -91,33 +180,58 @@ public class MainDataService {
 
 
     /**
-     * 订阅套餐
+     * 以指定的时间订阅套餐
      *
      * @param userId              用户ID
      * @param planId              套餐ID
+     * @param datetime 订阅时间
      * @param activateImmediately 立即生效？若为false，则为下月生效
      * @return 交易ID
      */
-    public int orderPlan(int userId, int planId, boolean activateImmediately) {
+    public int orderPlan(int userId, int planId, LocalDateTime datetime, boolean activateImmediately) {
         try (SqlSession sqlSession = MapperFactory.getSession()) {
             MainMapper mapper = sqlSession.getMapper(MainMapper.class);
 
-            return mapper.orderPlan(userId, planId, activateImmediately);
+            return mapper.orderPlan(userId, planId, datetime, activateImmediately);
         }
     }
 
     /**
-     * 取消套餐
+     * 以现在的时间订阅套餐。
+     * @param userId 用户ID
+     * @param planId 套餐ID
+     * @param activateImmediately 立即生效？若为false，则为下月生效
+     * @return 交易ID
+     */
+
+    public int orderPlan(int userId, int planId, boolean activateImmediately) {
+        return orderPlan(userId, planId, LocalDateTime.now(), activateImmediately);
+    }
+
+
+    /**
+     * 以指定时间取消套餐
      *
+     * @param transactionId       订阅此套餐的交易ID
+     * @param datetime 取消套餐时间
+     * @param activateImmediately 立即生效？若为false，则为下月生效
+     */
+    public void cancelPlan(int transactionId, LocalDateTime datetime, boolean activateImmediately) {
+        try (SqlSession sqlSession = MapperFactory.getSession()) {
+            MainMapper mapper = sqlSession.getMapper(MainMapper.class);
+
+            mapper.cancelPlan(transactionId, datetime, activateImmediately);
+        }
+    }
+
+
+    /**
+     * 以当前时间取消套餐。
      * @param transactionId       订阅此套餐的交易ID
      * @param activateImmediately 立即生效？若为false，则为下月生效
      */
     public void cancelPlan(int transactionId, boolean activateImmediately) {
-        try (SqlSession sqlSession = MapperFactory.getSession()) {
-            MainMapper mapper = sqlSession.getMapper(MainMapper.class);
-
-            mapper.cancelPlan(transactionId, activateImmediately);
-        }
+        cancelPlan(transactionId, LocalDateTime.now(), activateImmediately);
     }
 
     /**
@@ -162,15 +276,23 @@ public class MainDataService {
 
             // set active plans
 
-            List<Plan> activePlans = mapper.getActivePlans(userId, endDate);
+            List<ActivePlan> activePlans = mapper.getActivePlans(userId, endDate);
 
             bill.setActivePlanList(activePlans);
 
-            // 设置手机流量使用量
+            // 设置各个服务使用量
 
-            List<Usage> callUsages = mapper.getUsages(userId, endDate, ServiceType.CALL);
+            ServiceBill callBill = getBillUsageByServiceType(ServiceType.CALL, userId, endDate, activePlans, basicCost.getCallCost());
+            bill.setCallBill(callBill);
 
+            ServiceBill smsBill = getBillUsageByServiceType(ServiceType.SMS, userId, endDate, activePlans, basicCost.getSmsCost());
+            bill.setSmsBill(smsBill);
 
+            ServiceBill localDataBill = getBillUsageByServiceType(ServiceType.LOCAL_DATA, userId, endDate, activePlans, basicCost.getLocalDataCost());
+            bill.setLocalDataBill(localDataBill);
+
+            ServiceBill domesticDataBill = getBillUsageByServiceType(ServiceType.DOMESTIC_DATA, userId, endDate, activePlans, basicCost.getDomesticDataCost());
+            bill.setDomesticDataBill(domesticDataBill);
 
 
 

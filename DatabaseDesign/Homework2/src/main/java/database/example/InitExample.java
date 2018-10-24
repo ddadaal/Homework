@@ -19,6 +19,8 @@ public class InitExample {
      * 1. 5种套餐，示例4种+霸王套餐，每月70，100分钟数，200短信，2G本地，2G国内
      * 2. 用户1订阅2, 3, 4套餐，2下月生效，3，4立刻生效；用户2订阅1,5套餐，都立刻生效
      * 3. 用户1打了300秒电话，算7分钟；发了一条短信；用了3G省内流量，1.5G国内流量
+     * 4. 用户2定了1,5套餐，立刻生效。
+     * 5. 用户3什么都没定。
      */
     public static void insertInitData() {
         try (SqlSession session = MapperFactory.getSession()) {
@@ -48,27 +50,30 @@ public class InitExample {
 
             User user1 = new User("测试用户1", basicCost.getId());
             User user2 = new User("测试用户2", basicCost.getId());
+            User user3 = new User("测试用户3", basicCost.getId());
 
             creatorMapper.insertUser(user1);
             creatorMapper.insertUser(user2);
+            creatorMapper.insertUser(user3);
 
+            LocalDateTime baseTime = LocalDateTime.now();
 
             // 用户1订阅2, 3, 4套餐，2下月生效，3，4立刻生效
-            mainMapper.orderPlan(user1.getId(), plan2.getId(), false);
-            mainMapper.orderPlan(user1.getId(), plan3.getId(), true);
-            mainMapper.orderPlan(user1.getId(), plan4.getId(), true);
+            mainMapper.orderPlan(user1.getId(), plan2.getId(), baseTime, false);
+            mainMapper.orderPlan(user1.getId(), plan3.getId(),baseTime, true);
+            mainMapper.orderPlan(user1.getId(), plan4.getId(), baseTime, true);
 
             // 用户2订阅1,5套餐，都立刻生效
-            mainMapper.orderPlan(user2.getId(), plan1.getId(), true);
-            mainMapper.orderPlan(user2.getId(), plan5.getId(), true);
+            mainMapper.orderPlan(user2.getId(), plan1.getId(), baseTime, true);
+            mainMapper.orderPlan(user2.getId(), plan5.getId(), baseTime, true);
+
 
 
             // 用户1打了300秒电话，算7分钟；发了一条短信；用了3G省内流量，1.5G国内流量
-            mainMapper.addUsage(user1.getId(), LocalDateTime.now(), 7, ServiceType.CALL);
-            mainMapper.addUsage(user1.getId(), LocalDateTime.now(), 1, ServiceType.SMS);
-            mainMapper.addUsage(user1.getId(), LocalDateTime.now(), 3*1024, ServiceType.LOCAL_DATA);
-            mainMapper.addUsage(user1.getId(), LocalDateTime.now(), 1.5*1024, ServiceType.DOMESTIC_DATA);
-
+            mainMapper.addUsage(user1.getId(), baseTime, 7, ServiceType.CALL);
+            mainMapper.addUsage(user1.getId(), baseTime.plusSeconds(1), 1, ServiceType.SMS);
+            mainMapper.addUsage(user1.getId(), baseTime.plusSeconds(2), 3*1024, ServiceType.LOCAL_DATA);
+            mainMapper.addUsage(user1.getId(), baseTime.plusSeconds(3), 1.5*1024, ServiceType.DOMESTIC_DATA);
 
         }
     }

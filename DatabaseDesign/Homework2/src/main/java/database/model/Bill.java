@@ -16,21 +16,21 @@ public class Bill {
     private BasicCost basicCost;
 
     // active plans
-    private List<Plan> activePlanList;
+    private List<ActivePlan> activePlanList;
 
     // usages
-    private BillUsage localDataUsage;
-    private BillUsage domesticDataUsage;
-    private BillUsage callUsage;
-    private BillUsage smsUsage;
+    private ServiceBill localDataBill;
+    private ServiceBill domesticDataBill;
+    private ServiceBill callBill;
+    private ServiceBill smsBill;
 
     // total fees
     public double getTotalCharge() {
-        return localDataUsage.getCharge()
-            + domesticDataUsage.getCharge()
-            + callUsage.getCharge()
-            + smsUsage.getCharge()
-            + activePlanList.stream().mapToDouble(Plan::getCost).sum();
+        return localDataBill.getCharge()
+            + domesticDataBill.getCharge()
+            + callBill.getCharge()
+            + smsBill.getCharge()
+            + activePlanList.stream().mapToDouble(x -> x.getPlan().getCost()).sum();
     }
 
     public String getName() {
@@ -74,43 +74,43 @@ public class Bill {
         this.basicCost = basicCost;
     }
 
-    public List<Plan> getActivePlanList() {
+    public List<ActivePlan> getActivePlanList() {
         return activePlanList;
     }
 
-    public void setActivePlanList(List<Plan> activePlanList) {
+    public void setActivePlanList(List<ActivePlan> activePlanList) {
         this.activePlanList = activePlanList;
     }
 
-    public BillUsage getLocalDataUsage() {
-        return localDataUsage;
+    public ServiceBill getLocalDataBill() {
+        return localDataBill;
     }
 
-    public void setLocalDataUsage(BillUsage localDataUsage) {
-        this.localDataUsage = localDataUsage;
+    public void setLocalDataBill(ServiceBill localDataBill) {
+        this.localDataBill = localDataBill;
     }
 
-    public BillUsage getDomesticDataUsage() {
-        return domesticDataUsage;
+    public ServiceBill getDomesticDataBill() {
+        return domesticDataBill;
     }
 
-    public void setDomesticDataUsage(BillUsage domesticDataUsage) {
-        this.domesticDataUsage = domesticDataUsage;
+    public void setDomesticDataBill(ServiceBill domesticDataBill) {
+        this.domesticDataBill = domesticDataBill;
     }
 
-    public BillUsage getCallUsage() {
-        return callUsage;
+    public ServiceBill getCallBill() {
+        return callBill;
     }
 
-    public void setCallUsage(BillUsage callUsage) {
-        this.callUsage = callUsage;
+    public void setCallBill(ServiceBill callBill) {
+        this.callBill = callBill;
     }
 
-    public BillUsage getSmsUsage() {
-        return smsUsage;
+    public ServiceBill getSmsBill() {
+        return smsBill;
     }
 
-    public void setSmsUsage(BillUsage smsUsage) {
-        this.smsUsage = smsUsage;
+    public void setSmsBill(ServiceBill smsBill) {
+        this.smsBill = smsBill;
     }
 }

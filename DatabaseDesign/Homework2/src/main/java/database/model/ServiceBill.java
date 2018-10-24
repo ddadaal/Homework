@@ -2,24 +2,24 @@ package database.model;
 
 import java.util.Objects;
 
-public class BillUsage {
+public class ServiceBill {
     private double total;
     private double extra;
     private double charge;
     private double limit;
 
-    public BillUsage(double total, double extra, double charge, double limit) {
+    public ServiceBill(double total, double extra, double charge, double limit) {
         this.total = total;
         this.extra = extra;
         this.charge = charge;
         this.limit = limit;
     }
 
-    public BillUsage() {
+    public ServiceBill() {
     }
 
-//    public static BillUsage fromUsage(Usage usage, double chargePerUnit) {
-//        BillUsage billUsage = new BillUsage();
+//    public static ServiceBill fromUsage(Usage usage, double chargePerUnit) {
+//        ServiceBill billUsage = new ServiceBill();
 //        billUsage.total = usage.getTotal();
 //        billUsage.extra = usage.getTotal() > usage.getLimit() ? usage.getTotal() - usage.getLimit() : 0;
 //        billUsage.charge = billUsage.extra * chargePerUnit;
@@ -37,7 +37,7 @@ public class BillUsage {
 
     @Override
     public String toString() {
-        return "BillUsage{" +
+        return "ServiceBill{" +
             "total=" + total +
             ", extra=" + extra +
             ", charge=" + charge +
@@ -48,12 +48,12 @@ public class BillUsage {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof BillUsage)) return false;
-        BillUsage billUsage = (BillUsage) o;
-        return Double.compare(billUsage.getTotal(), getTotal()) == 0 &&
-            Double.compare(billUsage.getExtra(), getExtra()) == 0 &&
-            Double.compare(billUsage.getCharge(), getCharge()) == 0 &&
-            Double.compare(billUsage.getLimit(), getLimit()) == 0;
+        if (!(o instanceof ServiceBill)) return false;
+        ServiceBill serviceBill = (ServiceBill) o;
+        return Double.compare(serviceBill.getTotal(), getTotal()) == 0 &&
+            Double.compare(serviceBill.getExtra(), getExtra()) == 0 &&
+            Double.compare(serviceBill.getCharge(), getCharge()) == 0 &&
+            Double.compare(serviceBill.getLimit(), getLimit()) == 0;
     }
 
     @Override

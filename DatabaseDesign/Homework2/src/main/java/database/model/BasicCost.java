@@ -1,5 +1,7 @@
 package database.model;
 
+import database.model.usage.ServiceType;
+
 public class BasicCost {
     private int id;
     private double callCost;
@@ -55,5 +57,19 @@ public class BasicCost {
 
     public void setDomesticDataCost(double domesticDataCost) {
         this.domesticDataCost = domesticDataCost;
+    }
+
+    public double getCostByServiceType(ServiceType serviceType) {
+        switch (serviceType) {
+            case CALL:
+                return callCost;
+            case SMS:
+                return smsCost;
+            case LOCAL_DATA:
+                return localDataCost;
+            case DOMESTIC_DATA:
+                return domesticDataCost;
+        }
+        return 0;
     }
 }

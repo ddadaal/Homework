@@ -54,10 +54,10 @@
     <sql id="createBasicCost">
         create table if not exists basiccost (
             `id` int primary key auto_increment,
-            `callCost` int,
-            `smsCost` int,
-            `localDataCost` int,
-            `domesticDataCost` int
+            `callCost` decimal(11, 3),
+            `smsCost` decimal(11, 3),
+            `localDataCost` decimal(11, 3),
+            `domesticDataCost` decimal(11, 3)
         );
     </sql>
 
