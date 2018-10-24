@@ -18,7 +18,6 @@ public class Bill {
     // active plans
     private List<Plan> activePlanList;
 
-
     // usages
     private BillUsage localDataUsage;
     private BillUsage domesticDataUsage;
@@ -27,7 +26,11 @@ public class Bill {
 
     // total fees
     public double getTotalCharge() {
-        return localDataUsage.getCharge() + domesticDataUsage.getCharge() + callUsage.getCharge() + smsUsage.getCharge();
+        return localDataUsage.getCharge()
+            + domesticDataUsage.getCharge()
+            + callUsage.getCharge()
+            + smsUsage.getCharge()
+            + activePlanList.stream().mapToDouble(Plan::getCost).sum();
     }
 
     public String getName() {
@@ -61,7 +64,6 @@ public class Bill {
     public void setUserId(int userId) {
         this.userId = userId;
     }
-
 
 
     public BasicCost getBasicCost() {

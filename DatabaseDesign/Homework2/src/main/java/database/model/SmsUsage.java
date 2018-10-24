@@ -7,10 +7,6 @@ public class SmsUsage {
     private int userId;
     private Instant time;
 
-    public SmsUsage(int userId, Instant time) {
-        this.userId = userId;
-        this.time = time;
-    }
 
     public SmsUsage() {
     }

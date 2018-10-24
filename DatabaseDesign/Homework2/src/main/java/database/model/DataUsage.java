@@ -1,12 +1,10 @@
 package database.model;
 import java.time.Instant;
-import java.util.Date;
 
 public class DataUsage {
     private int userId;
-    private DataUsageType dataType;
-    private double amount
-        ;
+    private DataType dataType;
+    private double amount;
     private Instant startTime;
     private Instant endTime;
 
@@ -18,11 +16,11 @@ public class DataUsage {
         this.userId = userId;
     }
 
-    public DataUsageType getDataType() {
+    public DataType getDataType() {
         return dataType;
     }
 
-    public void setDataType(DataUsageType dataType) {
+    public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
 

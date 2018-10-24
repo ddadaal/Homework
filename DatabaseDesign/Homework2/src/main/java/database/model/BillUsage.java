@@ -6,11 +6,13 @@ public class BillUsage {
     private double total;
     private double extra;
     private double charge;
+    private double limit;
 
-    public BillUsage(double total, double extra, double charge) {
+    public BillUsage(double total, double extra, double charge, double limit) {
         this.total = total;
         this.extra = extra;
         this.charge = charge;
+        this.limit = limit;
     }
 
     public BillUsage() {
@@ -21,9 +23,17 @@ public class BillUsage {
         billUsage.total = usage.getTotal();
         billUsage.extra = usage.getTotal() > usage.getLimit() ? usage.getTotal() - usage.getLimit() : 0;
         billUsage.charge = billUsage.extra * chargePerUnit;
+        billUsage.limit = usage.getLimit();
         return billUsage;
     }
 
+    public double getLimit() {
+        return limit;
+    }
+
+    public void setLimit(double limit) {
+        this.limit = limit;
+    }
 
     @Override
     public String toString() {
@@ -31,6 +41,7 @@ public class BillUsage {
             "total=" + total +
             ", extra=" + extra +
             ", charge=" + charge +
+            ", limit=" + limit +
             '}';
     }
 

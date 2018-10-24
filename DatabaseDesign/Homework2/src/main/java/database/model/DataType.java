@@ -1,6 +1,6 @@
 package database.model;
 
-public enum DataUsageType {
+public enum DataType {
     LOCAL,
     DOMESTIC
 }

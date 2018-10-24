@@ -1,9 +1,5 @@
 package database.model;
 
-import com.sun.prism.PixelFormat;
-
-import java.util.Date;
-
 public class BasicCost {
     private int id;
     private double callCost;
@@ -61,8 +57,8 @@ public class BasicCost {
         this.domesticDataCost = domesticDataCost;
     }
 
-    public double getDataCost(DataUsageType type) {
-        if (type == DataUsageType.LOCAL) {
+    public double getDataCost(DataType type) {
+        if (type == DataType.LOCAL) {
             return localDataCost;
         } else {
             return domesticDataCost;

@@ -4,6 +4,7 @@ import database.model.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MainMapper {
@@ -15,11 +16,11 @@ public interface MainMapper {
     List<Plan> getAllPlans();
 
     /**
-     * 获得用户正在使用的套餐
+     * 获得某个人的套餐
      * @param userId 用户ID
      * @return 正在使用的套餐
      */
-    List<Plan> getActivePlans(@Param("userId") int userId);
+    List<Plan> getMyPlans(@Param("userId") int userId);
 
     /**
      * 订阅套餐
@@ -53,20 +54,20 @@ public interface MainMapper {
                       @Param("startTime") Instant startTime,
                       @Param("endTime") Instant endTime,
                       @Param("amount") double amount,
-                      @Param("dataType") DataUsageType dataType
+                      @Param("dataType") DataType dataType
     );
 
     void addSmsUsage(@Param("userId") int userId,
                      @Param("time") Instant time
     );
 
-    Usage getCallUsage(@Param("userId") int userId);
+    Usage getCallUsage(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
 
-    Usage getSmsUsage(@Param("userId") int userId);
+    Usage getSmsUsage(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
 
-    Usage getLocalDataUsage(@Param("userId") int userId);
+    Usage getLocalDataUsage(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
 
-    Usage getDomesticDataUsage(@Param("userId") int userId);
+    Usage getDomesticDataUsage(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
 
     BasicCost getBasicCost(@Param("userId") int userId);
 
