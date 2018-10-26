@@ -70,10 +70,10 @@ public class InitExample {
 
 
             // 用户1打了300秒电话，算7分钟；发了一条短信；用了3G省内流量，1.5G国内流量
-            mainMapper.addUsage(user1.getId(), baseTime, 7, ServiceType.CALL);
+            mainMapper.addUsage(user1.getId(), baseTime.plusSeconds(1), 7, ServiceType.CALL);
             mainMapper.addUsage(user1.getId(), baseTime.plusSeconds(1), 1, ServiceType.SMS);
-            mainMapper.addUsage(user1.getId(), baseTime.plusSeconds(2), 3*1024, ServiceType.LOCAL_DATA);
-            mainMapper.addUsage(user1.getId(), baseTime.plusSeconds(3), 1.5*1024, ServiceType.DOMESTIC_DATA);
+            mainMapper.addUsage(user1.getId(), baseTime.plusSeconds(1), 3*1024, ServiceType.LOCAL_DATA);
+            mainMapper.addUsage(user1.getId(), baseTime.plusSeconds(2), 1.5*1024, ServiceType.DOMESTIC_DATA);
 
         }
     }

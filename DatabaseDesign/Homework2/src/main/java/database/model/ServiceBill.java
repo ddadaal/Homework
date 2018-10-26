@@ -37,11 +37,11 @@ public class ServiceBill {
 
     @Override
     public String toString() {
-        return "ServiceBill{" +
-            "total=" + total +
-            ", extra=" + extra +
-            ", charge=" + charge +
-            ", limit=" + limit +
+        return "服务账单{" +
+            "总使用量=" + total +
+            ", 套餐外使用量=" + extra +
+            ", 套餐外使用量收费=" + charge +
+            ", 套餐限额=" + limit +
             '}';
     }
 

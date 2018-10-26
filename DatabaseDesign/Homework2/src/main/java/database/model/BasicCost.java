@@ -19,6 +19,17 @@ public class BasicCost {
         this.domesticDataCost = domesticDataCost;
     }
 
+    @Override
+    public String toString() {
+        return "基础资费{" +
+            "id=" + id +
+            ", 电话资费（每分钟）=" + callCost +
+            ", 短信资费（每条）=" + smsCost +
+            ", 本地流量资费（每M）=" + localDataCost +
+            ", 国内流量资费（每M）=" + domesticDataCost +
+            '}';
+    }
+
     public int getId() {
         return id;
     }

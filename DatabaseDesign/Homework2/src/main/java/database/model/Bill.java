@@ -2,6 +2,7 @@ package database.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Bill {
     // basic information
@@ -41,6 +42,32 @@ public class Bill {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+
+    @Override
+    public String toString() {
+        String lb = System.lineSeparator();
+        return "账单：" + lb
+        + "用户ID：" + userId + lb
+            + "用户姓名：" + name + lb
+            + "电话号码：" + phoneNumber + lb
+            + lb
+            + "账单开始时间：" + startDate + lb
+            + "账单结束时间：" + endDate + lb
+            + lb
+            + "基础资费信息：" + basicCost + lb
+            + lb
+            + "已生效的套餐：" + lb
+            + activePlanList.stream().map(UserPlan::toString).collect(Collectors.joining(lb)) + lb
+            + lb
+            + "电话服务账单：" + callBill + lb
+            + "短信服务账单：" + smsBill + lb
+            + "本地流量服务账单：" + localDataBill + lb
+            + "国内流量服务账单：" + domesticDataBill + lb
+            + lb
+            + "总需要付费：" + getTotalCharge();
+
     }
 
     public String getName() {

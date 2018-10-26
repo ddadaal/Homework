@@ -13,6 +13,11 @@ import java.util.List;
 
 public class MainDataService {
 
+    /**
+     * 获得用户订阅记录
+     * @param userId 用户ID
+     * @return 用户订阅记录
+     */
     public List<UserPlan> getUserPlans(int userId) {
         try (SqlSession sqlSession = MapperFactory.getSession()) {
             MainMapper mapper = sqlSession.getMapper(MainMapper.class);
@@ -20,6 +25,12 @@ public class MainDataService {
             return mapper.getUserPlans(userId);
         }
     }
+
+    /**
+     * 获得用户交易记录
+     * @param userId 用户ID
+     * @return 用户交易记录
+     */
 
     public List<UserPlanTransaction> getTransactions(int userId) {
         try (SqlSession sqlSession = MapperFactory.getSession()) {
@@ -53,29 +64,43 @@ public class MainDataService {
 
                 List<Usage> usages = mainMapper.getUsages(userId, endDate, serviceType);
 
+                // 计算所有目前激活的套餐的限额量。
                 double limit = activePlans.stream().mapToDouble(x -> x.getPlan().getLimitByServiceType(serviceType)).sum();
 
+                // 初始化 目前剩余限额量，超出量，总使用量
                 double remaining = 0;
                 double extra = 0;
                 double totalUsed = 0;
 
                 int planIndex = 0;
+                // 对每一个使用情况
                 for (Usage u : usages) {
+                    // 将 在此使用情况前就生效了的 且 还没有加入目前剩余限额量 的套餐所包含的限额加入 目前剩余限额量
                     while (planIndex < activePlans.size() && activePlans.get(planIndex).isActivatedAt(u.getStartTime())) {
                         UserPlan plan = activePlans.get(planIndex);
                         remaining += plan.getPlan().getLimitByServiceType(serviceType);
                         planIndex++;
                     }
+                    // 获得此使用情况的使用量
                     double amount = u.getAmount();
+
+                    //增加总使用量
                     totalUsed += amount;
+
                     if (amount > remaining) {
+                        // 如果此使用情况的使用量 大于 目前剩余限额量
+                        // 增加超出的是使用量至超出量
                         extra += amount - remaining;
+                        // 清空剩余量
                         remaining = 0;
                     } else {
+                        // 如果此使用情况的使用量 小于或等于 目前剩余限额量
+                        // 目前剩余限额量
                         remaining -= amount;
                     }
                 }
 
+                // 计算超出计费
                 double charge = extra * basicCost;
                 return new ServiceBill(totalUsed, extra, charge, limit);
             } else {
@@ -160,23 +185,13 @@ public class MainDataService {
      * 插入Usage
      *
      * @param usage Usage
-     * @return 本Usage所花费的话费。
      */
-    public double addUsage(Usage usage) {
+    public void addUsage(Usage usage) {
         try (SqlSession sqlSession = MapperFactory.getSession()) {
             MainMapper mapper = sqlSession.getMapper(MainMapper.class);
 
-            BasicCost basicCost = mapper.getBasicCost(usage.getUserId());
-
-            List<UserPlan> activePlans = mapper.getActivePlans(usage.getUserId(), usage.getStartTime());
-
-            ServiceBill serviceBill1 = getBillUsageByServiceType(usage.getServiceType(), usage.getUserId(), usage.getStartTime(), activePlans, basicCost.getCostByServiceType(usage.getServiceType()));
-
             mapper.addUsage(usage.getUserId(), usage.getStartTime(), usage.getAmount(), usage.getServiceType());
 
-            ServiceBill serviceBill2 = getBillUsageByServiceType(usage.getServiceType(), usage.getUserId(), usage.getStartTime().plusSeconds(1), activePlans, basicCost.getCostByServiceType(usage.getServiceType()));
-
-            return serviceBill2.getCharge() - serviceBill1.getCharge();
         }
     }
 
