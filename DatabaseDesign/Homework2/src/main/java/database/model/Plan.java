@@ -22,6 +22,19 @@ public class Plan {
         this.domesticData = domesticData;
     }
 
+    @Override
+    public String toString() {
+        return "套餐{" +
+            "id=" + id +
+            ", 名称='" + name + '\'' +
+            ", 资费（元）=" + cost +
+            ", 通话时长（分钟）=" + callMinutes +
+            ", 短信（条）=" + sms +
+            ", 本地流量（每M）=" + localData +
+            ", 国内流量（每M）=" + domesticData +
+            '}';
+    }
+
     public Plan() {
     }
 

@@ -4,10 +4,20 @@ public class User {
     private int id;
     private String name;
     private int basicCostId;
+    private String phoneNumber;
 
-    public User(String name, int basicCostId) {
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public User(String name, int basicCostId, String phoneNumber) {
         this.name = name;
         this.basicCostId = basicCostId;
+        this.phoneNumber = phoneNumber;
     }
 
     public User() {

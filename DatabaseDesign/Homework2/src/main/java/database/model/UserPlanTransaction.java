@@ -1,14 +1,27 @@
 package database.model;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class UserPlanTransaction {
     private String transactionId;
     private String userId;
     private String planId;
-    private Instant time;
+    private LocalDateTime time;
     private PlanAction action;
+
+
+    @Override
+    public String toString() {
+        return "用户交易记录{" +
+            "交易ID='" + transactionId + '\'' +
+            ", 用户ID='" + userId + '\'' +
+            ", 套餐ID='" + planId + '\'' +
+            ", 交易时间=" + time +
+            ", 交易操作=" + action +
+            '}';
+    }
 
     public String getTransactionId() {
         return transactionId;
@@ -34,11 +47,11 @@ public class UserPlanTransaction {
         this.planId = planId;
     }
 
-    public Instant getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
-    public void setTime(Instant time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 

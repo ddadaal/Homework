@@ -5,7 +5,6 @@ import database.model.usage.ServiceType;
 import database.model.usage.Usage;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public interface MainMapper {
      * @param userId 用户ID
      * @return 正在使用的套餐
      */
-    List<ActivePlan> getActivePlans(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
+    List<UserPlan> getActivePlans(@Param("userId") int userId, @Param("datetime") LocalDateTime datetime);
 
     /**
      * 订阅套餐
@@ -66,4 +65,8 @@ public interface MainMapper {
     User getUser(@Param("userId") int userId);
 
     Plan getPlan(@Param("planId") int planId);
+
+    List<UserPlan> getUserPlans(@Param("userId") int userId);
+
+    List<UserPlanTransaction> getTransactions(@Param("userId") int userId);
 }

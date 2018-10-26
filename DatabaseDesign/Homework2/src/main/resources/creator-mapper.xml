@@ -20,11 +20,12 @@
         create table if not exists user (
             `id` int primary key auto_increment,
             `name` varchar(30),
-            `basicCostId` int
+            `basicCostId` int,
+            `phoneNumber` varchar(15)
         );
     </sql>
-    <sql id="createUserPlan">
-        create table if not exists userplan (
+    <sql id="createUserPlanSubscription">
+        create table if not exists userplansubscription (
             `transactionId` int primary key,
             `userId` int,
             `planId` int,
@@ -64,7 +65,7 @@
     <insert id="createAllTables">
         <include refid="createPlan"/>
         <include refid="createUser"/>
-        <include refid="createUserPlan"/>
+        <include refid="createUserPlanSubscription"/>
         <include refid="createUserPlanTransaction"/>
         <include refid="createUsage"/>
         <include refid="createBasicCost"/>
@@ -77,10 +78,10 @@
         insert into basiccost(callCost, smsCost, localDataCost, domesticDataCost) VALUES (#{callCost}, #{smsCost}, #{localDataCost}, #{domesticDataCost});
     </insert>
     <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
-        insert into user(name, basicCostId) VALUES (#{name}, #{basicCostId});
+        insert into user(name, basicCostId, phoneNumber) VALUES (#{name}, #{basicCostId}, #{phoneNumber});
     </insert>
 
     <delete id="dropAllTables">
-        drop table if exists plan, user, userplan, userplantransaction, `usage`, basiccost;
+        drop table if exists plan, user, userplansubscription, userplantransaction, `usage`, basiccost;
     </delete>
 </mapper>

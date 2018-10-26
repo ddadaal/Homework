@@ -1,15 +1,24 @@
 package database.model;
-import java.time.Instant;
+
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class UserPlan {
+    private Plan plan;
     private int transactionId;
-    private String userId;
-    private String planId;
     private LocalDateTime activateTime;
     private LocalDateTime orderTime;
     private LocalDateTime deactivateTime;
+
+    @Override
+    public String toString() {
+        return "用户套餐订阅{" +
+            "套餐=" + plan +
+            ", 对应交易ID=" + transactionId +
+            ", 生效时间=" + activateTime +
+            ", 订阅时间=" + orderTime +
+            ", 失效时间（NULL则为长期有效）=" + deactivateTime +
+            '}';
+    }
 
     public int getTransactionId() {
         return transactionId;
@@ -19,20 +28,12 @@ public class UserPlan {
         this.transactionId = transactionId;
     }
 
-    public String getUserId() {
-        return userId;
+    public Plan getPlan() {
+        return plan;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getPlanId() {
-        return planId;
-    }
-
-    public void setPlanId(String planId) {
-        this.planId = planId;
+    public void setPlan(Plan plan) {
+        this.plan = plan;
     }
 
     public LocalDateTime getActivateTime() {
@@ -59,7 +60,7 @@ public class UserPlan {
         this.deactivateTime = deactivateTime;
     }
 
-    public boolean isActivated(LocalDateTime datetime) {
-        return datetime.isAfter(activateTime) && (deactivateTime == null || deactivateTime.isAfter(datetime));
+    public boolean isActivatedAt(LocalDateTime dateTime) {
+        return (dateTime.equals(activateTime) || dateTime.isAfter(activateTime)) && (deactivateTime == null || deactivateTime.isAfter(dateTime));
     }
 }

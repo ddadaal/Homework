@@ -13,7 +13,7 @@ public class MapperFactory {
     private static SqlSessionFactory factory;
 
     static {
-        org.apache.ibatis.logging.LogFactory.useStdOutLogging();
+//        org.apache.ibatis.logging.LogFactory.useStdOutLogging();
 
         String resource = "/mybatis-config.xml";
         InputStream inputStream = Main.class.getResourceAsStream(resource);

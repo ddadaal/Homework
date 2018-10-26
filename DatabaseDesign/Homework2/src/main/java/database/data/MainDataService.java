@@ -13,6 +13,21 @@ import java.util.List;
 
 public class MainDataService {
 
+    public List<UserPlan> getUserPlans(int userId) {
+        try (SqlSession sqlSession = MapperFactory.getSession()) {
+            MainMapper mapper = sqlSession.getMapper(MainMapper.class);
+
+            return mapper.getUserPlans(userId);
+        }
+    }
+
+    public List<UserPlanTransaction> getTransactions(int userId) {
+        try (SqlSession sqlSession = MapperFactory.getSession()) {
+            MainMapper mapper = sqlSession.getMapper(MainMapper.class);
+
+            return mapper.getTransactions(userId);
+        }
+    }
 
     /**
      * 获得某个服务项目的服务账单
@@ -26,7 +41,7 @@ public class MainDataService {
     private ServiceBill getBillUsageByServiceType(ServiceType serviceType,
                                                   int userId,
                                                   LocalDateTime endDate,
-                                                  List<ActivePlan> activePlans,
+                                                  List<UserPlan> activePlans,
                                                   double basicCost
     ) {
         try (SqlSession session = MapperFactory.getSession()) {
@@ -47,7 +62,7 @@ public class MainDataService {
                 int planIndex = 0;
                 for (Usage u : usages) {
                     while (planIndex < activePlans.size() && activePlans.get(planIndex).isActivatedAt(u.getStartTime())) {
-                        ActivePlan plan = activePlans.get(planIndex);
+                        UserPlan plan = activePlans.get(planIndex);
                         remaining += plan.getPlan().getLimitByServiceType(serviceType);
                         planIndex++;
                     }
@@ -86,7 +101,7 @@ public class MainDataService {
                 int planIndex = 0;
                 for (Usage u : usages) {
                     while (planIndex < activePlans.size() && activePlans.get(planIndex).isActivatedAt(u.getStartTime())) {
-                        ActivePlan plan = activePlans.get(planIndex);
+                        UserPlan plan = activePlans.get(planIndex);
 
                         localDataRemaining += plan.getPlan().getLocalData();
 
@@ -153,7 +168,7 @@ public class MainDataService {
 
             BasicCost basicCost = mapper.getBasicCost(usage.getUserId());
 
-            List<ActivePlan> activePlans = mapper.getActivePlans(usage.getUserId(), usage.getStartTime());
+            List<UserPlan> activePlans = mapper.getActivePlans(usage.getUserId(), usage.getStartTime());
 
             ServiceBill serviceBill1 = getBillUsageByServiceType(usage.getServiceType(), usage.getUserId(), usage.getStartTime(), activePlans, basicCost.getCostByServiceType(usage.getServiceType()));
 
@@ -267,6 +282,7 @@ public class MainDataService {
 
             bill.setUserId(userId);
             bill.setName(user.getName());
+            bill.setPhoneNumber(user.getPhoneNumber());
 
             // set basic cost
 
@@ -276,7 +292,7 @@ public class MainDataService {
 
             // set active plans
 
-            List<ActivePlan> activePlans = mapper.getActivePlans(userId, endDate);
+            List<UserPlan> activePlans = mapper.getActivePlans(userId, endDate);
 
             bill.setActivePlanList(activePlans);
 

@@ -39,20 +39,24 @@ public class MainTest {
 
     @Test
     void tryOrderPlan() {
+
+
         Bill bill1 = assertUser2Valid();
 
+        LocalDateTime t = LocalDateTime.now();
+
         //用户2订阅一个套餐1（20块），立刻生效；再订阅一个套餐1，下月生效
-        int tid1 = service.orderPlan(2, 1, true);
-        int tid2 = service.orderPlan(2, 1, false);
+        int tid1 = service.orderPlan(2, 1, t,true);
+        int tid2 = service.orderPlan(2, 1, t,false);
 
         // 现在用户有300分钟的电话，需要支付的话费为110元；有效的套餐有3个。
-        Bill bill2 = service.generateBill(2);
+        Bill bill2 = service.generateBill(2, t.plusSeconds(1));
         assertEquals(300, bill2.getCallBill().getLimit(), DELTA);
         assertEquals(110, bill2.getTotalCharge(), DELTA);
         assertEquals(3, bill2.getActivePlanList().size());
 
         // 下月用户有400分钟电话，需要支付的话费为130;有效的套餐有4个。
-        Bill bill3 = service.generateBill(2, YearMonth.now().plusMonths(1).atEndOfMonth().atTime(LocalTime.MIN));
+        Bill bill3 = service.generateBill(2, YearMonth.from(t).plusMonths(1).atEndOfMonth().atTime(LocalTime.MAX));
         assertEquals(400, bill3.getCallBill().getLimit(), DELTA);
         assertEquals(130, bill3.getTotalCharge(), DELTA);
         assertEquals(4, bill3.getActivePlanList().size());

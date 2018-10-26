@@ -1,14 +1,15 @@
 package database.model;
-
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Date;
 
-public class ActivePlan {
-    private Plan plan;
+public class UserPlanSubscription {
     private int transactionId;
+    private String userId;
+    private String planId;
     private LocalDateTime activateTime;
     private LocalDateTime orderTime;
     private LocalDateTime deactivateTime;
-
 
     public int getTransactionId() {
         return transactionId;
@@ -18,12 +19,20 @@ public class ActivePlan {
         this.transactionId = transactionId;
     }
 
-    public Plan getPlan() {
-        return plan;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setPlan(Plan plan) {
-        this.plan = plan;
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getPlanId() {
+        return planId;
+    }
+
+    public void setPlanId(String planId) {
+        this.planId = planId;
     }
 
     public LocalDateTime getActivateTime() {
@@ -50,7 +59,7 @@ public class ActivePlan {
         this.deactivateTime = deactivateTime;
     }
 
-    public boolean isActivatedAt(LocalDateTime dateTime) {
-        return dateTime.equals(activateTime) || dateTime.isAfter(activateTime);
+    public boolean isActivated(LocalDateTime datetime) {
+        return datetime.isAfter(activateTime) && (deactivateTime == null || deactivateTime.isAfter(datetime));
     }
 }

@@ -4,11 +4,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="database.data.MainMapper">
-
-    <sql id="isPlanActivated">
-        (@time >= userplan.activateTime and (ISNULL(userplan.deactivateTime) or userplan.deactivateTime > @time))
-    </sql>
-
     <select id="getPlan" resultType="Plan">
         select *
         from plan
@@ -27,7 +22,7 @@
         from plan;
     </select>
 
-    <resultMap id="ActivePlanResultMap" type="ActivePlan">
+    <resultMap id="UserPlanResultMap" type="UserPlan">
         <result property="activateTime" column="activateTime"/>
         <result property="orderTime" column="orderTime"/>
         <result property="deactivateTime" column="deactivateTime"/>
@@ -43,12 +38,11 @@
         </association>
     </resultMap>
 
-    <select id="getActivePlans" resultMap="ActivePlanResultMap" resultOrdered="true">
+    <select id="getActivePlans" resultMap="UserPlanResultMap" resultOrdered="true" flushCache="true">
         set @time = #{datetime};
-        select plan.*, userplan.* from plan, userplan
-        where userplan.userId = #{userId} and plan.id = userplan.planId and
-        <include refid="isPlanActivated"/>
-        order by userplan.activateTime;
+        select plan.*, userplansubscription.* from plan, userplansubscription
+        where userplansubscription.userId = #{userId} and plan.id = userplansubscription.planId and (@time >= userplansubscription.activateTime and (ISNULL(userplansubscription.deactivateTime) or userplansubscription.deactivateTime > @time))
+        order by userplansubscription.activateTime;
     </select>
 
     <select id="orderPlan" resultType="int">
@@ -68,7 +62,7 @@
 
         set @transactionId = last_insert_id();
 
-        insert into userplan(transactionId, userId, planId, activateTime, orderTime)
+        insert into userplansubscription(transactionId, userId, planId, activateTime, orderTime)
         values (@transactionId, #{userId}, #{planId},
         <choose>
             <when test="activateImmediately">
@@ -104,7 +98,7 @@
         </choose>
         );
 
-        update userplan set deactivateTime =
+        update userplansubscription set deactivateTime =
         <choose>
             <when test="activateImmediately">
                 @now
@@ -117,12 +111,6 @@
 
     </select>
 
-
-    <sql id="insideTheMonth">
-        between @firstDayOfMonth and @firstDayOfNextMonth
-    </sql>
-
-
     <select id="getUsages" resultOrdered="true" resultType="Usage">
         <include refid="first, today, last"/>
         select * from `usage`
@@ -134,12 +122,6 @@
         order by startTime;
 
     </select>
-
-    <sql id="returnsUsage">
-        select
-            @limit as `limit`,
-            @total as `total`;
-    </sql>
 
     <select id="getBasicCost" resultType="BasicCost">
         select basicCostId
@@ -162,5 +144,16 @@
         insert into `usage`(userId, amount, startTime, serviceType)
         values (#{userId}, #{amount}, #{startTime}, #{serviceType});
     </insert>
+
+    <select id="getUserPlans" resultMap="UserPlanResultMap">
+        select plan.*, userplansubscription.* from plan, userplansubscription
+        where userplansubscription.userId = #{userId} and plan.id = userplansubscription.planId
+        order by userplansubscription.orderTime;
+    </select>
+
+    <select id="getTransactions" resultType="UserPlanTransaction">
+        select * from userplantransaction
+        where userId=#{userId};
+    </select>
 
 </mapper>

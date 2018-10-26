@@ -48,9 +48,9 @@ public class InitExample {
             BasicCost basicCost = new BasicCost(0.5, 0.1, 2, 5);
             creatorMapper.insertBasicCost(basicCost);
 
-            User user1 = new User("测试用户1", basicCost.getId());
-            User user2 = new User("测试用户2", basicCost.getId());
-            User user3 = new User("测试用户3", basicCost.getId());
+            User user1 = new User("测试用户1", basicCost.getId(), "12345667891");
+            User user2 = new User("测试用户2", basicCost.getId(), "12345678892");
+            User user3 = new User("测试用户3", basicCost.getId(), "12342356783");
 
             creatorMapper.insertUser(user1);
             creatorMapper.insertUser(user2);

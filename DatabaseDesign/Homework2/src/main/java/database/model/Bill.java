@@ -7,6 +7,7 @@ public class Bill {
     // basic information
     private int userId;
     private String name;
+    private String phoneNumber;
 
     // bill date range
     private LocalDateTime startDate;
@@ -16,7 +17,7 @@ public class Bill {
     private BasicCost basicCost;
 
     // active plans
-    private List<ActivePlan> activePlanList;
+    private List<UserPlan> activePlanList;
 
     // usages
     private ServiceBill localDataBill;
@@ -31,6 +32,15 @@ public class Bill {
             + callBill.getCharge()
             + smsBill.getCharge()
             + activePlanList.stream().mapToDouble(x -> x.getPlan().getCost()).sum();
+    }
+
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getName() {
@@ -74,11 +84,11 @@ public class Bill {
         this.basicCost = basicCost;
     }
 
-    public List<ActivePlan> getActivePlanList() {
+    public List<UserPlan> getActivePlanList() {
         return activePlanList;
     }
 
-    public void setActivePlanList(List<ActivePlan> activePlanList) {
+    public void setActivePlanList(List<UserPlan> activePlanList) {
         this.activePlanList = activePlanList;
     }
 
