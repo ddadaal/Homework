@@ -59,10 +59,10 @@ class CreatorTest {
             assertEquals(2, bill.getActivePlanList().size());
             assertEquals(basicCost.getId(), bill.getBasicCost().getId());
 
-            assertEquals(new ServiceBill(7, 7, 7 * basicCost.getCallCost(), 0), bill.getCallBill());
-            assertEquals(new ServiceBill(1, 1, 1 * basicCost.getSmsCost(), 0), bill.getSmsBill());
-            assertEquals(new ServiceBill(3072, 0, 0, 2048), bill.getLocalDataBill());
-            assertEquals(new ServiceBill((1.5)*1024, 512, 512*basicCost.getDomesticDataCost(), 2048), bill.getDomesticDataBill());
+            assertEquals(new ServiceBill(7, 7, 7 * basicCost.getCallCost(), 0, 0), bill.getCallBill());
+            assertEquals(new ServiceBill(1, 1, 1 * basicCost.getSmsCost(), 0, 0), bill.getSmsBill());
+            assertEquals(new ServiceBill(3072, 0, 0, 2048, 0), bill.getLocalDataBill());
+            assertEquals(new ServiceBill((1.5)*1024, 512, 512*basicCost.getDomesticDataCost(), 2048, 0), bill.getDomesticDataBill());
 
             assertEquals(7 * basicCost.getCallCost()
                     + 1 * basicCost.getSmsCost()

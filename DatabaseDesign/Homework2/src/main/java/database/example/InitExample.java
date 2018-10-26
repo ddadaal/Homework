@@ -19,7 +19,7 @@ public class InitExample {
      * 1. 5种套餐，示例4种+霸王套餐，每月70，100分钟数，200短信，2G本地，2G国内
      * 2. 用户1订阅2, 3, 4套餐，2下月生效，3，4立刻生效；用户2订阅1,5套餐，都立刻生效
      * 3. 用户1打了300秒电话，算7分钟；发了一条短信；用了3G省内流量，1.5G国内流量
-     * 4. 用户2定了1,5套餐，立刻生效。
+     * 4. 用户2定了1,5套餐，立刻生效；但是在1s后取消了1套餐。
      * 5. 用户3什么都没定。
      */
     public static void insertInitData() {
@@ -63,10 +63,10 @@ public class InitExample {
             mainMapper.orderPlan(user1.getId(), plan3.getId(),baseTime, true);
             mainMapper.orderPlan(user1.getId(), plan4.getId(), baseTime, true);
 
-            // 用户2订阅1,5套餐，都立刻生效
-            mainMapper.orderPlan(user2.getId(), plan1.getId(), baseTime, true);
+            // 用户2订阅1, 5套餐，都立刻生效；但是在1s后取消1套餐。
+            int tid = mainMapper.orderPlan(user2.getId(), plan1.getId(), baseTime, true);
             mainMapper.orderPlan(user2.getId(), plan5.getId(), baseTime, true);
-
+            mainMapper.cancelPlan(tid, baseTime.plusSeconds(1), true);
 
 
             // 用户1打了300秒电话，算7分钟；发了一条短信；用了3G省内流量，1.5G国内流量

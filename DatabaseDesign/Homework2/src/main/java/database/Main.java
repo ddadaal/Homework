@@ -57,17 +57,27 @@ public class Main {
         });
     }
 
-    public void queryUserPlan() {
-        int userId = 1;
-        countTime("1.2 查询用户1的套餐订阅记录", () -> {
+    public void queryActivePlans() {
+        int userId = 2;
+
+        LocalDateTime t = LocalDateTime.now().plusSeconds(2);
+        countTime("1.2 查询用户2的目前生效的订阅记录", () -> {
+            List<UserPlan> userPlans = service.getActivePlans(userId, t);
+            printAll(userPlans, true);
+        });
+    }
+
+    public void queryUserPlanSubscriptions() {
+        int userId = 2;
+        countTime("1.3 查询用户2的套餐订阅记录（包含生效的和已取消的）", () -> {
             List<UserPlan> userPlans = service.getUserPlans(userId);
             printAll(userPlans, true);
         });
     }
 
-    public void queryUserTransaction() {
-        int userId = 1;
-        countTime("1.3 查询用户1的套餐交易记录", () -> {
+    public void queryUserTransactions() {
+        int userId = 2;
+        countTime("1.4 查询用户2的套餐交易记录", () -> {
             List<UserPlanTransaction> transactions = service.getTransactions(userId);
             printAll(transactions, true);
         });
@@ -183,16 +193,16 @@ public class Main {
 
         System.out.println();
         System.out.println("查看此时用户的电话服务账单");
-        System.out.println(service.generateBill(userId, t.plusSeconds(2)).getCallBill());
+        System.out.println(service.generateBill(userId, t.plusSeconds(3)).getCallBill());
 
         System.out.println();
         countTime("用户3在打完刚才10分钟的电话的1秒后时候又打了200分钟电话（套餐只剩90，对另外的110分钟额外计费），将此使用情况记入数据库", () -> {
-            service.addUsage(new Usage(userId, 200, t.plusMinutes(10).plusSeconds(3), ServiceType.CALL));
+            service.addUsage(new Usage(userId, 200, t.plusMinutes(10).plusSeconds(4), ServiceType.CALL));
         });
 
         System.out.println();
         System.out.println("查看用户的电话服务账单");
-        System.out.println(service.generateBill(userId, t.plusMinutes(10).plusSeconds(3)).getCallBill());
+        System.out.println(service.generateBill(userId, t.plusMinutes(10).plusSeconds(4)).getCallBill());
     }
 
     public void addDataUsage() {

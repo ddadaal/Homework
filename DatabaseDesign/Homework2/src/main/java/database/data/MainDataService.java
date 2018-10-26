@@ -13,8 +13,24 @@ import java.util.List;
 
 public class MainDataService {
 
+
     /**
-     * 获得用户订阅记录
+     * 获得用户在某一时间点生效的套餐
+     * @param userId 用户ID
+     * @param datetime 时间点
+     * @return 用户生效的套餐
+     */
+
+    public List<UserPlan> getActivePlans(int userId, LocalDateTime datetime) {
+        try (SqlSession sqlSession = MapperFactory.getSession()) {
+            MainMapper mapper = sqlSession.getMapper(MainMapper.class);
+
+            return mapper.getActivePlans(userId, datetime);
+        }
+    }
+
+    /**
+     * 获得用户订阅记录（即所有订阅过的套餐的信息）
      * @param userId 用户ID
      * @return 用户订阅记录
      */
@@ -102,7 +118,7 @@ public class MainDataService {
 
                 // 计算超出计费
                 double charge = extra * basicCost;
-                return new ServiceBill(totalUsed, extra, charge, limit);
+                return new ServiceBill(totalUsed, extra, charge, limit, remaining);
             } else {
                 List<Usage> usages = mainMapper.getUsages(
                     userId,
@@ -170,9 +186,9 @@ public class MainDataService {
                 }
 
                 if (serviceType.equals(ServiceType.LOCAL_DATA)) {
-                    return new ServiceBill(localDataTotal, localDataExtra, localDataExtra * basicCost, localDataLimit);
+                    return new ServiceBill(localDataTotal, localDataExtra, localDataExtra * basicCost, localDataLimit, localDataRemaining);
                 } else {
-                    return new ServiceBill(domesticDataTotal, domesticDataExtra, domesticDataExtra * basicCost, domesticDataLimit);
+                    return new ServiceBill(domesticDataTotal, domesticDataExtra, domesticDataExtra * basicCost, domesticDataLimit, domesticDataRemaining);
                 }
 
 

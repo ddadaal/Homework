@@ -7,12 +7,14 @@ public class ServiceBill {
     private double extra;
     private double charge;
     private double limit;
+    private double remaining;
 
-    public ServiceBill(double total, double extra, double charge, double limit) {
+    public ServiceBill(double total, double extra, double charge, double limit, double remaining) {
         this.total = total;
         this.extra = extra;
         this.charge = charge;
         this.limit = limit;
+        this.remaining = remaining;
     }
 
     public ServiceBill() {
@@ -26,6 +28,15 @@ public class ServiceBill {
 //        billUsage.limit = usage.getLimit();
 //        return billUsage;
 //    }
+
+
+    public double getRemaining() {
+        return remaining;
+    }
+
+    public void setRemaining(double remaining) {
+        this.remaining = remaining;
+    }
 
     public double getLimit() {
         return limit;
@@ -42,6 +53,7 @@ public class ServiceBill {
             ", 套餐外使用量=" + extra +
             ", 套餐外使用量收费=" + charge +
             ", 套餐限额=" + limit +
+            ", 套餐剩余=" + remaining +
             '}';
     }
 
@@ -53,7 +65,9 @@ public class ServiceBill {
         return Double.compare(serviceBill.getTotal(), getTotal()) == 0 &&
             Double.compare(serviceBill.getExtra(), getExtra()) == 0 &&
             Double.compare(serviceBill.getCharge(), getCharge()) == 0 &&
-            Double.compare(serviceBill.getLimit(), getLimit()) == 0;
+            Double.compare(serviceBill.getLimit(), getLimit()) == 0 &&
+            Double.compare(serviceBill.getRemaining(), getRemaining()) == 0
+            ;
     }
 
     @Override
