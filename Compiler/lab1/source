@@ -1,9 +1,181 @@
-logging {
-    category lame-servers { null; };
-    category cname { null; };
-};
+int main()
+{
+    /*
 
-zone "." {
-    type hint;
-    file "/etc/bind/db.root";
+    multi line comments 
+
+    */
+    // 1.3.1
+    0x2f;
+    0x88;
+    0xAB43;
+    0xAbCd;
+    0x1;
+
+    057;
+    012;
+    03;
+    0241;
+
+    459;
+    23901;
+    8;
+    12;
+
+    45U;
+    45L;
+    45UL;
+    45ULL;
+    45LL;
+
+    // 1.3.2
+    '\\';
+    '\?';
+    '\'';
+    '\"';
+    '\a';
+    '\b';
+    '\e';
+    '\f';
+    '\n';
+    '\r';
+    '\t';
+    '\v';
+    '\13';
+    '\x0f';
+
+    // 1.3.3
+    double a, b, c, d, e, f;
+    a = 4.7;
+    b = 4.;
+    c = 4;
+    d = .7;
+    e = 0.7;
+
+    double x, y;
+    x = 5e2;  /* x is 5 * 100, or 500.0. */
+    y = 5e-2; /* y is 5 * (1/100), or 0.05. */
+    y = 5.3e-02;
+    y = 5.3E+4;
+    y= 5.3E+4l;
+    y = 0.f;
+    y = 013.f;
+    y = 0x2fe-2L;
+
+
+    // 1.3.4
+    "tutti frutti ice cream";
+    "tutti "
+    "frutti"
+    " ice "
+    "cream";
+    "\b";
+    "\"hello, world!\"";
+    "Today’s special is a pastrami sandwich on rye bread with \
+a potato knish and a cherry soda.";
+    
+    "Tomorrow’s special is a corned beef sandwich on "
+    "pumpernickel bread with a kasha knish and seltzer water.";
+
+    // 1.5 separators which are token themselves
+    (123);
+    [];
+    {};
+    ;
+
+    // 1.6 whitespace \t, \n,
+                
+    // 1.4  operators
+    int i;
+    i = 0;
+    i += 1;
+    i *= 1;
+    i /= 1;
+    i -= 1;
+    i %= 1;
+    i <<= 1;
+    i >>= 1;
+    i &= 1;
+    i ^= 1;
+    i |= 1;
+    1 + 1;
+    1 - 1;
+    1 * 1;
+    1 / 1;
+    1 % 1;
+
+    a++;
+    ++a;
+    --a;
+    a--;
+
+    -5;
+    -3.1415825;
+
+    1 + -2;
+    -1 * -3;
+    1 - +3;
+
+    a == 2;
+    a != 2;
+    a < 2;
+    a > 2;
+    a >= 2;
+    a <= 2;
+
+    2 && 3;
+    2 || 3;
+    (2 == 3) || (2 < 4);
+    !2;
+    !(2 == 3);
+
+    1 << 2;
+    2 >> 3;
+    (((2 << 4) + 3) << 5) + 6;
+
+    123123 & 12321;
+    123124 | 1251;
+    123213 ^ 12421;
+    ~213124;
+
+    // pointers
+    int x = 5;
+    int *pointer_to_x = &x;
+
+    int x = 5;
+    int y;
+    int *ptr;
+    ptr = &x; /* ptr now holds the address of x. */
+    y = *ptr; /* y gets the value stored at the address
+stored in ptr */
+
+    sizeof(int);
+    sizeof x;
+    sizeof(5);
+
+    // type casts
+    float x;
+    int y = 7;
+    int z = 3;
+    x = (float)(y / z);
+
+    // comma
+    x++, y = x * x;
+    for (x = 1, y = 10; x <= 10 && y >= 1; x++, y--)
+    {
+    }
+
+    // member access
+    struct point
+    {
+        int x, y;
+    };
+    struct point first_point;
+    first_point.x = 0;
+    first_point.y = 5;
+
+    // conditional
+
+    a ? b :c;
+    a = (3 == 5) ? 4 : 5;
 }
