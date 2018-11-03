@@ -1,7 +1,9 @@
 %{
     #include <stdio.h>
     void onmatch(char * type);
+    void handleComment();
     
+    #define COMMENT "Comment"
     #define KEYWORD "Keyword"
     #define IDENTIFIER "Identifier"
     #define COMMENT "Comment"
@@ -9,13 +11,33 @@
     #define CHAR_CONST "Character Constant"
     #define REAL_CONST "Real Number Constant"
     #define STR_CONST "String Constant"
-    #define OPERATOR "Operator"
+    #define ASSIGN_OP "Assignment Operator"
+    #define INCRE_DECRE_OP "Increment or Decrement"
+    #define ARITHMETIC_OP "Arithmetic Operator"
+    #define COMPARISON_OP "Comparison Operator"
+    #define LOGICAL_OP "Logical Operator"
+    #define BIT_OP "Bit Operator"
+    #define POINTER_OP "Pointer Operator"
+    #define SIZEOF_OP "sizeof Operator"
+    #define QUESTION_MARK "Question mark (?)"
     #define UNKNOWN "Unknown"
+    #define LEFT_PARENTHESIS "Left Parenthesis"
+    #define RIGHT_PARENTHESIS "Right Parenthesis"
+    #define LEFT_BRACKET "Left Bracket"
+    #define RIGHT_BRACKET "Right Bracket"
+    #define LEFT_BRACE "Left Brace"
+    #define RIGHT_BRACE "Right Brace"
+    #define SEMICOLON "Semicolon"
+    #define COMMA "Comma"
+    #define DOT "Dot"
+    #define COLON "Colon"
+    #define STAR "*"
+    #define AND "&"
 %}
 
 letter [a-zA-Z]
 digit [0-9]
-WS [ \n\t]
+WS [ \n\t\f]
 octa_num [0-7]+
 octa 0{octa_num}
 hex_num ({digit}|[a-fA-F])+
@@ -29,6 +51,8 @@ float_e (e|E)(\+|-)?{digit}+
 
 %%
 
+\/\/.* {onmatch(COMMENT);} 
+\/\* { handleComment(); }
 
 
 "auto" { onmatch(KEYWORD); }
@@ -82,14 +106,94 @@ float_e (e|E)(\+|-)?{digit}+
 
 (\"((\\\n)|\'|({char})|[ \t])*\"({WS})*)+ { onmatch(STR_CONST); }
 
+"=" {onmatch(ASSIGN_OP);}
+"+=" {onmatch(ASSIGN_OP);}
+"-=" {onmatch(ASSIGN_OP);}
+"*=" {onmatch(ASSIGN_OP);}
+"/=" {onmatch(ASSIGN_OP);}
+"%=" {onmatch(ASSIGN_OP);}
+"<<=" {onmatch(ASSIGN_OP);}
+">>=" {onmatch(ASSIGN_OP);}
+"&=" {onmatch(ASSIGN_OP);}
+"^=" {onmatch(ASSIGN_OP);}
+"|=" {onmatch(ASSIGN_OP);}
+
+"++" {onmatch(INCRE_DECRE_OP);}
+"--" {onmatch(INCRE_DECRE_OP);}
+
+"+" {onmatch(ARITHMETIC_OP);}
+"-" {onmatch(ARITHMETIC_OP);}
+"/" {onmatch(ARITHMETIC_OP);}
+"%" {onmatch(ARITHMETIC_OP);}
+
+"==" {onmatch(COMPARISON_OP);}
+"!=" {onmatch(COMPARISON_OP);}
+"<" {onmatch(COMPARISON_OP);}
+">" {onmatch(COMPARISON_OP);}
+"<=" {onmatch(COMPARISON_OP);}
+">=" {onmatch(COMPARISON_OP);}
+
+"&&" {onmatch(LOGICAL_OP);}
+"||" {onmatch(LOGICAL_OP);}
+"!" {onmatch(LOGICAL_OP);}
+
+"<<" {onmatch(BIT_OP);}
+">>" {onmatch(BIT_OP);}
+"|" {onmatch(BIT_OP);}
+"^" {onmatch(BIT_OP);}
+"~" {onmatch(BIT_OP);}
+
+"?" {onmatch(QUESTION_MARK);}
+"*" {onmatch(STAR);}
+"&" {onmatch(AND);}
+
+
+\( {onmatch(LEFT_PARENTHESIS); }
+\) {onmatch(RIGHT_PARENTHESIS);}
+\[ {onmatch(LEFT_BRACKET);}
+\] {onmatch(RIGHT_BRACKET);}
+\{ {onmatch(LEFT_BRACE);}
+\} {onmatch(RIGHT_BRACE);}
+\; {onmatch(SEMICOLON);}
+\, {onmatch(COMMA);}
+\. {onmatch(DOT);}
+\: {onmatch(COLON);}
+
 {WS}* { /* ignored */}
 
-. { onmatch(UNKNOWN); }
+. { onmatch(UNKNOWN); return 1; }
 
 
 %%
 
+// char input() {
+//     char buff[1];
+//     int result;
+//     YY_INPUT(buff, result, 1);
+//     return buff[0];
+// }
 
+void handleComment() {
+    printf("<"COMMENT", ");
+    
+    while(1) {
+        char c = input();
+        if (c == '*') {
+            char c1 = input();
+            if (c1 == '/') {
+                break;
+            } else {
+                putchar(c);
+            }
+        } else {
+            putchar(c);
+        }
+    }
+
+    printf(">\n");
+
+    
+}
 
 void onmatch(char * type) {
     printf("<%s, %s>\n", type, yytext);

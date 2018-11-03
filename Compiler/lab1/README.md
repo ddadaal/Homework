@@ -161,3 +161,27 @@ output:
 "123"
 >
 ```
+
+5. Multiple meanings
+
+According to the manual, Some chars like "*" and "&" have multiple meanings, and therefore should be a token by its own.
+
+6. Comments
+
+My program parses comment as a single token, not simply ignoring them. 
+
+For simple comments with //, the following regex works just fine:
+
+```lex
+\/\/.* {onmatch(COMMENT);} 
+```
+
+When it comes to multiline comments, however, it's bit more complicated. First I write the following for /* */-type comment
+
+```lex
+\/\*(.|\n)*\*\/ { onmatch(COMMENT);}
+```
+
+However, I found that this regex eats all contents between the first /* and the last */ because of the longest prefix matching policy. It's not how it should have worked.
+
+Since flex doesn't support non-greedy policy, the only way to do it is to parse this kind of comment manually.
