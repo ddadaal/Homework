@@ -4,8 +4,11 @@ param($file)
 "Compilation completed."
 
 if ($file) {
+    "Analyzing $file"
+    ""
     Get-Content $file | ./test
 } else {
     "Type content now"
+    ""
     ./test
 }
