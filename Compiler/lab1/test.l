@@ -31,8 +31,11 @@
     #define COMMA "Comma"
     #define DOT "Dot"
     #define COLON "Colon"
-    #define STAR "*"
-    #define AND "&"
+
+    #define STAR "STAR"
+    #define AND "AND"
+    #define PLUS "PLUS"
+    #define MINUS "MINUS"
 %}
 
 letter [a-zA-Z]
@@ -44,7 +47,6 @@ hex_num ({digit}|[a-fA-F])+
 hex 0(x|X){hex_num}
 int_type (l|L)|((u|U)(l|L)?(l|L)?)
 escaped_char \\((\\)|(\?)|(\')|(\")|[abefnrtv]|([0-7]{1,3})|x({hex_num}))
-char {letter}|{digit}|{escaped_char}
 float_no_e {digit}+\.{digit}*|{digit}*\.{digit}+
 float_type (F|f|L|l)
 float_e (e|E)(\+|-)?{digit}+
@@ -99,12 +101,12 @@ float_e (e|E)(\+|-)?{digit}+
 {octa}({int_type})? { onmatch(INT_CONST); }
 0|[1-9][0-9]*({int_type})? { onmatch(INT_CONST); }
 
-\'({char})\' {onmatch(CHAR_CONST);}
+\'([^'\\\n]|{escaped_char})\' {onmatch(CHAR_CONST);}
 
 ({float_no_e}){float_type}? {onmatch(REAL_CONST);}
 (({float_no_e})|{digit}+|{hex}){float_e}{float_type}? {onmatch(REAL_CONST);}
 
-(\"((\\\n)|\'|({char})|[ \t])*\"({WS})*)+ { onmatch(STR_CONST); }
+(\"(.|(\\\n))*\"({WS})*)+ { onmatch(STR_CONST); }
 
 "=" {onmatch(ASSIGN_OP);}
 "+=" {onmatch(ASSIGN_OP);}
@@ -121,8 +123,6 @@ float_e (e|E)(\+|-)?{digit}+
 "++" {onmatch(INCRE_DECRE_OP);}
 "--" {onmatch(INCRE_DECRE_OP);}
 
-"+" {onmatch(ARITHMETIC_OP);}
-"-" {onmatch(ARITHMETIC_OP);}
 "/" {onmatch(ARITHMETIC_OP);}
 "%" {onmatch(ARITHMETIC_OP);}
 
@@ -146,6 +146,8 @@ float_e (e|E)(\+|-)?{digit}+
 "?" {onmatch(QUESTION_MARK);}
 "*" {onmatch(STAR);}
 "&" {onmatch(AND);}
+"+" {onmatch(PLUS);}
+"-" {onmatch(MINUS);}
 
 
 \( {onmatch(LEFT_PARENTHESIS); }
@@ -165,14 +167,6 @@ float_e (e|E)(\+|-)?{digit}+
 
 
 %%
-
-// char input() {
-//     char buff[1];
-//     int result;
-//     YY_INPUT(buff, result, 1);
-//     return buff[0];
-// }
-
 void handleComment() {
     printf("<"COMMENT", ");
     

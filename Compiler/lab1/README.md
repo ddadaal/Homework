@@ -185,3 +185,9 @@ When it comes to multiline comments, however, it's bit more complicated. First I
 However, I found that this regex eats all contents between the first /* and the last */ because of the longest prefix matching policy. It's not how it should have worked.
 
 Since flex doesn't support non-greedy policy, the only way to do it is to parse this kind of comment manually.
+
+7. Match anything but ...
+
+When matching char, it's a bit problem that we must reject any characters except a single \\(backslash). So the dot (.) can't be used since dot matches anything including backslash. Although such function is not mentioned in docs, I've found it in a stackoverflow page and proves it working.
+
+https://stackoverflow.com/questions/35696610/regular-expression-matches-any-word-except-for-some-words-in-flex
