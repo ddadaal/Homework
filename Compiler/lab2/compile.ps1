@@ -1,3 +1,3 @@
-win_bison -d -oc99yy.c c99.y
-win_flex -oc99ll.c c99.l
+win_bison -d -o c99yy.c c99.y
+win_flex -o c99ll.c c99.l
 gcc c99*.c -o c99
