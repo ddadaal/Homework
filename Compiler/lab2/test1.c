@@ -1,1 +1,5 @@
-HAHHA time(HAHAH t, HAHAH t2)
+#include <stdio.h>
+
+int main() {
+    printf("%d", b());
+}

@@ -87,41 +87,45 @@ float_type (F|f|L|l)
 
 (\"([^\"\n]|(\\\n))*\"({WS})*)+ { yylval.sv = strdup(yytext); return STR_CONST; }
 
-"=" {}
-"+=" {}
-"-=" {}
-"*=" {}
-"/=" {}
-"%=" {}
-"<<=" {}
-">>=" {}
-"&=" {}
-"^=" {}
-"|=" {}
+"=" { return ASSIGN; }
+"+=" { return PLUS_ASSIGN; }
+"-=" { return MINUS_ASSIGN; }
+"*=" { return MUL_ASSIGN; }
+"/=" { return DIV_ASSIGN; }
+"%=" { return MOD_ASSIGN; }
+"<<=" { return LEFT_SHIFT_ASSIGN; }
+">>=" { return RIGHT_SHIFT_ASSIGN; }
+"&=" { return AND_ASSIGN; }
+"^=" { return XOR_ASSIGN; }
+"|=" { return OR_ASSIGN; }
+"&&=" { return AND_AND_ASSIGN; }
+"||=" { return OR_OR_ASSIGN; }
 
-"++" {}
-"--" {}
+"++" { return INCRE; }
+"--" { return DECRE; }
 
-"/" {}
-"%" {}
+"/" { return DIV; }
+"%" { return MOD; }
 
-"==" {}
-"!=" {}
-"<" {}
-">" {}
-"<=" {}
-">=" {}
+"==" { return EQUAL; }
+"!=" { return NOT_EQUAL; }
+"<" { return LT; }
+">" { return GT;}
+"<=" { return LE;}
+">=" { return GE;}
 
-"&&" {}
-"||" {}
-"!" {}
-"..." {}
+"->" { return PTR_ACCESS; }
 
-"<<" { }
-">>" {}
-"|" {}
-"^" {}
-"~" {}
+"&&" { return AND_AND; }
+"||" { return OR_OR; }
+"!" { return EXCLAMATION; }
+"..." { return ELLIPSIS; }
+
+"<<" { return LEFT_SHIFT; }
+">>" { return RIGHT_SHIFT; }
+"|" { return OR; }
+"^" { return XOR; }
+"~" { return NEGATE; }
 
 "?" { return QUESTION_MARK; }
 "*" { return STAR;}

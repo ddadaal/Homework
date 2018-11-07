@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 typedef struct ListNode {
     ListNode* next;
     int value;
@@ -15,6 +13,10 @@ inline void printList(ListNode* node, ...) {
 
 int main() {
     ListNode* head = (ListNode*)malloc(sizeof(ListNode));
+
+    1<<3+2;
+
+    sizeof &head;
     ListNode* node = head;
     for (int i=0;i<1000;i++) {
         if (i % 5 < 1 && i % 6 == 0) {

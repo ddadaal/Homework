@@ -34,7 +34,7 @@
 # define YY_YY_C99YY_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -87,29 +87,54 @@ extern int yydebug;
     _COMPLEX = 297,
     _IMAGINARY = 298,
     RESTRICT = 299,
-    ASSIGN_OP = 300,
-    INCRE_DECRE_OP = 301,
-    ARITHMETIC_OP = 302,
-    COMPARISON_OP = 303,
-    LOGICAL_OP = 304,
-    BIT_OP = 305,
-    POINTER_OP = 306,
-    QUESTION_MARK = 307,
-    LEFT_PARENTHESIS = 308,
-    RIGHT_PARENTHESIS = 309,
-    LEFT_BRACKET = 310,
-    RIGHT_BRACKET = 311,
-    LEFT_BRACE = 312,
-    RIGHT_BRACE = 313,
-    SEMICOLON = 314,
-    COMMA = 315,
-    DOT = 316,
-    COLON = 317,
-    ELLIPSIS = 318,
-    STAR = 319,
-    AND = 320,
-    PLUS = 321,
-    MINUS = 322
+    LEFT_PARENTHESIS = 300,
+    RIGHT_PARENTHESIS = 301,
+    LEFT_BRACKET = 302,
+    RIGHT_BRACKET = 303,
+    LEFT_BRACE = 304,
+    RIGHT_BRACE = 305,
+    SEMICOLON = 306,
+    COMMA = 307,
+    DOT = 308,
+    COLON = 309,
+    ELLIPSIS = 310,
+    STAR = 311,
+    AND = 312,
+    PLUS = 313,
+    MINUS = 314,
+    QUESTION_MARK = 315,
+    PTR_ACCESS = 316,
+    ASSIGN = 317,
+    PLUS_ASSIGN = 318,
+    MINUS_ASSIGN = 319,
+    MUL_ASSIGN = 320,
+    DIV_ASSIGN = 321,
+    MOD_ASSIGN = 322,
+    LEFT_SHIFT_ASSIGN = 323,
+    RIGHT_SHIFT_ASSIGN = 324,
+    AND_ASSIGN = 325,
+    XOR_ASSIGN = 326,
+    OR_ASSIGN = 327,
+    AND_AND_ASSIGN = 328,
+    OR_OR_ASSIGN = 329,
+    INCRE = 330,
+    DECRE = 331,
+    DIV = 332,
+    MOD = 333,
+    LT = 334,
+    GT = 335,
+    LE = 336,
+    GE = 337,
+    EQUAL = 338,
+    NOT_EQUAL = 339,
+    AND_AND = 340,
+    OR_OR = 341,
+    EXCLAMATION = 342,
+    LEFT_SHIFT = 343,
+    RIGHT_SHIFT = 344,
+    NEGATE = 345,
+    OR = 346,
+    XOR = 347
   };
 #endif
 
@@ -118,13 +143,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 13 "c99.y" /* yacc.c:1910  */
+#line 27 "c99.y" /* yacc.c:1910  */
 
   int iv;
   char *sv;
   double fv;
 
-#line 128 "c99yy.h" /* yacc.c:1910  */
+#line 153 "c99yy.h" /* yacc.c:1910  */
 };
 
 typedef union YYSTYPE YYSTYPE;
