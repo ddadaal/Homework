@@ -4,6 +4,8 @@
     #include <stdio.h>
     // #include "lex.h"
     #include "c99yy.h"  //由bison生成
+    #include "symtable.h"
+
 
 
     extern int yyerror(char *);
@@ -11,6 +13,9 @@
     void onmatch(char * type);
     void handleComment();
     int handleError();
+    int handleIdentifier();
+
+    
 
     // comment this to make the program NOT crash on unknown token
     #define CRASH_ON_UNKNOWN
@@ -73,7 +78,7 @@ float_type (F|f|L|l)
 "_Imaginary" {  return _IMAGINARY;}
 "restrict" {  return RESTRICT;}
 
-{letter}({letter}|{digit}|_)* {  yylval.sv = strdup(yytext); return IDENTIFIER;  }
+{letter}({letter}|{digit}|_)* {  return handleIdentifier();  }
 
 {hex}({int_type})? {  yylval.iv = strtol(yytext, 0, 10); return INT_CONST; }
 {octa}({int_type})? {  yylval.iv = strtol(yytext, 0, 10); return INT_CONST; }
@@ -159,6 +164,15 @@ float_type (F|f|L|l)
 
 
 %%
+
+int handleIdentifier() {
+    yylval.sv = strdup(yytext);
+
+    if (find(yytext)) {
+        return TYPE_NAME;
+    }
+    return IDENTIFIER;
+}
 
 void handleComment() {
     

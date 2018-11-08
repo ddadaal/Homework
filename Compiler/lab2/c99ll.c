@@ -673,6 +673,8 @@ char *yytext;
     #include <stdio.h>
     // #include "lex.h"
     #include "c99yy.h"  //由bison生成
+    #include "symtable.h"
+
 
 
     extern int yyerror(char *);
@@ -680,12 +682,15 @@ char *yytext;
     void onmatch(char * type);
     void handleComment();
     int handleError();
+    int handleIdentifier();
+
+    
 
     // comment this to make the program NOT crash on unknown token
     #define CRASH_ON_UNKNOWN
     
-#line 687 "c99ll.c"
-#line 688 "c99ll.c"
+#line 692 "c99ll.c"
+#line 693 "c99ll.c"
 
 #define INITIAL 0
 
@@ -902,10 +907,10 @@ YY_DECL
 		}
 
 	{
-#line 32 "c99.l"
+#line 37 "c99.l"
 
 
-#line 908 "c99ll.c"
+#line 913 "c99ll.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -974,489 +979,489 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 34 "c99.l"
+#line 39 "c99.l"
 {} 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 35 "c99.l"
+#line 40 "c99.l"
 { handleComment(); }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 38 "c99.l"
+#line 43 "c99.l"
 {  return AUTO; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 39 "c99.l"
+#line 44 "c99.l"
 {  return BREAK; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 40 "c99.l"
+#line 45 "c99.l"
 {  return CASE; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 41 "c99.l"
+#line 46 "c99.l"
 {  return CHAR;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 42 "c99.l"
+#line 47 "c99.l"
 {  return CONST; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 43 "c99.l"
+#line 48 "c99.l"
 {  return CONTINUE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 44 "c99.l"
+#line 49 "c99.l"
 {  return DEFAULT; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 45 "c99.l"
+#line 50 "c99.l"
 {  return DO; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 46 "c99.l"
+#line 51 "c99.l"
 {  return DOUBLE;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 47 "c99.l"
+#line 52 "c99.l"
 {   return ELSE;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 48 "c99.l"
+#line 53 "c99.l"
 {  return ENUM;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 49 "c99.l"
+#line 54 "c99.l"
 {  return EXTERN;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 50 "c99.l"
+#line 55 "c99.l"
 {  return FLOAT;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 51 "c99.l"
+#line 56 "c99.l"
 {   return FOR;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 52 "c99.l"
+#line 57 "c99.l"
 {  return GOTO; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 53 "c99.l"
+#line 58 "c99.l"
 {  return IF; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 54 "c99.l"
+#line 59 "c99.l"
 {  return INT; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 55 "c99.l"
+#line 60 "c99.l"
 {  return LONG; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 56 "c99.l"
+#line 61 "c99.l"
 {   return REGISTER; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 57 "c99.l"
+#line 62 "c99.l"
 {  return RETURN; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 58 "c99.l"
+#line 63 "c99.l"
 {  return SHORT; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 59 "c99.l"
+#line 64 "c99.l"
 {  return SIGNED; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 60 "c99.l"
+#line 65 "c99.l"
 {  return SIZEOF;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 61 "c99.l"
+#line 66 "c99.l"
 {  return STATIC;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 62 "c99.l"
+#line 67 "c99.l"
 {  return STRUCT; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 63 "c99.l"
+#line 68 "c99.l"
 {  return SWITCH;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 64 "c99.l"
+#line 69 "c99.l"
 {  return TYPEDEF;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 65 "c99.l"
+#line 70 "c99.l"
 {   return UNION;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 66 "c99.l"
+#line 71 "c99.l"
 {  return UNSIGNED; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 67 "c99.l"
+#line 72 "c99.l"
 {  return VOID;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 68 "c99.l"
+#line 73 "c99.l"
 {  return VOLATILE;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 69 "c99.l"
+#line 74 "c99.l"
 {  return WHILE;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 70 "c99.l"
+#line 75 "c99.l"
 {  return INLINE;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 71 "c99.l"
+#line 76 "c99.l"
 {   return _BOOL;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 72 "c99.l"
+#line 77 "c99.l"
 {  return _COMPLEX;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 73 "c99.l"
+#line 78 "c99.l"
 {  return _IMAGINARY;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 74 "c99.l"
+#line 79 "c99.l"
 {  return RESTRICT;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 76 "c99.l"
-{  yylval.sv = strdup(yytext); return IDENTIFIER;  }
+#line 81 "c99.l"
+{  return handleIdentifier();  }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 78 "c99.l"
+#line 83 "c99.l"
 {  yylval.iv = strtol(yytext, 0, 10); return INT_CONST; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 79 "c99.l"
+#line 84 "c99.l"
 {  yylval.iv = strtol(yytext, 0, 10); return INT_CONST; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 80 "c99.l"
+#line 85 "c99.l"
 { yylval.iv = strtol(yytext, 0, 10); return INT_CONST; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 82 "c99.l"
+#line 87 "c99.l"
 {}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 84 "c99.l"
+#line 89 "c99.l"
 {}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 86 "c99.l"
+#line 91 "c99.l"
 {}
 	YY_BREAK
 case 47:
 /* rule 47 can match eol */
 YY_RULE_SETUP
-#line 88 "c99.l"
+#line 93 "c99.l"
 { yylval.sv = strdup(yytext); return STR_CONST; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 90 "c99.l"
+#line 95 "c99.l"
 { return ASSIGN; }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 91 "c99.l"
+#line 96 "c99.l"
 { return PLUS_ASSIGN; }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 92 "c99.l"
+#line 97 "c99.l"
 { return MINUS_ASSIGN; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 93 "c99.l"
+#line 98 "c99.l"
 { return MUL_ASSIGN; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 94 "c99.l"
+#line 99 "c99.l"
 { return DIV_ASSIGN; }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 95 "c99.l"
+#line 100 "c99.l"
 { return MOD_ASSIGN; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 96 "c99.l"
+#line 101 "c99.l"
 { return LEFT_SHIFT_ASSIGN; }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 97 "c99.l"
+#line 102 "c99.l"
 { return RIGHT_SHIFT_ASSIGN; }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 98 "c99.l"
+#line 103 "c99.l"
 { return AND_ASSIGN; }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 99 "c99.l"
+#line 104 "c99.l"
 { return XOR_ASSIGN; }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 100 "c99.l"
+#line 105 "c99.l"
 { return OR_ASSIGN; }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 101 "c99.l"
+#line 106 "c99.l"
 { return AND_AND_ASSIGN; }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 102 "c99.l"
+#line 107 "c99.l"
 { return OR_OR_ASSIGN; }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 104 "c99.l"
+#line 109 "c99.l"
 { return INCRE; }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 105 "c99.l"
+#line 110 "c99.l"
 { return DECRE; }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 107 "c99.l"
+#line 112 "c99.l"
 { return DIV; }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 108 "c99.l"
+#line 113 "c99.l"
 { return MOD; }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 110 "c99.l"
+#line 115 "c99.l"
 { return EQUAL; }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 111 "c99.l"
+#line 116 "c99.l"
 { return NOT_EQUAL; }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 112 "c99.l"
+#line 117 "c99.l"
 { return LT; }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 113 "c99.l"
+#line 118 "c99.l"
 { return GT;}
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 114 "c99.l"
+#line 119 "c99.l"
 { return LE;}
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 115 "c99.l"
+#line 120 "c99.l"
 { return GE;}
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 117 "c99.l"
+#line 122 "c99.l"
 { return PTR_ACCESS; }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 119 "c99.l"
+#line 124 "c99.l"
 { return AND_AND; }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 120 "c99.l"
+#line 125 "c99.l"
 { return OR_OR; }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 121 "c99.l"
+#line 126 "c99.l"
 { return EXCLAMATION; }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 122 "c99.l"
+#line 127 "c99.l"
 { return ELLIPSIS; }
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 124 "c99.l"
+#line 129 "c99.l"
 { return LEFT_SHIFT; }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 125 "c99.l"
+#line 130 "c99.l"
 { return RIGHT_SHIFT; }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 126 "c99.l"
+#line 131 "c99.l"
 { return OR; }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 127 "c99.l"
+#line 132 "c99.l"
 { return XOR; }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 128 "c99.l"
+#line 133 "c99.l"
 { return NEGATE; }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 130 "c99.l"
+#line 135 "c99.l"
 { return QUESTION_MARK; }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 131 "c99.l"
+#line 136 "c99.l"
 { return STAR;}
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 132 "c99.l"
+#line 137 "c99.l"
 { return AND; } 
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 133 "c99.l"
+#line 138 "c99.l"
 { return PLUS; }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 134 "c99.l"
+#line 139 "c99.l"
 { return MINUS; }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 137 "c99.l"
+#line 142 "c99.l"
 { return LEFT_PARENTHESIS; }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 138 "c99.l"
+#line 143 "c99.l"
 { return RIGHT_PARENTHESIS; }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 139 "c99.l"
+#line 144 "c99.l"
 { return LEFT_BRACKET; }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 140 "c99.l"
+#line 145 "c99.l"
 { return RIGHT_BRACKET; }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 141 "c99.l"
+#line 146 "c99.l"
 { return LEFT_BRACE; }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 142 "c99.l"
+#line 147 "c99.l"
 { return RIGHT_BRACE; }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 143 "c99.l"
+#line 148 "c99.l"
 { return SEMICOLON; }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 144 "c99.l"
+#line 149 "c99.l"
 { return COMMA; }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 145 "c99.l"
+#line 150 "c99.l"
 { return DOT; }
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 146 "c99.l"
+#line 151 "c99.l"
 { return COLON; }
 	YY_BREAK
 case 96:
 /* rule 96 can match eol */
 YY_RULE_SETUP
-#line 148 "c99.l"
+#line 153 "c99.l"
 { /* do nothing */ }
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 152 "c99.l"
+#line 157 "c99.l"
 { 
     printf("\033[31mEncountered unknown char %s near line %d.\033[0m\n", yytext, yylineno);
     #ifdef CRASH_ON_UNKNOWN 
@@ -1466,10 +1471,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 161 "c99.l"
+#line 166 "c99.l"
 ECHO;
 	YY_BREAK
-#line 1472 "c99ll.c"
+#line 1477 "c99ll.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2486,8 +2491,17 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 161 "c99.l"
+#line 166 "c99.l"
 
+
+int handleIdentifier() {
+    yylval.sv = strdup(yytext);
+
+    if (find(yytext)) {
+        return TYPE_NAME;
+    }
+    return IDENTIFIER;
+}
 
 void handleComment() {
     

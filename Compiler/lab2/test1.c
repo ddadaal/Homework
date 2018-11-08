@@ -1,5 +1,6 @@
-#include <stdio.h>
+typedef int List;
 
 int main() {
-    printf("%d", b());
+    int i;
+    ~-0x20;
 }

@@ -52,11 +52,71 @@ A a;
 
 3. function pointer is not allowed.
 
-4. Label and goto is not allowed.
+4. Identify lvalue and rvalue during syntax analysis results in numerous S/R or R/R conflicts.
 
-```c
-// not allowed
-a:
-    int a =0;
-    goto a;
+5. Allow void a;
+
+Incomplete type check should happen in the semantics analysis.
+
+6. A optional Conflict
+
+The following will lead to a conflict and can't parse a function definition.
+
+```bison
+start:
+    variable 
+  | function definition
+  ;
+
+variable:
+    type IDNETIFIER SEMICOLON;
+  ;
+
+function_definition:
+    function_decorators type IDENTIFIER LEFT_PARENTHESIS RIGHT_PARENTHESIS
+  ;
+
+function_decorators:
+  
+  | function_decorators function_decorator
+  ;
+
+function_decorator:
+    INLINE
+  | STATIC
+  ;
+
 ```
+
+The following would work instead
+
+```bison
+start:
+    variable 
+  | function definition
+  ;
+
+
+variable:
+    type IDNETIFIER SEMICOLON;
+  ;
+
+function_definition:
+    type IDENTIFIER LEFT_PARENTHESIS RIGHT_PARENTHESIS
+  | function_decorators type IDENTIFIER LEFT PARENTHESIS RIGHT_PARENTHESIS
+  ;
+
+function_decorators:
+  function_decorator
+  | function_decorators function_decorator
+  ;
+
+function_decorator:
+    INLINE
+  | STATIC
+  ;
+```
+
+7. switch case and default are just labeled statements
+
+8. List* a is considered multiplication instead variable declaration. Can only be solved using a global symbol table.

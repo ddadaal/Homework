@@ -119,22 +119,23 @@ extern int yydebug;
     OR_OR_ASSIGN = 329,
     INCRE = 330,
     DECRE = 331,
-    DIV = 332,
-    MOD = 333,
-    LT = 334,
-    GT = 335,
-    LE = 336,
-    GE = 337,
-    EQUAL = 338,
-    NOT_EQUAL = 339,
-    AND_AND = 340,
-    OR_OR = 341,
-    EXCLAMATION = 342,
-    LEFT_SHIFT = 343,
-    RIGHT_SHIFT = 344,
-    NEGATE = 345,
-    OR = 346,
-    XOR = 347
+    TYPE_NAME = 332,
+    DIV = 333,
+    MOD = 334,
+    LT = 335,
+    GT = 336,
+    LE = 337,
+    GE = 338,
+    EQUAL = 339,
+    NOT_EQUAL = 340,
+    AND_AND = 341,
+    OR_OR = 342,
+    EXCLAMATION = 343,
+    LEFT_SHIFT = 344,
+    RIGHT_SHIFT = 345,
+    NEGATE = 346,
+    OR = 347,
+    XOR = 348
   };
 #endif
 
@@ -143,13 +144,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 27 "c99.y" /* yacc.c:1910  */
+#line 30 "c99.y" /* yacc.c:1910  */
 
   int iv;
   char *sv;
   double fv;
 
-#line 153 "c99yy.h" /* yacc.c:1910  */
+#line 154 "c99yy.h" /* yacc.c:1910  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -4,12 +4,14 @@
 
 %{
   #include <stdio.h>
+  #include "symtable.h"
 
   // #define ENABLE_TRACE
 
 
   int yylex(); 
   int yyerror(const char *); 
+  void handleTypedef(char*);
 %}
 %token <sv> IDENTIFIER
 %token <iv> INT_CONST CHAR_CONST 
@@ -20,6 +22,7 @@
 %token STAR AND PLUS MINUS QUESTION_MARK PTR_ACCESS
 %token ASSIGN PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN LEFT_SHIFT_ASSIGN RIGHT_SHIFT_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN AND_AND_ASSIGN OR_OR_ASSIGN
 %token INCRE DECRE
+%token TYPE_NAME
 %token DIV MOD
 %token LT GT LE GE EQUAL NOT_EQUAL
 %token AND_AND OR_OR EXCLAMATION
@@ -33,10 +36,13 @@
 %%
 
 start: 
-    start declaration
-  | start func_definition
+    start root_declaration
+  | root_declaration
+  ;
+
+root_declaration:
+    func_definition
   | declaration
-  | func_definition
   ;
 
 declaration:
@@ -45,9 +51,13 @@ declaration:
   | variable_declaration
   ;
 
+type_name_declaration:
+    type variable_or_member
+  ;
+
 variable_declaration:
-    type variable_or_member SEMICOLON
-  | type variable_or_member ASSIGN expression SEMICOLON
+    type_name_declaration SEMICOLON
+  | type_name_declaration ASSIGN expression SEMICOLON { printf("Initlaized variable declaration.\n");}
   ;
 
 statement: 
@@ -55,20 +65,57 @@ statement:
   | expression_statement
   | if_statement
   | switch_statement
+  | labeled_statement
+  | while_statement
+  | for_statement
+  | goto_statement
+  | return_statement
+  | continue_and_break_statement
+  | declaration
+  ;
+
+continue_and_break_statement:
+    CONTINUE SEMICOLON
+  | BREAK SEMICOLON
+  ;
+
+goto_statement:
+    GOTO IDENTIFIER SEMICOLON
+  ;
+
+return_statement:
+    RETURN SEMICOLON
+  | RETURN expression SEMICOLON
+  ;
+
+while_statement:
+    WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS statement
+  ;
+
+for_statement:
+    FOR LEFT_PARENTHESIS expression_statement expression_statement expression RIGHT_PARENTHESIS statement
+  | FOR LEFT_PARENTHESIS variable_declaration expression_statement expression RIGHT_PARENTHESIS statement
+  ;  
+
+
+labeled_statement:
+    IDENTIFIER COLON statement
+  | CASE constant COLON statement
+  | DEFAULT COLON statement
   ;
 
 braced_statement:
-   LEFT_BRACE braced_statement_items RIGHT_BRACE
+    LEFT_BRACE braced_statement_items RIGHT_BRACE
+  | LEFT_BRACE RIGHT_BRACE
   ;
 
 braced_statement_items:
     braced_statement_items braced_statement_item
-  | 
+  | braced_statement_item
   ;
 
 braced_statement_item:
-    declaration
-  | statement
+  statement
   ;
 
 
@@ -78,17 +125,7 @@ if_statement:
   ; 
 
 switch_statement:
-    SWITCH LEFT_PARENTHESIS expression RIGHT_PARENTHESIS switch_case_part optional_default
-  ;
-
-switch_case_part:
-    switch_case_part CASE constant COLON statement
-  | 
-  ;
-
-optional_default:
-  
-  | DEFAULT COLON statement 
+    SWITCH LEFT_PARENTHESIS expression RIGHT_PARENTHESIS braced_statement
   ;
 
 expression_statement:
@@ -99,10 +136,10 @@ expression_statement:
 expression: 
     assignment_expression
   | expression COMMA assignment_expression
-  ;
+  ; 
 
 assignment_expression: 
-    lvalue assignment_operator assignment_expression
+    unary_expression assignment_operator assignment_expression
   | conditional_expression
   ;
 
@@ -129,8 +166,8 @@ conditional_expression:
 
 logical_expression: 
     equality_expression
-  | logical_expression OR equality_expression
-  | logical_expression AND equality_expression
+  | logical_expression OR_OR equality_expression
+  | logical_expression AND_AND equality_expression
   ;
 
 equality_expression:
@@ -163,6 +200,7 @@ mul_div_expression:
     cast_expression
   | mul_div_expression STAR cast_expression
   | mul_div_expression DIV cast_expression
+  | mul_div_expression MOD cast_expression
   ;
 
 cast_expression:
@@ -176,42 +214,39 @@ cast_type:
   ;
 
 unary_expression:
+    access_expression
+  | unary_operator unary_expression
+  | INCRE unary_expression
+  | DECRE unary_expression
+  | SIZEOF unary_expression
+  | SIZEOF LEFT_PARENTHESIS unary_expression RIGHT_PARENTHESIS
+  | SIZEOF type
+  | SIZEOF LEFT_PARENTHESIS type RIGHT_PARENTHESIS
+  ;
+
+unary_operator:
+    PLUS
+  | MINUS
+  | AND
+  | STAR
+  | NEGATE
+  | EXCLAMATION
+  ;
+
+access_expression:
     atomic_expression
-  | lvalue
-  | rvalue
-  ;
-
-lvalue: 
-    IDENTIFIER
-  | IDENTIFIER DOT IDENTIFIER
-  | IDENTIFIER LEFT_BRACKET expression RIGHT_BRACKET
-  | IDENTIFIER PTR_ACCESS IDENTIFIER
-  ;
-
-rvalue: 
-    INCRE lvalue
-  | DECRE lvalue
-  | lvalue INCRE
-  | lvalue DECRE
-  | AND lrvalue
-  | SIZEOF lrvalue
-  | SIZEOF LEFT_PARENTHESIS lrvalue RIGHT_PARENTHESIS
-  | PLUS lrvalue
-  | MINUS lrvalue
-  | EXCLAMATION lrvalue
-  | NEGATE lrvalue
-  | lrvalue LEFT_PARENTHESIS RIGHT_PARENTHESIS
-  | lrvalue LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS
+  | access_expression LEFT_BRACKET expression RIGHT_BRACKET
+  | access_expression LEFT_PARENTHESIS RIGHT_PARENTHESIS { printf("function call with no parameter.\n"); }
+  | access_expression LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS { printf("function call with parameters.\n"); }
+  | access_expression DOT IDENTIFIER
+  | access_expression PTR_ACCESS IDENTIFIER
+  | access_expression INCRE
+  | access_expression DECRE
   ;
 
 func_call_parameters: 
     assignment_expression
   | func_call_parameters COMMA assignment_expression
-  ;
-
-lrvalue: 
-    lvalue 
-  | rvalue
   ;
 
 atomic_expression:
@@ -221,15 +256,20 @@ atomic_expression:
   ;
 
 constant:
-    INT_CONST
-  | FLOAT_CONST
-  | STR_CONST
-  | CHAR_CONST
+    INT_CONST { printf("Integer constant: %d\n", $1); }
+  | FLOAT_CONST { printf("Float constant: %.2f\n", $1); }
+  | STR_CONST { printf("Str constant: %s\n", $1); }
+  | CHAR_CONST { printf("Char constant: %c\n", $1); }
   ;
 
 typedef_declaration: 
-    TYPEDEF type IDENTIFIER SEMICOLON
-  | TYPEDEF struct_or_union_declaration IDENTIFIER SEMICOLON { printf("A type %s with struct\n", $3); }
+    TYPEDEF typedef_target IDENTIFIER SEMICOLON { handleTypedef($3); }
+  ;
+
+typedef_target:
+    type
+  | struct_or_union_declaration
+  | typedef_target STAR
   ;
 
 struct_or_union_declaration: 
@@ -248,6 +288,7 @@ struct_or_union_members:
 
 struct_or_union_member: 
     type variable_or_member SEMICOLON { printf("identifier\n");}
+  | IDENTIFIER variable_or_member SEMICOLON
   ;
 
 struct_or_union_type_definition_head: 
@@ -256,8 +297,8 @@ struct_or_union_type_definition_head:
   ;
 
 type: 
-    basic_type 
-  | struct_type
+    basic_type
+  | TYPE_NAME
   ;
 
 basic_type: 
@@ -265,37 +306,25 @@ basic_type:
   | FLOAT
   | DOUBLE
   | CHAR
-  ;
-
-struct_type: 
-    IDENTIFIER
+  | VOID
   ;
 
 variable_or_member: 
     IDENTIFIER
-  | pointer
-  ;
-
-pointer: 
-    STAR pointer
-  | STAR IDENTIFIER
+  | STAR variable_or_member
   ;
 
 func_definition: 
-    func_prototype LEFT_BRACE func_body RIGHT_BRACE  { printf("A function declaration\n"); }
+    func_prototype braced_statement  { printf("A function declaration\n"); }
   ;
 
-func_body: 
-    func_body statement
+func_prototype:
+    function_specifier LEFT_PARENTHESIS argument_list RIGHT_PARENTHESIS { printf("A function prototype \n");}
   ;
 
-func_prototype: 
-    func_decorators func_return_type IDENTIFIER LEFT_PARENTHESIS argument_list RIGHT_PARENTHESIS { printf("A function prototype %s\n", $3);}
-  ;
-
-func_return_type: 
-    type 
-  | VOID
+function_specifier:
+    type_name_declaration
+  | func_decorators type_name_declaration
   ;
 
 func_decorator: 
@@ -305,27 +334,32 @@ func_decorator:
 
 func_decorators: 
     func_decorators func_decorator
-  |
+  | func_decorator
   ;
 
 argument_list: 
-    canonical_argument_list COMMA ELLIPSIS { printf("argument list with ..."); }
-  | canonical_argument_list { printf("canonical_argument_list\n");}
+    canonical_argument_list COMMA ELLIPSIS
+  | canonical_argument_list
   | ELLIPSIS
-  ;
-
-canonical_argument_list: 
-    an_argument
-  | canonical_argument_list COMMA an_argument
   |
   ;
 
-an_argument: 
-    type variable_or_member
+canonical_argument_list: 
+    type_name_declaration
+  | canonical_argument_list COMMA type_name_declaration
   ;
 
 
 %%
+
+void handleTypedef(char* str) {
+  if (!find(str)) {
+    add(str);
+    printf("Adding a new type %s\n", str);
+  }
+  printf("Detected existing type %s\n", str);
+}
+
 int yyerror(const char * err)
 {
   printf("Syntax error:%s\n", err);
@@ -334,6 +368,7 @@ int yyerror(const char * err)
  
 int main()
 {
+  initSymtable();
   #ifdef ENABLE_TRACE
   yydebug = 1;
   #endif
