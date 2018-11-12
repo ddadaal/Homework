@@ -24,19 +24,7 @@ Precedence level
 
 ## 3. Limitations
 
-1. Variable initialization list is not allowed.
-   
-```c
-// not allowed
-int a=1, b=2;
-int a, b;
-int a=1, b;
-
-// allowed
-int b =2;
-```
-
-2. struct and union must be typedefed to be used.
+1. struct and union must be typedefed to be used.
 
 ```c
 // not allowed
@@ -50,15 +38,15 @@ A a;
 
 ```
 
-3. function pointer is not allowed.
+2. function pointer is not allowed.
 
-4. Identify lvalue and rvalue during syntax analysis results in numerous S/R or R/R conflicts.
+3. Identify lvalue and rvalue during syntax analysis results in numerous S/R or R/R conflicts.
 
-5. Allow void a;
+4. Allow void a;
 
 Incomplete type check should happen in the semantics analysis.
 
-6. A optional Conflict
+5. A optional Conflict
 
 The following will lead to a conflict and can't parse a function definition.
 
@@ -117,6 +105,6 @@ function_decorator:
   ;
 ```
 
-7. switch case and default are just labeled statements
+6. switch case and default are just labeled statements
 
-8. List* a is considered multiplication instead variable declaration. Can only be solved using a global symbol table.
+7. List* a is considered multiplication instead variable declaration. Can only be solved using a global symbol table.

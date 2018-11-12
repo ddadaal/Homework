@@ -6,13 +6,15 @@
   #include <stdio.h>
   #include "symtable.h"
 
-  // #define ENABLE_TRACE
+  #define ENABLE_TRACE
 
 
   int yylex(); 
+  void printExpression(char* left, char* right)
   int yyerror(const char *); 
   void handleTypedef(char*);
 %}
+
 %token <sv> IDENTIFIER
 %token <iv> INT_CONST CHAR_CONST 
 %token <fv> FLOAT_CONST
@@ -36,8 +38,8 @@
 %%
 
 start: 
-    start root_declaration
-  | root_declaration
+    start root_declaration { printExpression("start", "start root_declaration"); }
+  | root_declaration { printExpression("start", "root_declaration"); }
   ;
 
 root_declaration:
@@ -49,6 +51,7 @@ declaration:
   typedef_declaration
   | struct_or_union_declaration
   | variable_declaration
+  | func_declaration
   ;
 
 type_name_declaration:
@@ -56,8 +59,17 @@ type_name_declaration:
   ;
 
 variable_declaration:
-    type_name_declaration SEMICOLON
-  | type_name_declaration ASSIGN expression SEMICOLON { printf("Initlaized variable declaration.\n");}
+    type variable_declaration_list SEMICOLON
+  ;
+
+variable_declaration_list:
+    variable_declaration_item
+  | variable_declaration_list COMMA variable_declaration_item
+  ;
+
+variable_declaration_item:
+    variable_or_member
+  | variable_or_member ASSIGN expression
   ;
 
 statement: 
@@ -106,16 +118,11 @@ labeled_statement:
 
 braced_statement:
     LEFT_BRACE braced_statement_items RIGHT_BRACE
-  | LEFT_BRACE RIGHT_BRACE
   ;
 
 braced_statement_items:
-    braced_statement_items braced_statement_item
-  | braced_statement_item
-  ;
-
-braced_statement_item:
-  statement
+    braced_statement_items statement
+  | 
   ;
 
 
@@ -322,6 +329,10 @@ func_prototype:
     function_specifier LEFT_PARENTHESIS argument_list RIGHT_PARENTHESIS { printf("A function prototype \n");}
   ;
 
+func_declaration:
+    func_prototype SEMICOLON
+  ;
+
 function_specifier:
     type_name_declaration
   | func_decorators type_name_declaration
@@ -352,6 +363,10 @@ canonical_argument_list:
 
 %%
 
+void printExpression(char* left, char* right) {
+  printf("%s -> %s\n", left, right);
+}
+
 void handleTypedef(char* str) {
   if (!find(str)) {
     add(str);
@@ -369,8 +384,10 @@ int yyerror(const char * err)
 int main()
 {
   initSymtable();
+
   #ifdef ENABLE_TRACE
   yydebug = 1;
   #endif
+
   yyparse();
 }

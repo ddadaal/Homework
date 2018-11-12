@@ -15,7 +15,7 @@ inline void printList(ListNode* node, ...) {
 
 int main() {
     ListNode* l = 123;
-    ListNode* head = (ListNode*)malloc(sizeof(ListNode));
+    ListNode* head = (ListNode*)malloc(sizeof(ListNode)), dummy, *l2 = 0;
 
     1<<3+2;
 

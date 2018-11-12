@@ -1,3 +1,3 @@
-win_bison -d -o c99yy.c c99.y
-win_flex -o c99ll.c c99.l
-gcc c99*.c symtable.c -o c99
+win_bison -d -o subcyy.c subc.y
+win_flex -o subcll.c subc.l
+gcc subc*.c symtable.c -o subc

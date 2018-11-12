@@ -3,7 +3,7 @@
 %{
     #include <stdio.h>
     // #include "lex.h"
-    #include "c99yy.h"  //由bison生成
+    #include "subcyy.h"  //由bison生成
     #include "symtable.h"
 
 
@@ -43,17 +43,17 @@ float_type (F|f|L|l)
 "auto" {  return AUTO; }
 "break" {  return BREAK; }
 "case" {  return CASE; }
-"char" {  return CHAR;}
+"char" {  return CHAR; }
 "const" {  return CONST; }
 "continue" {  return CONTINUE; }
 "default" {  return DEFAULT; }
 "do" {  return DO; }
-"double" {  return DOUBLE;}
-"else" {   return ELSE;}
-"enum" {  return ENUM;}
-"extern" {  return EXTERN;}
-"float" {  return FLOAT;}
-"for" {   return FOR;}
+"double" {  return DOUBLE; }
+"else" {   return ELSE; }
+"enum" {  return ENUM; }
+"extern" {  return EXTERN; }
+"float" {  return FLOAT; }
+"for" {   return FOR; }
 "goto" {  return GOTO; }
 "if" {  return IF; }
 "int" {  return INT; }
@@ -62,21 +62,21 @@ float_type (F|f|L|l)
 "return" {  return RETURN; }
 "short" {  return SHORT; }
 "signed" {  return SIGNED; }
-"sizeof" {  return SIZEOF;}
-"static" {  return STATIC;}
+"sizeof" {  return SIZEOF; }
+"static" {  return STATIC; }
 "struct" {  return STRUCT; }
-"switch" {  return SWITCH;}
-"typedef" {  return TYPEDEF;}
-"union" {   return UNION;}
+"switch" {  return SWITCH; }
+"typedef" {  return TYPEDEF; }
+"union" {   return UNION; }
 "unsigned" {  return UNSIGNED; }
-"void" {  return VOID;}
-"volatile" {  return VOLATILE;}
-"while" {  return WHILE;}
-"inline" {  return INLINE;}
-"_Bool" {   return _BOOL;}
-"_Complex" {  return _COMPLEX;}
-"_Imaginary" {  return _IMAGINARY;}
-"restrict" {  return RESTRICT;}
+"void" {  return VOID; }
+"volatile" {  return VOLATILE; }
+"while" {  return WHILE; }
+"inline" {  return INLINE; }
+"_Bool" {   return _BOOL; }
+"_Complex" {  return _COMPLEX; }
+"_Imaginary" {  return _IMAGINARY; }
+"restrict" {  return RESTRICT; }
 
 {letter}({letter}|{digit}|_)* {  return handleIdentifier();  }
 
@@ -115,9 +115,9 @@ float_type (F|f|L|l)
 "==" { return EQUAL; }
 "!=" { return NOT_EQUAL; }
 "<" { return LT; }
-">" { return GT;}
-"<=" { return LE;}
-">=" { return GE;}
+">" { return GT; }
+"<=" { return LE; }
+">=" { return GE; }
 
 "->" { return PTR_ACCESS; }
 
@@ -133,7 +133,7 @@ float_type (F|f|L|l)
 "~" { return NEGATE; }
 
 "?" { return QUESTION_MARK; }
-"*" { return STAR;}
+"*" { return STAR; }
 "&" { return AND; } 
 "+" { return PLUS; }
 "-" { return MINUS; }

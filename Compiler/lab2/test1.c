@@ -1,6 +1,5 @@
-typedef int List;
+int func() { return 1; }
 
 int main() {
-    int i;
-    ~-0x20;
+  int (*a)() = func;
 }
