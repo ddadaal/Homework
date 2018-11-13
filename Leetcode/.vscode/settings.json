@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "C:\\Users\\viccrubs\\AppData\\Local\\Programs\\Python\\Python37\\python.exe",
+    "python.pythonPath": "C:\\Python37\\python.exe",
     "files.associations": {
         "vector": "cpp",
         "xstring": "cpp",
