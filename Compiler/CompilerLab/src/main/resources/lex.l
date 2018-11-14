@@ -23,6 +23,9 @@
 "+" { return PLUS; }
 "-" { return MINUS; }
 "/" { return DIV; }
+"++" { return INC; }
+"<" { return LT; }
+"<=" { return LE; }
 
 
 [a-zA-Z]([0-9a-zA-Z_])* { return IDENTIFIER; }

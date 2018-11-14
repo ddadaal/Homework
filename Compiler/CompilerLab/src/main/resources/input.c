@@ -11,7 +11,7 @@ int fib(int n) {
 
 int main() {
     int i =-5;
-    while (i<=10) {
+    while (i<10) {
         if (i<=0) {
             printf("i is negative\n");
         } else {

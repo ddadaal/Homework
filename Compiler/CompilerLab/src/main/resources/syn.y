@@ -1,40 +1,53 @@
 %token VOID ELLIPSIS INT RETURN IF ELSE WHILE
 %token INT_CONST STR_CONST
-%token OR_OR EQUAL MINUS PLUS STAR
+%token OR_OR EQUAL MINUS PLUS STAR LT LG
 %token LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE INCRE SEMICOLON
 %token IDENTIFIER FUNC_NAME
 
 %%
 
 start:
+   func_definition
+ | declaration
+ ;
 
-  | func_definition
+declaration:
+    func_declaration
+  | variable_declaration
   ;
 
+func_declaration:
+    func_prototype SEMICOLON
+  ;
 
 
 variable_declaration:
-    type IDENTIFIER
-  | type STAR IDENTIFIER
+    type IDENTIFIER SEMICOLON
+  | type IDENTIFIER ASSIGN expression SEMICOLON
   ;
 
 func_prototype:
-    type IDENTIFIER
+    type IDENTIFIER LEFT_PARENTHESIS func_param RIGHT_PARENTHESIS
   ;
 
 func_definition:
-    func_prototype LEFT_PARENTHESIS type IDENTIFIER RIGHT_PARENTHESIS braced_statement
+    func_prototype braced_statement
+  ;
+
+func_param:
+    type IDENTIFIER
+  | ELLIPSIS
   ;
 
 type:
     TYPE_NAME
   | INT
+  | VOID
   ;
 
 statement:
     braced_statement
   | if_statement
-  | break_statement
   | while_statement
   | return_statement
   | expression SEMICOLON
@@ -49,9 +62,6 @@ braced_statement_items:
     statement
   | statement braced_statement_items
   ;
-
-break_statement:
-    BREAK SEMICOLON;
 
 if_statement:
     IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS braced_statement ELSE braced_statement
@@ -71,13 +81,24 @@ expression:
 
 assignment_expression:
     atomic_expression ASSIGN expression
-  | equality_expression
+  | logical_expression
+  ;
+
+logical_expression:
+    equality_expression
+  | logical_expression OR_OR equality_expression
   ;
 
 equality_expression:
     add_minus_expression
   | equality_expression EQUAL comparison_expression
   | equality_expression NOT_EQUAL comparison_expression
+  ;
+
+comparison_expression:
+    add_minus_expression
+  | comparison_expression LT add_minus_expression
+  | comparison_expression LE add_minus_expression
   ;
 
 add_minus_expression:
@@ -94,9 +115,8 @@ mul_div_expression:
 
 unary_expression:
     atomic_expression
-  | SIZEOF LEFT_PARENTHESIS type RIGHT_PARENTHESIS
   | FUNC_NAME LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS
-  | IDENTIFIER PTR_ACCESS IDENTIFIER
+  | IDENTIFIER INC
   ;
 
 func_call_parameters:
