@@ -31,6 +31,7 @@ public enum TokenType {
     INT_CONST,
     STR_CONST,
 
+    IGNORED,
     UNKNOWN,
 
 }

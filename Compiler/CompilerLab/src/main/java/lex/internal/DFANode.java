@@ -1,29 +1,73 @@
 package lex.internal;
 
 import com.sun.istack.internal.Nullable;
+import lex.token.TokenType;
+import lombok.Getter;
+import lombok.Setter;
+import util.Constants;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DFANode {
-    private int state;
-    private Map<Character, DFANode> edges;
 
-    public DFANode(int state) {
-        this.state = state;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DFANode)) return false;
+        DFANode dfaNode = (DFANode) o;
+
+        // if two DFA note contains the same NFA nodes, then they are equal
+        if (dfaNode.nfaNodes.size() != this.nfaNodes.size()) {
+            return false;
+        }
+
+        return dfaNode.nfaNodes.containsAll(this.nfaNodes)
+            && this.nfaNodes.containsAll(dfaNode.nfaNodes)
+            ;
+    }
+
+    @Getter private List<NFANode> nfaNodes;
+
+    @Getter private Map<Character, DFANode> edges;
+
+    @Getter @Setter
+    private List<TokenType> endStateTokenTypes;
+
+    public boolean isEndState() {
+        return endStateTokenTypes != null && endStateTokenTypes.size() > 0;
+    }
+
+    public DFANode() {
         this.edges = new HashMap<>();
     }
 
+    public DFANode(List<NFANode> nfaNodes) {
+        this();
+        this.nfaNodes = nfaNodes;
+    }
+
+    public Set<Character> getEdgeCharset() {
+        Set<Character> result = new HashSet<>();
+
+        for (NFANode node: nfaNodes) {
+            for (char c : node.getEdges().keySet()) {
+                if (c != Constants.EPSILON) {
+                    result.add(c);
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+
     @Nullable
-    public DFANode move(char c) {
+    public DFANode getTargetOfEdge(char c) {
         return edges.get(c);
     }
 
-    public int getState() {
-        return state;
-    }
-
-    public Map<Character, DFANode> getEdges() {
-        return edges;
+    public void setTarget(char c, DFANode target) {
+        edges.put(c, target);
     }
 }

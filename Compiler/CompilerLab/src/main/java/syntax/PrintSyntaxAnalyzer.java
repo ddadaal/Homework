@@ -8,9 +8,9 @@ public class PrintSyntaxAnalyzer implements SyntaxAnalyzer {
 
     @Override
     public void analyze(LexicalAnalyzer lex, SymbolTable symbolTable) {
-        Token token;
-        while ((token = lex.analyze()) != null) {
-            System.out.println(token.toString());
-        }
+//        Token token;
+//        while ((token = lex.analyze()) != null) {
+//            System.out.println(token.toString());
+//        }
     }
 }

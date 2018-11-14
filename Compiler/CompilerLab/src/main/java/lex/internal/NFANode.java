@@ -2,28 +2,36 @@ package lex.internal;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import lex.token.TokenType;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 
 public class NFANode {
-    private int state;
-    private Map<Character, List<DFANode>> edges;
+    @Getter private Map<Character, List<NFANode>> edges;
 
-    public NFANode(int state) {
-        this.state = state;
+    @Getter @Setter private TokenType endStateToken;
+
+    public NFANode() {
         this.edges = new HashMap<>();
     }
 
+    public void addEdges(char c, NFANode... targets) {
+        List<NFANode> list = edges.get(c);
+        if (list == null) {
+            edges.put(c, new ArrayList<>(Arrays.asList(targets)));
+        } else {
+            list.addAll(Arrays.asList(targets));
+        }
+    }
+
     @NotNull
-    public List<DFANode> move(char c) {
-        List<DFANode> r = edges.get(c);
+    public List<NFANode> getTargetsOfEdge(char c) {
+        List<NFANode> r = edges.get(c);
         if (r == null) {
-            List<DFANode> r1 = new ArrayList<>();
-            edges.put(c, r1);
-            return r1;
+            return new ArrayList<>();
         } else {
             return r;
         }

@@ -1,32 +1,14 @@
 package lex.token;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.Objects;
 
+@AllArgsConstructor
 public class Token {
-    private String lexeme;
-    private TokenType type;
-
-
-    public Token(String lexeme, TokenType type) {
-        this.lexeme = lexeme;
-        this.type = type;
-    }
-
-    public String getLexeme() {
-        return lexeme;
-    }
-
-    public void setLexeme(String lexeme) {
-        this.lexeme = lexeme;
-    }
-
-    public TokenType getType() {
-        return type;
-    }
-
-    public void setType(TokenType type) {
-        this.type = type;
-    }
+    @Getter private String lexeme;
+    @Getter private TokenType type;
 
     @Override
     public String toString() {

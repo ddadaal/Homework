@@ -1,12 +1,42 @@
+%define parse.error verbose
+%define parse.lac full
+%define parse.trace
+
+%{
+  #include <stdio.h>
+  #include "symtable.h"
+
+  // #define ENABLE_TRACE
+
+
+  int yylex();
+  int yyerror(const char *);
+  void handleTypedef(char*);
+%}
+
+%token <sv> IDENTIFIER FUNC_NAME
+%token <iv> INT_CONST CHAR_CONST
+%token <fv> FLOAT_CONST
+%token <sv> STR_CONST
 %token VOID ELLIPSIS INT RETURN IF ELSE WHILE
-%token INT_CONST STR_CONST
 %token OR_OR EQUAL MINUS PLUS STAR LT LG
 %token LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_BRACE RIGHT_BRACE INCRE SEMICOLON
-%token IDENTIFIER FUNC_NAME
+%token ASSIGN COMMA DIV INC LE NOT_EQUAL
+%union {
+  int iv;
+  char *sv;
+  double fv;
+}
 
 %%
 
 start:
+
+  | start top_level_element
+ ;
+
+
+top_level_element:
    func_definition
  | declaration
  ;
@@ -27,7 +57,7 @@ variable_declaration:
   ;
 
 func_prototype:
-    type IDENTIFIER LEFT_PARENTHESIS func_param RIGHT_PARENTHESIS
+    type IDENTIFIER LEFT_PARENTHESIS func_param RIGHT_PARENTHESIS { handleTypedef($2); }
   ;
 
 func_definition:
@@ -37,11 +67,11 @@ func_definition:
 func_param:
     type IDENTIFIER
   | ELLIPSIS
+  |
   ;
 
 type:
-    TYPE_NAME
-  | INT
+    INT
   | VOID
   ;
 
@@ -52,6 +82,7 @@ statement:
   | return_statement
   | expression SEMICOLON
   | SEMICOLON
+  | declaration
   ;
 
 braced_statement:
@@ -90,7 +121,7 @@ logical_expression:
   ;
 
 equality_expression:
-    add_minus_expression
+    comparison_expression
   | equality_expression EQUAL comparison_expression
   | equality_expression NOT_EQUAL comparison_expression
   ;
@@ -109,14 +140,16 @@ add_minus_expression:
 
 mul_div_expression:
     unary_expression
-  | mul_div_expression STAR cast_expression
-  | mul_div_expression DIV cast_expression
+  | mul_div_expression STAR unary_expression
+  | mul_div_expression DIV unary_expression
   ;
 
 unary_expression:
     atomic_expression
-  | FUNC_NAME LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS
+  | FUNC_NAME LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS { printf("Function call %s\n", $1); }
   | IDENTIFIER INC
+  | PLUS unary_expression
+  | MINUS unary_expression
   ;
 
 func_call_parameters:
@@ -131,3 +164,31 @@ atomic_expression:
   | IDENTIFIER
   ;
 
+
+%%
+
+
+void handleTypedef(char* str) {
+  if (!find(str)) {
+    add(str);
+    printf("Adding a new function %s\n", str);
+  }
+  printf("Detected existing function %s\n", str);
+}
+
+int yyerror(const char * err)
+{
+  printf("Syntax error:%s\n", err);
+}
+
+
+int main()
+{
+  initSymtable();
+
+  #ifdef ENABLE_TRACE
+  yydebug = 1;
+  #endif
+
+  yyparse();
+}
