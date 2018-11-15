@@ -2,9 +2,7 @@ package lex;
 
 import lex.internal.*;
 import lex.token.Token;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
 import symboltable.SymbolTable;
 import util.Constants;
 
@@ -73,14 +71,11 @@ public class LexicalAnalyzer {
     public List<Token> getAllRemainingTokens() {
         List<Token> result = new ArrayList<>();
 
-
         Token t;
         while ((t = getNextToken()) != null) {
             result.add(t);
         }
-
         return result;
-
     }
 
     public Token getNextToken() {
@@ -93,14 +88,14 @@ public class LexicalAnalyzer {
             if (index == input.length()) {
                 // read complete.
                 // returns token immediately
-                // increment prevents read again
+                // increment prevents repeated read
                 index++;
                 return returnToken(buffer.toString(), position);
             }
 
             // try move one more char
             char c = input.charAt(index);
-            DFANode newPosition = position.getTargetOfEdge(c);
+            DFANode newPosition = position.move(c);
 
             if (newPosition == null) {
                 // can't move, try return token from previous position

@@ -3,6 +3,7 @@ package lex.internal;
 import lex.token.TokenType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.var;
 import util.Constants;
 
 import java.util.*;
@@ -16,7 +17,7 @@ public class DFA {
 
 
     private static DFANode getUnmarkedDFA(Map<DFANode, Boolean> map) {
-        for (Map.Entry<DFANode, Boolean> entry : map.entrySet()) {
+        for (var entry : map.entrySet()) {
             if (!entry.getValue()) {
                 return entry.getKey();
             }
@@ -30,7 +31,7 @@ public class DFA {
 
         // add initial state s0
 
-        List<NFANode> closure = epsilonClosure(Arrays.asList(nfa.getStart()));
+        var closure = epsilonClosure(Arrays.asList(nfa.getStart()));
         DFANode s0 = new DFANode(closure);
         existingNodes.put(s0, false);
 
@@ -43,18 +44,18 @@ public class DFA {
                 // get move set
                 Set<NFANode> move = new HashSet<>();
                 for (NFANode nfaNode: node.getNfaNodes()) {
-                    move.addAll(nfaNode.getTargetsOfEdge(c));
+                    move.addAll(nfaNode.move(c));
                 }
 
                 // e-closure
-                List<NFANode> eclosure = epsilonClosure(new ArrayList<>(move));
+                var eclosure = epsilonClosure(new ArrayList<>(move));
 
                 // new state acquired
                 DFANode newNode = new DFANode(eclosure);
 
                 // if the state doesn't exist, add it
                 DFANode existing = null;
-                for (Map.Entry<DFANode, Boolean> entry : existingNodes.entrySet()) {
+                for (var entry : existingNodes.entrySet()) {
                     if (entry.getKey().equals(newNode)) {
                         existing = entry.getKey();
                         break;
@@ -98,13 +99,13 @@ public class DFA {
         return new DFA(s0, endStates);
     }
 
-    private static List<NFANode> epsilonClosure(List<NFANode> nodes) {
-        List<NFANode> results = new ArrayList<>(nodes);
+    private static List<NFANode> epsilonClosure(List<NFANode> kernel) {
+        List<NFANode> results = new ArrayList<>(kernel);
 
         Stack<NFANode> stack = new Stack<>();
 
         // 1. push all items in nodes to stack
-        for (NFANode node: nodes) {
+        for (NFANode node: kernel) {
             stack.push(node);
         }
 
@@ -113,7 +114,7 @@ public class DFA {
             NFANode node = stack.pop();
 
             // find all targets of epsilon edge of the node
-            List<NFANode> targets = node.getTargetsOfEdge(Constants.EPSILON);
+            List<NFANode> targets = node.move(Constants.EPSILON);
 
             for (NFANode target : targets) {
                 // if target is not in results, add it into it and also push it into stack

@@ -16,7 +16,7 @@ public class RENode {
         OR('|', 1),
         LEFT_PARENTHESIS('(', -1),
         RIGHT_PARENTHESIS(')', -1),
-        CONCATENATION(Constants.CONCATENATION, 2);
+        CONCATENATION(Constants.DOT, 2);
 
         private char c;
         @Getter private int priority;

@@ -28,7 +28,7 @@ public class NFANode {
     }
 
     @NotNull
-    public List<NFANode> getTargetsOfEdge(char c) {
+    public List<NFANode> move(char c) {
         List<NFANode> r = edges.get(c);
         if (r == null) {
             return new ArrayList<>();

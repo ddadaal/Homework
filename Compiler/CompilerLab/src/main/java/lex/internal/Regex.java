@@ -146,7 +146,6 @@ public class Regex {
         return leftIsTheEndOfAnExpression && rightIsTheStartOfAnExpression;
     }
 
-
     public static List<RENode> preprocess(String regex) {
         ArrayList<RENode> result = new ArrayList<>();
 

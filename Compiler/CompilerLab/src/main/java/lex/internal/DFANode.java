@@ -4,27 +4,14 @@ import com.sun.istack.internal.Nullable;
 import lex.token.TokenType;
 import lombok.Getter;
 import lombok.Setter;
+import util.CollectionExtensions;
 import util.Constants;
 
 import java.util.*;
 
 public class DFANode {
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DFANode)) return false;
-        DFANode dfaNode = (DFANode) o;
 
-        // if two DFA note contains the same NFA nodes, then they are equal
-        if (dfaNode.nfaNodes.size() != this.nfaNodes.size()) {
-            return false;
-        }
-
-        return dfaNode.nfaNodes.containsAll(this.nfaNodes)
-            && this.nfaNodes.containsAll(dfaNode.nfaNodes)
-            ;
-    }
 
     @Getter private List<NFANode> nfaNodes;
 
@@ -60,10 +47,22 @@ public class DFANode {
         return result;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DFANode)) return false;
+        DFANode dfaNode = (DFANode) o;
 
+        // if two DFA note contains the same NFA nodes, then they are equal
+        if (dfaNode.nfaNodes.size() != this.nfaNodes.size()) {
+            return false;
+        }
+
+        return CollectionExtensions.containsSameElements(nfaNodes,dfaNode.nfaNodes);
+    }
 
     @Nullable
-    public DFANode getTargetOfEdge(char c) {
+    public DFANode move(char c) {
         return edges.get(c);
     }
 
