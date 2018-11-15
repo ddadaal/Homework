@@ -1,12 +1,9 @@
 package lex.internal;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import util.Constants;
-
-import java.util.Map;
 
 @EqualsAndHashCode
 @ToString

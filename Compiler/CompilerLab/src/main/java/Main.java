@@ -19,11 +19,7 @@ public class Main {
         LexicalAnalyzer analyzer = LexicalAnalyzer.construct("1234bbaaaaa1b", symbolTable, rules);
 
 
-        Token token;
-        while ((token = analyzer.getNextToken()) != null) {
-            System.out.println(token);
-        }
-
+        analyzer.getAllRemainingTokens().forEach(System.out::println);
 
     }
 }

@@ -1,11 +1,22 @@
 package syntax;
 
 import lex.LexicalAnalyzer;
-import lex.token.Token;
+import lombok.Getter;
 import symboltable.SymbolTable;
 
-import java.util.List;
 
-public interface SyntaxAnalyzer {
-    void analyze(LexicalAnalyzer lex, SymbolTable symbolTable);
+public class SyntaxAnalyzer {
+
+    private int index = 0;
+
+    @Getter
+    private SymbolTable symbolTable;
+
+
+    public SyntaxAnalyzer(SymbolTable symbolTable) {
+        this.symbolTable = symbolTable;
+    }
+
+
+
 }

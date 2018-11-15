@@ -9,6 +9,7 @@ import lex.token.Token;
 import lex.token.TokenType;
 import org.junit.Test;
 import symboltable.SymbolTable;
+import util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,43 +30,42 @@ public class LexTest {
     @Test
     public void testPreprocess() {
 
-        // easy
-//        String regex1 = "a*|b";
-//
-//        List<RENode> expected1 = new ArrayList<>();
-//        expected1.add(new RENode('a'));
-//        expected1.add(new RENode(RENode.RENodeType.STAR));
-//        expected1.add(new RENode(RENode.RENodeType.OR));
-//        expected1.add(new RENode('b'));
-//
-//        Regex r1 = Regex.constructRegex(regex1);
-//
-//        assertEquals(expected1, r1.getNodes());
-//
-//
-//        // with [ preprocess
-//        String regex2 = "0|[1-9][0-9_]*";
-//
-//        String expected2 = "0|((1|2|3|4|5|6|7|8|9))((0|1|2|3|4|5|6|7|8|9)|_)*";
-//
-//        Regex r2 = Regex.constructRegex(regex2);
-//
-//        List<RENode> result2 = r2.preprocess();
-//
-//        assertEquals(expected2, Regex.showRENodes(result2));
+//         easy
+        String regex1 = "a*|b";
+
+        List<RENode> expected1 = new ArrayList<>();
+        expected1.add(new RENode('a'));
+        expected1.add(new RENode(RENode.RENodeType.STAR));
+        expected1.add(new RENode(RENode.RENodeType.OR));
+        expected1.add(new RENode('b'));
+
+        List<RENode> actual1 = Regex.preprocess(regex1);
+
+        assertEquals(expected1, actual1);
+
+
+        // with [ preprocess
+        String regex2 = "0|[1-9][0-9_]*";
+
+        String expected2 = "0|((1|2|3|4|5|6|7|8|9))((0|1|2|3|4|5|6|7|8|9)|_)*";
+
+
+        List<RENode> result2 = Regex.preprocess(regex2);
+
+        assertEquals(expected2, Regex.showRENodes(result2));
 
     }
 
     @Test
     public void testPostfix() {
         // easy
-//        String regex1 = "a*|bcd";
-//
-//        Regex r1 = new Regex(regex1);
-//
-//        String expected1 = "a*bc·d·|";
-//
-//        assertEquals(expected1, r1.getPostfix());
+        String regex1 = "a*|bcd";
+
+        Regex r1 = Regex.constructRegex(regex1);
+
+        String expected1 = "a*bc·d·|";
+
+        assertEquals(expected1, r1.getPostfix());
 
         // hard
 
@@ -119,15 +119,7 @@ public class LexTest {
 
         LexicalAnalyzer analyzer = LexicalAnalyzer.construct(str, symbolTable, Arrays.asList(rules));
 
-
-        List<Token> actuals = new ArrayList<>();
-
-        Token token;
-        while ((token = analyzer.getNextToken()) != null) {
-            actuals.add(token);
-        }
-
-        return actuals;
+        return analyzer.getAllRemainingTokens();
     }
 
     private void expectString(String str) {
@@ -143,7 +135,12 @@ public class LexTest {
 
     @Test
     public void testDotRegex() {
-        parse("\"i is negative\\n\"", new Rule("\\\"(.|\\\\\\n)*\\\"", TokenType.ASSIGN)).forEach(System.out::println);
+
+        List<Token> actual = parse("\"i is negative\\n\"", new Rule("\\\"(.|\\\\\\n)*\\\"", TokenType.STR_CONST));
+
+        Token expected = new Token("\"i is negative\\n\"", TokenType.STR_CONST);
+
+        assertEquals(expected, actual.get(0));
     }
 
     @Test
@@ -190,23 +187,16 @@ public class LexTest {
 
         SymbolTable symbolTable = new SymbolTable();
 
+        String content = FileUtil.getContentsOfResource("/input.c");
 
-        try {
-            URI sourceFile = Main.class.getResource("/input.c").toURI();
-            String content = Files.readAllLines(Paths.get(sourceFile)).stream().collect(Collectors.joining("\n"));
+        LexicalAnalyzer analyzer = LexicalAnalyzer.construct(content, symbolTable, rules);
 
-            LexicalAnalyzer analyzer = LexicalAnalyzer.construct(content, symbolTable, rules);
+        Token token;
+        while ((token = analyzer.getNextToken()) != null) {
+            if (!token.getType().equals(TokenType.IGNORED)) {
+                System.out.println(token);
 
-            Token token;
-            while ((token = analyzer.getNextToken()) != null) {
-                if (!token.getType().equals(TokenType.IGNORED)) {
-                    System.out.println(token);
-
-                }
             }
-
-        } catch (URISyntaxException | IOException e) {
-            e.printStackTrace();
         }
 
 

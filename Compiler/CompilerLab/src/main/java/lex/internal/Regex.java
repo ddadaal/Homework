@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static lex.internal.RENode.RENodeType;
 

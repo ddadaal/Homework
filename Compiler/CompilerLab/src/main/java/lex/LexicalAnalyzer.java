@@ -66,6 +66,23 @@ public class LexicalAnalyzer {
         }
     }
 
+    public void resetIndex() {
+        index = 0;
+    }
+
+    public List<Token> getAllRemainingTokens() {
+        List<Token> result = new ArrayList<>();
+
+
+        Token t;
+        while ((t = getNextToken()) != null) {
+            result.add(t);
+        }
+
+        return result;
+
+    }
+
     public Token getNextToken() {
 
         StringBuilder buffer = new StringBuilder();
@@ -83,15 +100,14 @@ public class LexicalAnalyzer {
 
             // try move one more char
             char c = input.charAt(index);
-            buffer.append(c);
             DFANode newPosition = position.getTargetOfEdge(c);
 
             if (newPosition == null) {
                 // can't move, try return token from previous position
-                buffer.deleteCharAt(buffer.length()-1);
                 return returnToken(buffer.toString(), position);
             } else {
                 // can move. move one more
+                buffer.append(c);
                 position = newPosition;
                 index++;
             }
