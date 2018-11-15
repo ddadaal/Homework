@@ -10,14 +10,14 @@ import java.util.List;
 @EqualsAndHashCode
 @AllArgsConstructor
 public class Production {
-    @Getter private ProductionSymbol left;
-    @Getter private List<ProductionSymbol> right;
+    @Getter private Symbol left;
+    @Getter private List<Symbol> right;
 
     public int rightSize() {
         return right.size();
     }
 
-    public Production(ProductionSymbol left, ProductionSymbol... right) {
+    public Production(Symbol left, Symbol... right) {
         this(left, Arrays.asList(right));
     }
 
@@ -26,8 +26,9 @@ public class Production {
         StringBuilder sb = new StringBuilder();
 
         sb.append(left.toString());
-        sb.append(" -> ");
-        for (ProductionSymbol rightSymbol: right) {
+        sb.append(" ->");
+        for (Symbol rightSymbol: right) {
+            sb.append(" ");
             sb.append(rightSymbol.toString());
         }
 

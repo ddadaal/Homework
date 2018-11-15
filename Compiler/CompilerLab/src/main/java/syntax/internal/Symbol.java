@@ -10,15 +10,15 @@ import lombok.Getter;
  * can be either a non-terminal or terminal by calling different constructor
  */
 @EqualsAndHashCode
-public class ProductionSymbol {
+public class Symbol {
     @Getter private String ntName;
     @Getter private TokenType tokenType;
 
-    public ProductionSymbol(String ntName) {
+    public Symbol(String ntName) {
         this.ntName = ntName;
     }
 
-    public ProductionSymbol(TokenType tokenType) {
+    public Symbol(TokenType tokenType) {
         this.tokenType = tokenType;
     }
 
@@ -31,7 +31,7 @@ public class ProductionSymbol {
         if (isNonTerminalSymbol()) {
             return ntName;
         } else {
-            return tokenType.name();
+            return tokenType.toString();
         }
     }
 }

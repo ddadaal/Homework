@@ -9,22 +9,24 @@ import java.util.*;
 @ExtensionMethod(CollectionExtensions.class)
 public class LRDFANode {
 
+    @Getter private List<LRItem> kernel;
     @Getter private List<LRItem> lrItems;
-    @Getter private Map<ProductionSymbol, LRDFANode> edges;
+    @Getter private Map<Symbol, LRDFANode> edges;
 
     public LRDFANode() {
         this.edges = new HashMap<>();
     }
 
-    public LRDFANode(List<LRItem> lrItems) {
+    public LRDFANode(List<LRItem> kernel, List<LRItem> lrItems) {
         this();
+        this.kernel = kernel;
         this.lrItems = lrItems;
     }
 
-    public Set<ProductionSymbol> getMovableSymbols() {
-        Set<ProductionSymbol> result = new HashSet<>();
+    public Set<Symbol> getMovableSymbols() {
+        Set<Symbol> result = new HashSet<>();
         for (LRItem lrItem : lrItems) {
-            ProductionSymbol symbol = lrItem.getSymbolAfterDot();
+            Symbol symbol = lrItem.getSymbolAfterDot();
             if (symbol != null) {
                 result.add(symbol);
             }
@@ -33,7 +35,7 @@ public class LRDFANode {
         return result;
     }
 
-    public void setEdge(ProductionSymbol symbol, LRDFANode node) {
+    public void setEdge(Symbol symbol, LRDFANode node) {
         edges.put(symbol, node);
     }
 
@@ -47,7 +49,7 @@ public class LRDFANode {
         if (!(o instanceof LRDFANode)) return false;
         LRDFANode lrdfaNode = (LRDFANode) o;
 
-        return CollectionExtensions.containsSameElements(lrItems, lrdfaNode.lrItems);
+        return CollectionExtensions.containsSameElements(kernel, lrdfaNode.kernel);
     }
 
 

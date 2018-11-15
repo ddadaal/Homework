@@ -14,7 +14,7 @@ import util.Constants;
 public class LRItem {
     @Getter private Production production;
     @Getter private int dotPosition;
-    @Getter private ProductionSymbol lookaheadSymbol;
+    @Getter private Symbol lookaheadSymbol;
 
 
     public LRItem(Production production, int dotPosition) {
@@ -37,12 +37,12 @@ public class LRItem {
         return new LRItem(production, dotPosition +1);
     }
 
-    public ProductionSymbol getSymbolAfterDot() {
+    public Symbol getSymbolAfterDot() {
         if (isReducible()) {
             return null;
         }
 
-        return production.getRight().get(dotPosition+1);
+        return production.getRight().get(dotPosition);
 
     }
 
@@ -57,7 +57,12 @@ public class LRItem {
             if (dotPosition == i) {
                 sb.append(Constants.DOT);
             }
+            sb.append(" ");
             sb.append(production.getRight().get(i));
+        }
+
+        if (isReducible()) {
+            sb.append(Constants.DOT);
         }
 
         return sb.toString();

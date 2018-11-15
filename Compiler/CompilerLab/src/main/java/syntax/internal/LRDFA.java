@@ -19,6 +19,8 @@ public class LRDFA {
     @Getter
     private List<LRDFANode> allNodes;
 
+
+
     public static LRDFA constructDFA(ProductionList productionList) {
 
 
@@ -29,7 +31,7 @@ public class LRDFA {
         // 2. add lookahead symbols
 
 
-
+        return dfa;
 
 
     }
@@ -47,21 +49,24 @@ public class LRDFA {
         Stack<LRDFANode> stack = new Stack<>();
 
         // create initial node
+
         LRItem startItem = new LRItem(startProduction, 0);
-        List<LRItem> closure = closure(Collections.singletonList(startItem), productions);
-        var startNode = new LRDFANode(closure);
+        List<LRItem> firstKernel = Collections.singletonList(startItem);
+
+        List<LRItem> closure = closure(firstKernel, productions);
+        var startNode = new LRDFANode(firstKernel, closure);
         nodes.add(startNode);
         stack.push(startNode);
 
         while (!stack.empty()) {
             LRDFANode node = stack.pop();
 
-            for (ProductionSymbol symbol: node.getMovableSymbols()) {
+            for (Symbol symbol: node.getMovableSymbols()) {
 
                 // inter-state expansion. shift point
                 List<LRItem> shifted = new ArrayList<>();
                 for (var item: node.getLrItems()) {
-                    if (item.getSymbolAfterDot().equals(symbol)) {
+                    if (symbol.equals(item.getSymbolAfterDot())) {
                         shifted.add(item.shift());
                     }
                 }
@@ -70,7 +75,7 @@ public class LRDFA {
                 List<LRItem> newClosure = closure(shifted, productions);
 
                 // construct node
-                var newNode = new LRDFANode(newClosure);
+                var newNode = new LRDFANode(shifted, newClosure);
 
                 LRDFANode existing = null;
 
@@ -119,7 +124,7 @@ public class LRDFA {
             if (item.isReducible()) {
                 continue;
             }
-            ProductionSymbol leftSymbol = item.getSymbolAfterDot();
+            Symbol leftSymbol = item.getSymbolAfterDot();
             if (leftSymbol.isNonTerminalSymbol()) {
                 for (var production : productions) {
                     if (production.getLeft().equals(leftSymbol)) {

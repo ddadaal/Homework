@@ -1,24 +1,32 @@
 package syntax.internal;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.*;
 
 
+/**
+ * Production list
+ */
 public class ProductionList {
 
     @Getter private List<Production> productions;
 
     @Getter private Production startProduction;
 
-    @Getter private ProductionSymbol startSymbol;
+    @Getter private Symbol startSymbol;
 
 
-    @Getter private Map<ProductionSymbol, Set<ProductionSymbol>> followMap;
+    @Getter private Map<Symbol, Set<Symbol>> followMap;
 
 
-    public ProductionList(List<Production> productions, Production startProduction, ProductionSymbol startSymbol) {
+    /**
+     * Augmented production list with only one start production
+     * @param productions productions
+     * @param startProduction start production
+     * @param startSymbol start symbol
+     */
+    public ProductionList(List<Production> productions, Production startProduction, Symbol startSymbol) {
         this.productions = productions;
         this.startProduction = startProduction;
         this.startSymbol = startSymbol;
@@ -26,14 +34,15 @@ public class ProductionList {
         this.followMap = new HashMap<>();
     }
 
-    public Set<ProductionSymbol> follow(ProductionSymbol symbol) {
+
+    public Set<Symbol> follow(Symbol symbol) {
 
         if (followMap.containsKey(symbol)) {
             return followMap.get(symbol);
         }
 
         // calculate follow
-        Set<ProductionSymbol> symbols = new HashSet<>();
+        Set<Symbol> symbols = new HashSet<>();
 
 
 

@@ -1,14 +1,11 @@
 package syntax;
 
-import lex.token.Token;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import symboltable.SymbolTable;
 import syntax.internal.Production;
-import syntax.internal.ProductionSymbol;
+import syntax.internal.Symbol;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -17,7 +14,7 @@ public class SyntaxAnalyzer {
     private List<Production> productions;
 
     @Getter
-    private ProductionSymbol startSymbol;
+    private Symbol startSymbol;
 
 
     public void init() {
@@ -37,7 +34,7 @@ public class SyntaxAnalyzer {
 
     public void augmentProduction() {
 
-        ProductionSymbol symbol = new ProductionSymbol("S'");
+        Symbol symbol = new Symbol("S'");
 
         Production newProduction = new Production(symbol, startSymbol);
 
