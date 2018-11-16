@@ -1,16 +1,11 @@
 package syntax.internal;
 
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.var;
+import lombok.*;
 import util.Constants;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static util.Constants.DOLLAR_SYMBOL;
 
 
 @AllArgsConstructor
@@ -24,7 +19,6 @@ public class LRDFA {
     private List<LRDFANode> allNodes;
 
 
-
     public static LRDFA constructDFA(ProductionList productionList) {
 
 
@@ -34,6 +28,9 @@ public class LRDFA {
 
         // 2. add lookahead symbols
 
+        addLookaheadSymbols(dfa,productionList);
+
+        // 3 return the LALR(1) DFA
 
         return dfa;
 
@@ -65,11 +62,11 @@ public class LRDFA {
         while (!stack.empty()) {
             LRDFANode node = stack.pop();
 
-            for (Symbol symbol: node.getMovableSymbols()) {
+            for (Symbol symbol : node.getMovableSymbols()) {
 
                 // inter-state expansion. shift point
                 List<LRItem> shifted = new ArrayList<>();
-                for (var item: node.getLrItems()) {
+                for (var item : node.getLrItems()) {
                     if (symbol.equals(item.getSymbolAfterDot())) {
                         shifted.add(item.shift());
                     }
@@ -84,7 +81,7 @@ public class LRDFA {
                 LRDFANode existing = null;
 
                 // find existing node if there is
-                for (LRDFANode e: nodes) {
+                for (LRDFANode e : nodes) {
                     if (e.equals(newNode)) {
                         existing = e;
                         break;
@@ -152,7 +149,7 @@ public class LRDFA {
 
                             // for all lookahead symbols, add the item into result
                             for (var x : lookaheadSymbols) {
-                                var newItem = newLrItem.addLookaheadSymbol(x);
+                                var newItem = newLrItem.setLookaheadSymbol(x);
                                 if (!result.contains(newItem)) {
                                     result.add(newItem);
                                     stack.push(newItem);
@@ -178,36 +175,127 @@ public class LRDFA {
 
 
     // add lookahead symbols
-    public static LRDFA addLookaheadSymbols(LRDFA dfa, ProductionList productionList) {
+    public static void addLookaheadSymbols(LRDFA dfa, ProductionList productionList) {
 
         @EqualsAndHashCode
         @AllArgsConstructor
-        class StackItem {
+        class StateSpecificLRItem {
             LRDFANode node;
             LRItem lrItem;
+
+            @Override
+            public String toString() {
+                return String.format("%s: %s", node.hashCode(), lrItem.toString());
+            }
         }
 
-        var stack = new Stack<StackItem>();
-        var resultSet = new HashSet<StackItem>();
+        // 1. construct propagate map and spontaneously generated map.
+        // during this process, all spontaneously generated lookahead symbol will be recorded into resultLookaheadsSymbolMap
+        // and propagated relation (lookaheads of Key StateSpecificLRItem will be propagated to the Value StateSpecficLRItem) will be recorded into propagatedMap
+
+        var propagateMap = new HashMap<StateSpecificLRItem, List<StateSpecificLRItem>>();
+        var resultLookaheadsSymbolMap = new HashMap<StateSpecificLRItem, List<Symbol>>();
+
+        // add $R as spontaneously generated symbol for the S' -> S
+        resultLookaheadsSymbolMap.put(
+            new StateSpecificLRItem(dfa.getStartState(), dfa.getStartState().getKernel().get(0)),
+            new ArrayList<>(Collections.singletonList(Constants.DOLLAR_SYMBOL))
+        );
 
 
-        // 1. add $r to the start production
-        var startNode = dfa.getStartState();
-        var startItem = startNode.getKernel().get(0).addLookaheadSymbol(DOLLAR_SYMBOL);
-        var stackItem = new StackItem(startNode, startItem);
-        stack.push(stackItem);
-        resultSet.add(stackItem);
+        val externalSymbol = Constants.EXTERNAL_SYMBOL;
 
-        while (!stack.empty()) {
-            var item = stack.peek();
+        for (var node : dfa.getAllNodes()) {
+            for (var item : node.getKernel()) {
+
+                var stateSpecificKernelItem = new StateSpecificLRItem(node, item);
+
+                // add all kernel items into spontaneously generated map
+                resultLookaheadsSymbolMap.putIfAbsent(stateSpecificKernelItem, new ArrayList<>());
+
+                for (var symbol : node.getMovableSymbols()) {
+
+                    var targetNode = node.goTo(symbol);
+
+                    var list = propagateMap.computeIfAbsent(stateSpecificKernelItem, k -> new ArrayList<>());
+
+                    var probeItem = item.setLookaheadSymbol(externalSymbol);
+
+                    var closure = closure(Collections.singletonList(probeItem), productionList);
+
+                    for (var closureItem : closure) {
+                        if (symbol.equals(closureItem.getSymbolAfterDot())) {
+
+                            // remove the lookahead symbol
+                            var shifted = closureItem.shift().setLookaheadSymbol(null);
+                            var targetSSLRItem = new StateSpecificLRItem(targetNode, shifted);
+
+                            if (closureItem.getLookaheadSymbol().equals(externalSymbol)) {
+                                // this closure item is propagated.
+                                // add the shifted item without the lookahead symbol
+
+                                list.add(targetSSLRItem);
+
+                            } else {
+                                // this closureItem's symbol is spontaneously generated
+                                // add it into the record
+                                var listOfTargetSSLRItem = resultLookaheadsSymbolMap.computeIfAbsent(targetSSLRItem, k -> new ArrayList<>());
+                                listOfTargetSSLRItem.add(closureItem.getLookaheadSymbol());
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
 
 
+        // remove empty propagated map entries
+        propagateMap.entrySet().removeIf(x -> x.getValue().isEmpty());
 
+        // 2. propagate lookaheads into resultLookaheadsSymbolMap
+
+        boolean added = true;
+
+        while (added) {
+            added = false;
+            for (var stateSpecificKernelItem : resultLookaheadsSymbolMap.keySet()) {
+                var existingLookaheads = resultLookaheadsSymbolMap.get(stateSpecificKernelItem);
+
+                var propagateTargetLookaheads = propagateMap.get(stateSpecificKernelItem);
+
+                if (propagateTargetLookaheads == null) {
+                    continue;
+                }
+
+                for (var propagateTarget : propagateTargetLookaheads) {
+                    var list = resultLookaheadsSymbolMap.get(propagateTarget);
+                    for (var lookahead : existingLookaheads) {
+                        if (!list.contains(lookahead)) {
+                            list.add(lookahead);
+                            added = true;
+                        }
+                    }
+                }
+            }
 
         }
 
 
-        return null;
+        // add the symbols back to the original DFA and result in final LALR(1) DFA!!!!!
+
+        for (var entry: resultLookaheadsSymbolMap.entrySet()) {
+            var key = entry.getKey();
+            var list = entry.getValue();
+
+            var newKernel = list.stream().map(symbol -> key.lrItem.setLookaheadSymbol(symbol)).collect(Collectors.toList());
+
+            var closure = closure(newKernel, productionList);
+
+            key.node.setKernel(newKernel);
+            key.node.setLrItems(closure);
+        }
+
 
     }
 }

@@ -1,47 +1,44 @@
 package syntax;
 
+import lex.token.Token;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import syntax.internal.Production;
-import syntax.internal.Symbol;
+import lombok.var;
+import syntax.internal.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 
 @AllArgsConstructor
 public class SyntaxAnalyzer {
     @Getter
-    private List<Production> productions;
-
+    private ProductionList productionList;
     @Getter
-    private Symbol startSymbol;
+    private LRDFA lalrdfa;
 
+    public static SyntaxAnalyzer construct(List<Production> productions, Symbol startSymbol) {
+        var productionList = ProductionList.fromUnaugmentedList(productions, startSymbol);
 
-    public void init() {
-        // 1. add s' into the productions
-        augmentProduction();
+        var lalrdfa = LRDFA.constructDFA(productionList);
 
-        // 2. build graph
-
-
-
+        return new SyntaxAnalyzer(productionList, lalrdfa);
     }
 
+    public List<Production> getProductionSequence(List<Token> tokens) {
 
-    public void analyze() {
+        var productionList = new ArrayList<Production>();
 
+        LRDFANode state = lalrdfa.getStartState();
+
+        var stateStack = new Stack<LRDFANode>();
+
+        var symbolStack = new Stack<Symbol>();
+
+        for (int i =0;i<tokens.size();i++) {
+            
+        }
     }
-
-    public void augmentProduction() {
-
-        Symbol symbol = new Symbol("S'");
-
-        Production newProduction = new Production(symbol, startSymbol);
-
-        productions.add(newProduction);
-        startSymbol = symbol;
-
-    }
-
 
 }

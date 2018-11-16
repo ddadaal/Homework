@@ -12,7 +12,7 @@ import util.Constants;
 public class LRItem {
     @Getter private Production production;
     @Getter private int dotPosition;
-    @Getter @Setter private Symbol lookaheadSymbol;
+    @Getter private Symbol lookaheadSymbol;
 
 
     public LRItem(Production production, int dotPosition) {
@@ -44,9 +44,10 @@ public class LRItem {
 
     }
 
-    public LRItem addLookaheadSymbol(Symbol symbol) {
+    public LRItem setLookaheadSymbol(Symbol symbol) {
         return new LRItem(production, dotPosition, symbol);
     }
+
 
     @Override
     public String toString() {

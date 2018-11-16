@@ -1,9 +1,7 @@
 package syntax.internal;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.var;
-import syntax.SyntaxParseException;
 
 import java.util.*;
 
@@ -22,9 +20,9 @@ public class ProductionList {
     @Getter private Symbol startSymbol;
 
 
-    @Getter private Map<Symbol, Set<Symbol>> firstMap = new HashMap<>();
+    @Getter private Map<Symbol, Set<Symbol>> firstMemo = new HashMap<>();
 
-    private Map<Symbol, Boolean> canDeriveToEpsilonMap = new HashMap<>();
+    private Map<Symbol, Boolean> canDeriveToEpsilonMemo = new HashMap<>();
 
 
     public ProductionList(List<Production> productions, Production startProduction, Symbol startSymbol) {
@@ -46,74 +44,66 @@ public class ProductionList {
 
     public Set<Symbol> first(Symbol symbol) {
 
-        if (firstMap.containsKey(symbol)) {
-            return firstMap.get(symbol);
-        }
+        return firstMemo.computeIfAbsent(symbol, key -> {
+            Set<Symbol> symbols = new HashSet<>();
 
-        // calculate first
-        Set<Symbol> symbols = new HashSet<>();
+            if (!symbol.isNonTerminalSymbol()) {
+                // if symbol is a terminal symbol, return itself
+                symbols.add(symbol);
+            } else {
+                for (var production: productions) {
 
-        if (!symbol.isNonTerminalSymbol()) {
-            // if symbol is a terminal symbol, return itself
-            symbols.add(symbol);
-        } else {
-            for (var production: productions) {
-
-                if (!production.getLeft().equals(symbol)) {
-                    continue;
-                }
-
-                for (var rightSymbol: production.getRight()) {
-
-                    // ignore itself to avoid endless loop
-                    if (rightSymbol.equals(symbol)) {
+                    if (!production.getLeft().equals(symbol)) {
                         continue;
                     }
 
-                    var set = first(rightSymbol);
-                    symbols.addAll(set);
+                    for (var rightSymbol: production.getRight()) {
 
-                    if (!canDeriveToEpsilon(rightSymbol)) {
-                        break;
+                        // ignore itself to avoid endless loop
+                        if (rightSymbol.equals(symbol)) {
+                            continue;
+                        }
+
+                        var set = first(rightSymbol);
+                        symbols.addAll(set);
+
+                        if (!canDeriveToEpsilon(rightSymbol)) {
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        firstMap.put(symbol, symbols);
-
-        return symbols;
+            return symbols;
+        });
 
     }
 
     public boolean canDeriveToEpsilon(Symbol symbol) {
-        if (canDeriveToEpsilonMap.containsKey(symbol)) {
-            return canDeriveToEpsilonMap.get(symbol);
-        }
 
-        boolean result = false;
 
-        if (!symbol.isNonTerminalSymbol()) {
-            // if symbol is a terminal symbol,  it can't derive to epsilon
-            result = false;
-        } else {
-            for (var production: productions) {
-                if (!production.getLeft().equals(symbol)) {
-                    continue;
-                }
+        return canDeriveToEpsilonMemo.computeIfAbsent(symbol, key -> {
 
-                // if there is no right symbol (meaning this production derives to epsilon),
-                // or all right symbol can derive epsilon,
-                // the result would be true
-                if (production.rightSize() == 0 || production.getRight().stream().allMatch(this::canDeriveToEpsilon)) {
-                    result= true;
-                    break;
+            if (!symbol.isNonTerminalSymbol()) {
+                // if symbol is a terminal symbol,  it can't derive to epsilon
+                return false;
+            } else {
+                for (var production: productions) {
+                    if (!production.getLeft().equals(symbol)) {
+                        continue;
+                    }
+
+                    // if there is no right symbol (meaning this production derives to epsilon),
+                    // or all right symbol can derive epsilon,
+                    // the result would be true
+                    if (production.rightSize() == 0 || production.getRight().stream().allMatch(this::canDeriveToEpsilon)) {
+                        return true;
+                    }
                 }
             }
-        }
 
-        canDeriveToEpsilonMap.put(symbol, result);
-        return result;
+            return true;
+        });
     }
 
 

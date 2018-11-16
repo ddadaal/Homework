@@ -14,5 +14,6 @@ public class Constants {
 
     public static Symbol DOLLAR_SYMBOL = new Symbol("$R");
     public static Symbol AUGMENTED_START_SYMBOL = new Symbol("S'");
+    public static Symbol EXTERNAL_SYMBOL = new Symbol(TokenType.UNKNOWN);
 }
 

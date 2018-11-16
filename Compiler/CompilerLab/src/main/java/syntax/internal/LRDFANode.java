@@ -1,6 +1,7 @@
 package syntax.internal;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
 import util.CollectionExtensions;
 
@@ -8,8 +9,9 @@ import java.util.*;
 
 public class LRDFANode {
 
-    @Getter private List<LRItem> kernel;
-    @Getter private List<LRItem> lrItems;
+    @Getter @Setter
+    private List<LRItem> kernel;
+    @Getter @Setter private List<LRItem> lrItems;
     @Getter private Map<Symbol, LRDFANode> edges;
 
     public LRDFANode() {
@@ -32,6 +34,10 @@ public class LRDFANode {
         }
 
         return result;
+    }
+
+    public LRDFANode goTo(Symbol symbol) {
+        return edges.get(symbol);
     }
 
     public void setEdge(Symbol symbol, LRDFANode node) {

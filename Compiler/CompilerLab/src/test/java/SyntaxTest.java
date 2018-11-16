@@ -15,9 +15,8 @@ import static util.Constants.*;
 
 public class SyntaxTest {
 
-    @Test
-    public void testLR0DFA() {
-
+    private LRDFA constructExample4dot45LR0DFA() {
+        // example 4.45
         var S = new Symbol("S");
         var L = new Symbol("L");
         var R = new Symbol("R");
@@ -41,6 +40,12 @@ public class SyntaxTest {
 
         // manual check
 
+        return lr0dfa;
+    }
+
+    @Test
+    public void testLR0DFA() {
+        constructExample4dot45LR0DFA();
 
     }
 
@@ -127,4 +132,37 @@ public class SyntaxTest {
         assertEquals(expected, actual);
 
     }
+
+
+    @Test
+    public void testLALRConstruction() {
+
+        var S = new Symbol("S");
+        var L = new Symbol("L");
+        var R = new Symbol("R");
+
+        var ASSIGN = new Symbol(TokenType.ASSIGN);
+        var STAR = new Symbol(TokenType.STAR);
+        var ID = new Symbol(TokenType.IDENTIFIER);
+
+
+        Production[] productions = {
+            new Production(S, L, ASSIGN, R),
+            new Production(S, R),
+            new Production(L, STAR, R),
+            new Production(L, ID),
+            new Production(R, L)
+        };
+
+        var list = ProductionList.fromUnaugmentedList(Arrays.asList(productions), S);
+
+        var lr0dfa = LRDFA.constructLR0DFA(list);
+
+        // example 4.45
+
+        LRDFA.addLookaheadSymbols(lr0dfa, list);
+
+
+    }
+
 }
