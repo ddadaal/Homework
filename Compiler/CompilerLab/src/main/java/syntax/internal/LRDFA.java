@@ -284,16 +284,25 @@ public class LRDFA {
 
         // add the symbols back to the original DFA and result in final LALR(1) DFA!!!!!
 
+        // clear up the kernel and lritems for each nodes
+        for (var node: dfa.getAllNodes()) {
+            node.setLrItems(new ArrayList<>());
+            node.setKernel(new ArrayList<>());
+        }
+
         for (var entry: resultLookaheadsSymbolMap.entrySet()) {
             var key = entry.getKey();
             var list = entry.getValue();
 
-            var newKernel = list.stream().map(symbol -> key.lrItem.setLookaheadSymbol(symbol)).collect(Collectors.toList());
+            var newKernel = list.stream()
+                .map(symbol -> key.lrItem.setLookaheadSymbol(symbol))
+                .distinct()
+                .collect(Collectors.toList());
 
             var closure = closure(newKernel, productionList);
 
-            key.node.setKernel(newKernel);
-            key.node.setLrItems(closure);
+            key.node.getKernel().addAll(newKernel);
+            key.node.getLrItems().addAll(closure);
         }
 
 

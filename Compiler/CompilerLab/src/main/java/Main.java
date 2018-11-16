@@ -1,8 +1,10 @@
+import jdk.nashorn.internal.runtime.arrays.IteratorAction;
 import lex.LexicalAnalyzer;
 import lex.Rule;
 import lex.token.Token;
 import lex.token.TokenType;
 import symboltable.SymbolTable;
+import util.IteratorUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,10 +18,13 @@ public class Main {
 
         List<Rule> rules = Arrays.asList(rule1, rule2);
         SymbolTable symbolTable = new SymbolTable();
-        LexicalAnalyzer analyzer = LexicalAnalyzer.construct("1234bbaaaaa1b", symbolTable, rules);
+        LexicalAnalyzer analyzer = LexicalAnalyzer.construct(
+            IteratorUtil.strToIterator("1234bbaaaaa1b"),
+            symbolTable,
+            rules
+        );
 
 
-        analyzer.getAllRemainingTokens().forEach(System.out::println);
 
     }
 }

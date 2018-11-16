@@ -14,6 +14,6 @@ public class Token {
 
     @Override
     public String toString() {
-        return String.format("<%s, %s>", type.toString(), lexeme);
+        return String.format("<%s, %s>", type.name(), lexeme);
     }
 }

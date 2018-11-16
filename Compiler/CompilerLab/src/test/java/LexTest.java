@@ -1,26 +1,18 @@
-import com.sun.org.apache.regexp.internal.RE;
 import lex.LexicalAnalyzer;
-import lex.LexicalParseException;
 import lex.Rule;
-import lex.internal.NFA;
 import lex.internal.RENode;
 import lex.internal.Regex;
 import lex.token.Token;
 import lex.token.TokenType;
 import org.junit.Test;
 import symboltable.SymbolTable;
+import util.CollectionUtil;
 import util.FileUtil;
+import util.IteratorUtil;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -87,6 +79,8 @@ public class LexTest {
 
     }
 
+
+
     @Test
     public void testSimpleRulesAndInput() {
         Rule rule1 = new Rule("b|ba*", TokenType.COMMA);
@@ -95,15 +89,15 @@ public class LexTest {
 
         List<Rule> rules = Arrays.asList(rule1, rule2);
         SymbolTable symbolTable = new SymbolTable();
-        LexicalAnalyzer analyzer = LexicalAnalyzer.construct("1234bbaaaaa1b", symbolTable, rules);
+        LexicalAnalyzer analyzer = LexicalAnalyzer.construct(
+            IteratorUtil.strToIterator("1234bbaaaaa1b"),
+            symbolTable,
+            rules
+        );
 
 
         List<Token> actuals = new ArrayList<>();
-
-        Token token;
-        while ((token = analyzer.getNextToken()) != null) {
-            actuals.add(token);
-        }
+        analyzer.forEachRemaining(actuals::add);
 
 
         List<Token> expected = new ArrayList<>();
@@ -117,9 +111,15 @@ public class LexTest {
     private List<Token> parse(String str, Rule... rules) {
         SymbolTable symbolTable = new SymbolTable();
 
-        LexicalAnalyzer analyzer = LexicalAnalyzer.construct(str, symbolTable, Arrays.asList(rules));
+        LexicalAnalyzer analyzer = LexicalAnalyzer.construct(
+            IteratorUtil.strToIterator(str),
+            symbolTable,
+            Arrays.asList(rules)
+        );
 
-        return analyzer.getAllRemainingTokens();
+        List<Token> actuals = IteratorUtil.iterateAll(analyzer);
+
+        return actuals;
     }
 
     private void expectString(String str) {
@@ -187,17 +187,15 @@ public class LexTest {
 
         SymbolTable symbolTable = new SymbolTable();
 
-        String content = FileUtil.getContentsOfResource("/input.c");
+        LexicalAnalyzer analyzer = LexicalAnalyzer.construct(
+            IteratorUtil.strToIterator(FileUtil.getContentsOfResource("/input.c")),
+            symbolTable,
+            rules);
 
-        LexicalAnalyzer analyzer = LexicalAnalyzer.construct(content, symbolTable, rules);
+        IteratorUtil.iterateAll(analyzer).stream()
+            .filter(x -> !x.getType().equals(TokenType.IGNORED))
+            .forEach(System.out::println);
 
-        Token token;
-        while ((token = analyzer.getNextToken()) != null) {
-            if (!token.getType().equals(TokenType.IGNORED)) {
-                System.out.println(token);
-
-            }
-        }
 
 
     }

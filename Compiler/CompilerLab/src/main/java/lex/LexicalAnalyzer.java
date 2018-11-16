@@ -2,19 +2,20 @@ package lex;
 
 import lex.internal.*;
 import lex.token.Token;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.var;
 import symboltable.SymbolTable;
 import util.Constants;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class LexicalAnalyzer {
-
-    private int index = 0;
+@AllArgsConstructor
+public class LexicalAnalyzer implements Iterator<Token> {
 
     @Getter
-    private String input;
+    private ListIterator<Character> characterIterator;
 
     @Getter
     private SymbolTable symbolTable;
@@ -22,17 +23,11 @@ public class LexicalAnalyzer {
     @Getter
     private DFA dfa;
 
-    public LexicalAnalyzer(String input, SymbolTable symbolTable, DFA dfa) {
-        this.input = input;
-        this.symbolTable = symbolTable;
-        this.dfa = dfa;
-    }
-
-    public static LexicalAnalyzer construct(String input, SymbolTable symbolTable, List<Rule> rules) {
+    public static LexicalAnalyzer construct(ListIterator<Character> characterIterator, SymbolTable symbolTable, List<Rule> rules) {
 
         DFA dfa = constructDFA(rules);
 
-        return new LexicalAnalyzer(input ,symbolTable, dfa);
+        return new LexicalAnalyzer(characterIterator, symbolTable, dfa);
     }
 
     public static DFA constructDFA(List<Rule> rules) {
@@ -54,62 +49,78 @@ public class LexicalAnalyzer {
     }
 
 
-    private Token returnToken(String str, DFANode position) {
-        if (position.isEndState()) {
-            return new Token(str, position.getEndStateTokenTypes().get(0));
-        } else {
-            // find the next expected chars
-            String more = position.getEdges().keySet().stream().map(Object::toString).collect(Collectors.joining(", "));
-            throw new LexicalParseException("Unexpected end of input. Expect: " + more);
+    /**
+     * Returns {@code true} if the iteration has more elements.
+     * (In other words, returns {@code true} if {@link #next} would
+     * return an element rather than throwing an exception.)
+     *
+     * @return {@code true} if the iteration has more elements
+     */
+    @Override
+    public boolean hasNext() {
+        try {
+            var token = next();
+            for (int i =0;i<token.getLexeme().length();i++) {
+                characterIterator.previous();
+            }
+            return true;
+        } catch (LexicalParseException e) {
+            return false;
         }
     }
 
-    public void resetIndex() {
-        index = 0;
-    }
-
-    public List<Token> getAllRemainingTokens() {
-        List<Token> result = new ArrayList<>();
-
-        Token t;
-        while ((t = getNextToken()) != null) {
-            result.add(t);
-        }
-        return result;
-    }
-
-    public Token getNextToken() {
-
+    /**
+     * Returns the next element in the iteration.
+     *
+     * @return the next element in the iteration
+     * @throws NoSuchElementException if the iteration has no more elements
+     */
+    @Override
+    public Token next() {
         StringBuilder buffer = new StringBuilder();
         DFANode position = dfa.getStart();
 
-        while (index < input.length() + 1) {
-
-            if (index == input.length()) {
-                // read complete.
-                // returns token immediately
-                // increment prevents repeated read
-                index++;
-                return returnToken(buffer.toString(), position);
-            }
+        while (characterIterator.hasNext()) {
 
             // try move one more char
-            char c = input.charAt(index);
+            char c = characterIterator.next();
             DFANode newPosition = position.move(c);
 
             if (newPosition == null) {
-                // can't move, try return token from previous position
-                return returnToken(buffer.toString(), position);
+                // can't move, reverse and token from previous position
+
+                characterIterator.previous();
+
+                if (position.isEndState()) {
+                    return new Token(
+                        buffer.toString(),
+                        position.getEndStateTokenTypes().get(0)
+                    );
+                } else {
+                    // find the next expected chars
+                    String more = position.getEdges().keySet().stream().map(Object::toString).collect(Collectors.joining(", "));
+                    throw new LexicalParseException(
+                        "Expect: " + more
+                        );
+                }
             } else {
                 // can move. move one more
                 buffer.append(c);
                 position = newPosition;
-                index++;
             }
 
         }
 
-        return null;
-    }
+        if (position.isEndState()) {
+            return new Token(buffer.toString(), position.getEndStateTokenTypes().get(0));
+        }
 
+        String more = position.getEdges().keySet().stream().map(Object::toString).collect(Collectors.joining(", "));
+        throw new LexicalParseException(
+            String.format(
+                "Unexpected end of input. Expect: %s",
+                more
+            )
+        );
+    }
 }

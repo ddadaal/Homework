@@ -1,8 +1,8 @@
 import lex.token.TokenType;
 import lombok.var;
 import org.junit.Test;
+import syntax.SyntaxAnalyzer;
 import syntax.internal.*;
-import util.CollectionExtensions;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,7 +34,7 @@ public class SyntaxTest {
             new Production(R, L)
         };
 
-        var list = ProductionList.fromUnaugmentedList(Arrays.asList(productions), S);
+        var list = ProductionList.fromUnaugmentedList(productions, S);
 
         var lr0dfa = LRDFA.constructLR0DFA(list);
 
@@ -72,7 +72,7 @@ public class SyntaxTest {
             new Production(B),
         };
 
-        var list = ProductionList.fromUnaugmentedList(Arrays.asList(productions), A);
+        var list = ProductionList.fromUnaugmentedList(productions, A);
 
 
         var expectedFirstA = new HashSet<>(Arrays.asList(
@@ -82,7 +82,6 @@ public class SyntaxTest {
         var actual = list.first(A);
 
         assertEquals(expectedFirstA, actual);
-
 
 
     }
@@ -154,7 +153,7 @@ public class SyntaxTest {
             new Production(R, L)
         };
 
-        var list = ProductionList.fromUnaugmentedList(Arrays.asList(productions), S);
+        var list = ProductionList.fromUnaugmentedList(productions, S);
 
         var lr0dfa = LRDFA.constructLR0DFA(list);
 
@@ -162,6 +161,50 @@ public class SyntaxTest {
 
         LRDFA.addLookaheadSymbols(lr0dfa, list);
 
+
+    }
+
+    @Test
+    public void syntaxAnalyzeFinalTest() {
+        // example 4.31
+
+        var E = new Symbol("E");
+        var T = new Symbol("T");
+        var F = new Symbol("F");
+
+        var plus = new Symbol(TokenType.PLUS);
+        var lparen = new Symbol(TokenType.LEFT_PARENTHESIS);
+        var rparen = new Symbol(TokenType.RIGHT_PARENTHESIS);
+        var star = new Symbol(TokenType.STAR);
+        var id = new Symbol(TokenType.IDENTIFIER);
+
+        Production[] productions = {
+            new Production(E, E, plus, T),
+            new Production(E, T),
+            new Production(T, T, star, F),
+            new Production(T, F),
+            new Production(F, lparen, E, rparen),
+            new Production(F, id)
+        };
+
+        var analyzer = SyntaxAnalyzer.construct(Arrays.asList(productions), E);
+
+        var expected = Arrays.asList(
+            productions[5],
+            productions[3],
+            productions[5],
+            productions[2],
+            productions[1],
+            productions[5],
+            productions[3],
+            productions[0]
+        );
+
+        var tokens = Arrays.asList(
+            id, star, id, plus, id, DOLLAR_SYMBOL
+        );
+
+        assertEquals(expected, analyzer.getProductionSequence(tokens.iterator()));
 
     }
 

@@ -36,6 +36,8 @@ public enum TokenType {
     STR_CONST("str_const"),
 
     IGNORED(""),
+    DOLLAR_R("$R"),
+    DOLLAR_L("$L"),
     UNKNOWN("#");
 
     @Getter private String str;

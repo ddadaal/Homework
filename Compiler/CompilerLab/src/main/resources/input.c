@@ -15,7 +15,7 @@ int main() {
         if (i<=0) {
             printf("i is negative\n");
         } else {
-            printf("fib(%d) = %d\n(%d+3)*2 = %d\n", i, fib(i), i, (i+3)*2);
+            printf("fib(%d) = %d\n(%d+383)*2 = %d\n", i, fib(i), i, (i+383)*2);
         }
         i++;
     }

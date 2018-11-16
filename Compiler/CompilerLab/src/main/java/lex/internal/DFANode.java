@@ -4,7 +4,7 @@ import com.sun.istack.internal.Nullable;
 import lex.token.TokenType;
 import lombok.Getter;
 import lombok.Setter;
-import util.CollectionExtensions;
+import util.CollectionUtil;
 import util.Constants;
 
 import java.util.*;
@@ -58,7 +58,7 @@ public class DFANode {
             return false;
         }
 
-        return CollectionExtensions.containsSameElements(nfaNodes,dfaNode.nfaNodes);
+        return CollectionUtil.containsSameElements(nfaNodes,dfaNode.nfaNodes);
     }
 
     @Nullable

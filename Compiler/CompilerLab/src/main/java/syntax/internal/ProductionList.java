@@ -42,6 +42,10 @@ public class ProductionList {
         return new ProductionList(augmentedList, startProduction, AUGMENTED_START_SYMBOL);
     }
 
+    public static ProductionList fromUnaugmentedList(Production[] productions, Symbol startSymbol) {
+        return fromUnaugmentedList(Arrays.asList(productions), startSymbol);
+    }
+
     public Set<Symbol> first(Symbol symbol) {
 
         return firstMemo.computeIfAbsent(symbol, key -> {

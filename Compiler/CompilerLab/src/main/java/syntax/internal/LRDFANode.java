@@ -2,8 +2,7 @@ package syntax.internal;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.ExtensionMethod;
-import util.CollectionExtensions;
+import util.CollectionUtil;
 
 import java.util.*;
 
@@ -54,7 +53,7 @@ public class LRDFANode {
         if (!(o instanceof LRDFANode)) return false;
         LRDFANode lrdfaNode = (LRDFANode) o;
 
-        return CollectionExtensions.containsSameElements(kernel, lrdfaNode.kernel);
+        return CollectionUtil.containsSameElements(kernel, lrdfaNode.kernel);
     }
 
 
