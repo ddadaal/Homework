@@ -1,11 +1,6 @@
-package lex;
+package syntax;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-public class LexicalParseException extends RuntimeException {
-
-
+public class SyntaxParseException extends RuntimeException {
     /**
      * Constructs a new runtime exception with the specified detail message.
      * The cause is not initialized, and may subsequently be initialized by a
@@ -14,8 +9,7 @@ public class LexicalParseException extends RuntimeException {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public LexicalParseException(String message) {
+    public SyntaxParseException(String message) {
         super(message);
     }
-
 }

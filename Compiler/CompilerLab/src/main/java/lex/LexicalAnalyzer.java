@@ -58,9 +58,9 @@ public class LexicalAnalyzer {
         if (position.isEndState()) {
             return new Token(str, position.getEndStateTokenTypes().get(0));
         } else {
-            LexicalParseException.raise("Error when returning token.");
-            // never reaches
-            return null;
+            // find the next expected chars
+            String more = position.getEdges().keySet().stream().map(Object::toString).collect(Collectors.joining(", "));
+            throw new LexicalParseException("Unexpected end of input. Expect: " + more);
         }
     }
 

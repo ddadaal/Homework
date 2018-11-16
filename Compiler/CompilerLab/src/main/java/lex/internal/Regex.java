@@ -159,7 +159,7 @@ public class Regex {
                 // escaped
 
                 if (i == regex.length()-1) {
-                    LexicalParseException.raise("Bad use of /: expect a escaped char.");
+                    throw new LexicalParseException("Bad use of /: expect a escaped char.");
                 }
 
                 i++;
@@ -167,7 +167,7 @@ public class Regex {
 
                 Character r = escapedChars.get(nextChar);
                 if (r == null) {
-                    LexicalParseException.raise("Unexpected escaped char: " + nextChar);
+                    throw new LexicalParseException("Unexpected escaped char: " + nextChar);
                 }
                 result.add(new RENode(r));
             }
@@ -204,7 +204,7 @@ public class Regex {
                 result.remove(result.size()-1);
 
                 if (i == regex.length()-1) {
-                    LexicalParseException.raise("Bad use of /: expect a end char after.");
+                    throw new LexicalParseException("Bad use of /: expect a end char after.");
                 }
 
                 i++;
@@ -272,7 +272,7 @@ public class Regex {
         }
 
         if (bracketNestCount > 0) {
-            LexicalParseException.raise("Expect ending ]");
+            throw new LexicalParseException("Expect ending ]");
         }
 
         return result;

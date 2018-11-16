@@ -36,7 +36,8 @@ public enum TokenType {
     STR_CONST("str_const"),
 
     IGNORED(""),
-    UNKNOWN("");
+    UNKNOWN(""),
+    EPSILON("ε");
 
     @Getter private String str;
 

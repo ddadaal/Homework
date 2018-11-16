@@ -1,8 +1,6 @@
 package syntax.internal;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 import util.Constants;
 
 /**
@@ -14,7 +12,7 @@ import util.Constants;
 public class LRItem {
     @Getter private Production production;
     @Getter private int dotPosition;
-    @Getter private Symbol lookaheadSymbol;
+    @Getter @Setter private Symbol lookaheadSymbol;
 
 
     public LRItem(Production production, int dotPosition) {
@@ -34,7 +32,7 @@ public class LRItem {
         if (isReducible()) {
             return this;
         }
-        return new LRItem(production, dotPosition +1);
+        return new LRItem(production, dotPosition+1, lookaheadSymbol);
     }
 
     public Symbol getSymbolAfterDot() {
@@ -44,6 +42,10 @@ public class LRItem {
 
         return production.getRight().get(dotPosition);
 
+    }
+
+    public LRItem addLookaheadSymbol(Symbol symbol) {
+        return new LRItem(production, dotPosition, symbol);
     }
 
     @Override
@@ -63,6 +65,10 @@ public class LRItem {
 
         if (isReducible()) {
             sb.append(Constants.DOT);
+        }
+
+        if (isLALR1Item()) {
+            sb.append(" , ").append(lookaheadSymbol);
         }
 
         return sb.toString();

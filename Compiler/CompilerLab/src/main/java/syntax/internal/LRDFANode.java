@@ -6,7 +6,6 @@ import util.CollectionExtensions;
 
 import java.util.*;
 
-@ExtensionMethod(CollectionExtensions.class)
 public class LRDFANode {
 
     @Getter private List<LRItem> kernel;

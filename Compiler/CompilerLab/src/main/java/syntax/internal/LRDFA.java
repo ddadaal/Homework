@@ -2,11 +2,15 @@ package syntax.internal;
 
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.var;
+import util.Constants;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static util.Constants.DOLLAR_SYMBOL;
 
 
 @AllArgsConstructor
@@ -41,20 +45,20 @@ public class LRDFA {
     public static LRDFA constructLR0DFA(ProductionList productionList) {
 
 
-        Production startProduction = productionList.getStartProduction();
-        List<Production> productions = productionList.getProductions();
+        var startProduction = productionList.getStartProduction();
 
-        List<LRDFANode> nodes = new ArrayList<>();
+        var nodes = new ArrayList<LRDFANode>();
 
-        Stack<LRDFANode> stack = new Stack<>();
+        var stack = new Stack<LRDFANode>();
 
         // create initial node
 
-        LRItem startItem = new LRItem(startProduction, 0);
-        List<LRItem> firstKernel = Collections.singletonList(startItem);
+        var startItem = new LRItem(startProduction, 0);
+        var firstKernel = Collections.singletonList(startItem);
 
-        List<LRItem> closure = closure(firstKernel, productions);
+        List<LRItem> closure = closure(firstKernel, productionList);
         var startNode = new LRDFANode(firstKernel, closure);
+
         nodes.add(startNode);
         stack.push(startNode);
 
@@ -72,7 +76,7 @@ public class LRDFA {
                 }
 
                 // instate expansion
-                List<LRItem> newClosure = closure(shifted, productions);
+                List<LRItem> newClosure = closure(shifted, productionList);
 
                 // construct node
                 var newNode = new LRDFANode(shifted, newClosure);
@@ -109,10 +113,13 @@ public class LRDFA {
 
 
     // epsilon closure
-    public static List<LRItem> closure(List<LRItem> kernel, List<Production> productions) {
+    // if an item is a LR(1) item, the lookahead symbols will also be added
+    public static List<LRItem> closure(List<LRItem> kernel, ProductionList productionList) {
+
         List<LRItem> result = new ArrayList<>(kernel);
 
         Stack<LRItem> stack = new Stack<>();
+
         for (var item : kernel) {
             stack.push(item);
         }
@@ -121,18 +128,43 @@ public class LRDFA {
         while (!stack.isEmpty()) {
             LRItem item = stack.pop();
 
+
             if (item.isReducible()) {
                 continue;
             }
             Symbol leftSymbol = item.getSymbolAfterDot();
             if (leftSymbol.isNonTerminalSymbol()) {
-                for (var production : productions) {
+                for (var production : productionList.getProductions()) {
                     if (production.getLeft().equals(leftSymbol)) {
                         var newLrItem = new LRItem(production, 0);
-                        if (!result.contains(newLrItem)) {
-                            result.add(newLrItem);
-                            stack.push(newLrItem);
+                        if (item.isLALR1Item()) {
+                            // if the item is a LALR(1) item, lookahead item should also be added
+                            // skip the next symbol first
+                            var shifted = item.shift();
+                            Set<Symbol> lookaheadSymbols = new HashSet<>();
+                            if (shifted.isReducible()) {
+                                // if the item is reducible, add the lookahead symbol in it
+                                lookaheadSymbols.add(shifted.getLookaheadSymbol());
+                            } else {
+                                // if not reducible, add all first set in it
+                                lookaheadSymbols.addAll(productionList.first(shifted.getSymbolAfterDot()));
+                            }
+
+                            // for all lookahead symbols, add the item into result
+                            for (var x : lookaheadSymbols) {
+                                var newItem = newLrItem.addLookaheadSymbol(x);
+                                if (!result.contains(newItem)) {
+                                    result.add(newItem);
+                                    stack.push(newItem);
+                                }
+                            }
+                        } else {
+                            if (!result.contains(newLrItem)) {
+                                result.add(newLrItem);
+                                stack.push(newLrItem);
+                            }
                         }
+
                     }
                 }
 
@@ -146,9 +178,36 @@ public class LRDFA {
 
 
     // add lookahead symbols
-    public static void addLookaheadSymbols(LRDFA dfa, ProductionList productionList) {
+    public static LRDFA addLookaheadSymbols(LRDFA dfa, ProductionList productionList) {
+
+        @EqualsAndHashCode
+        @AllArgsConstructor
+        class StackItem {
+            LRDFANode node;
+            LRItem lrItem;
+        }
+
+        var stack = new Stack<StackItem>();
+        var resultSet = new HashSet<StackItem>();
 
 
+        // 1. add dollar r to the start production
+        var startNode = dfa.getStartState();
+        var startItem = startNode.getKernel().get(0).addLookaheadSymbol(DOLLAR_SYMBOL);
+        var stackItem = new StackItem(startNode, startItem);
+        stack.push(stackItem);
+        resultSet.add(stackItem);
+
+        while (!stack.empty()) {
+            var item = stack.peek();
+
+
+
+
+        }
+
+
+        return null;
 
     }
 }
