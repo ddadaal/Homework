@@ -8,8 +8,6 @@ import syntax.SyntaxParseException;
 import java.util.*;
 
 import static util.Constants.AUGMENTED_START_SYMBOL;
-import static util.Constants.EPSILON;
-import static util.Constants.EPSILON_SYMBOL;
 
 
 /**
@@ -45,27 +43,6 @@ public class ProductionList {
 
         return new ProductionList(augmentedList, startProduction, AUGMENTED_START_SYMBOL);
     }
-
-    /**
-     * Augmented production list with only one start production
-     * The production must be augmented with
-     * @param productions productions
-     */
-    public ProductionList(List<Production> productions, Symbol startSymbol) {
-        this.productions = productions;
-        this.startSymbol = startSymbol;
-
-        var startProduction = productions.stream().filter(x -> x.getLeft().equals(startSymbol)).findFirst();
-        if (startProduction.isPresent()) {
-            this.startProduction = startProduction.get();
-        } else {
-            throw new SyntaxParseException("Expect a S' -> S production");
-        }
-
-    }
-
-
-
 
     public Set<Symbol> first(Symbol symbol) {
 
@@ -103,10 +80,6 @@ public class ProductionList {
             }
         }
 
-        // remove epsilon
-        symbols.remove(EPSILON_SYMBOL);
-
-
         firstMap.put(symbol, symbols);
 
         return symbols;
@@ -121,16 +94,18 @@ public class ProductionList {
         boolean result = false;
 
         if (!symbol.isNonTerminalSymbol()) {
-            // if symbol is a terminal symbol, unless it's a epsilon, it can't derive to epsilon
-            result = symbol.equals(EPSILON_SYMBOL);
+            // if symbol is a terminal symbol,  it can't derive to epsilon
+            result = false;
         } else {
             for (var production: productions) {
                 if (!production.getLeft().equals(symbol)) {
                     continue;
                 }
 
-                // if all right symbol can derive epsilon, the result would be true
-                if (production.getRight().stream().allMatch(this::canDeriveToEpsilon)) {
+                // if there is no right symbol (meaning this production derives to epsilon),
+                // or all right symbol can derive epsilon,
+                // the result would be true
+                if (production.rightSize() == 0 || production.getRight().stream().allMatch(this::canDeriveToEpsilon)) {
                     result= true;
                     break;
                 }

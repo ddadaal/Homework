@@ -52,10 +52,11 @@ public class SyntaxTest {
         // A -> int
 
         // B -> assign B
-        // B -> ε
+        // B -> {nothing}
 
         var A = new Symbol("A");
         var B = new Symbol("B");
+
         var INT = new Symbol(TokenType.INT);
         var ASSIGN = new Symbol(TokenType.ASSIGN);
 
@@ -63,7 +64,7 @@ public class SyntaxTest {
             new Production(A, B, A),
             new Production(A, INT),
             new Production(B, ASSIGN, B),
-            new Production(B, EPSILON_SYMBOL),
+            new Production(B),
         };
 
         var list = ProductionList.fromUnaugmentedList(Arrays.asList(productions), A);

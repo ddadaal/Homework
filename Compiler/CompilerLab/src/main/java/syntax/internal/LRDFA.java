@@ -191,7 +191,7 @@ public class LRDFA {
         var resultSet = new HashSet<StackItem>();
 
 
-        // 1. add dollar r to the start production
+        // 1. add $r to the start production
         var startNode = dfa.getStartState();
         var startItem = startNode.getKernel().get(0).addLookaheadSymbol(DOLLAR_SYMBOL);
         var stackItem = new StackItem(startNode, startItem);
