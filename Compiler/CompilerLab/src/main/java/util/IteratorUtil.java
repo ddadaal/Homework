@@ -1,13 +1,9 @@
 package util;
 
-import lombok.var;
-
-import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.stream.Collectors;
 
 public class IteratorUtil {
     public static <T> List<T> iterateAll(Iterator<T> iterator) {
@@ -16,10 +12,7 @@ public class IteratorUtil {
         return list;
     }
 
-    public static <T> ListIterator<Character> strToIterator(String str) {
-        return str.chars()
-            .mapToObj(i -> (char) i)
-            .collect(Collectors.toList())
-            .listIterator();
+    public static ListIterator<Character> strToIterator(String str) {
+        return new BufferedIterator<>(str.chars().mapToObj(x -> (char)x).iterator());
     }
 }

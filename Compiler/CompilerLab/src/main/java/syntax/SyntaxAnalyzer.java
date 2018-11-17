@@ -8,7 +8,9 @@ import syntax.internal.*;
 import util.Constants;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 
 @AllArgsConstructor
@@ -19,14 +21,20 @@ public class SyntaxAnalyzer {
     private LRDFA lalrdfa;
 
     public static SyntaxAnalyzer construct(List<Production> productions, Symbol startSymbol) {
+
         var productionList = ProductionList.fromUnaugmentedList(productions, startSymbol);
 
-        var lalrdfa = LRDFA.constructDFA(productionList);
+        return construct(productionList);
+    }
+
+    public static SyntaxAnalyzer construct(ProductionList productionList) {
+        var lalrdfa = LRDFA.constructLALRDFA(productionList);
 
         return new SyntaxAnalyzer(productionList, lalrdfa);
     }
 
     public List<Production> getProductionSequence(Iterator<Symbol> symbolIterator) {
+
 
         var productionSequence = new ArrayList<Production>();
 
@@ -120,14 +128,14 @@ public class SyntaxAnalyzer {
 
                 throw new SyntaxParseException(
                     String.format(
-                        "Unexpected token %s. Expects: %s",
+                        "Unexpected token %s. Expect: %s",
                         symbol.getTokenType().toString(),
                         expectedTokens
                     ));
             }
 
 
-            // there is no reducible and 1 state
+            // there is no reducible and 1 move
 
             // push in state and read next input
 
@@ -136,8 +144,9 @@ public class SyntaxAnalyzer {
 
             if (symbolIterator.hasNext()) {
                 symbol = symbolIterator.next();
+
             } else {
-                break;
+                symbol = Constants.DOLLAR_SYMBOL;
             }
         }
 

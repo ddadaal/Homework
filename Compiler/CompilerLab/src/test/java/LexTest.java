@@ -1,12 +1,13 @@
 import lex.LexicalAnalyzer;
+import lex.MyLexReader;
 import lex.Rule;
 import lex.internal.RENode;
 import lex.internal.Regex;
 import lex.token.Token;
 import lex.token.TokenType;
+import lombok.var;
 import org.junit.Test;
 import symboltable.SymbolTable;
-import util.CollectionUtil;
 import util.FileUtil;
 import util.IteratorUtil;
 
@@ -197,6 +198,50 @@ public class LexTest {
             .forEach(System.out::println);
 
 
+
+    }
+
+    @Test
+    public void testReader() {
+        // test MyLexReader to read in rules
+        List<Rule> rules = new ArrayList<>(Arrays.asList(
+            new Rule("void", TokenType.VOID),
+            new Rule("int", TokenType.INT),
+            new Rule("return", TokenType.RETURN),
+            new Rule("while", TokenType.WHILE),
+            new Rule("if", TokenType.IF),
+            new Rule("else", TokenType.ELSE),
+
+            new Rule("\\.\\.\\.", TokenType.ELLIPSIS),
+            new Rule("==", TokenType.EQUAL),
+            new Rule("=", TokenType.ASSIGN),
+            new Rule("\\;", TokenType.SEMICOLON),
+            new Rule("\\*", TokenType.STAR),
+            new Rule("\\|\\|", TokenType.OR_OR),
+            new Rule("\\{", TokenType.LEFT_BRACE),
+            new Rule("\\}", TokenType.RIGHT_BRACE),
+            new Rule("\\(", TokenType.LEFT_PARENTHESIS),
+            new Rule("\\)", TokenType.RIGHT_PARENTHESIS),
+            new Rule(",", TokenType.COMMA),
+            new Rule("\\+", TokenType.PLUS),
+            new Rule("\\-", TokenType.MINUS),
+            new Rule("\\/", TokenType.DIV),
+            new Rule("\\+\\+", TokenType.INC),
+            new Rule("\\<", TokenType.LT),
+            new Rule("\\<=", TokenType.LE),
+
+            new Rule("[a-zA-Z]([0-9a-zA-Z_])*", TokenType.IDENTIFIER),
+            new Rule("0|[1-9][0-9]*", TokenType.INT_CONST),
+            // bypass " according to ascii code table
+            new Rule("\\\"([\\ -!#-~]|\\\\\\n)*\\\"", TokenType.STR_CONST),
+
+            new Rule("[\\ \\n]", TokenType.IGNORED),
+            new Rule(".", TokenType.UNKNOWN)
+        ));
+
+        var actual = MyLexReader.read(FileUtil.getLineIterator("/lex.myl"));
+
+        assertEquals(rules, actual);
 
     }
 }

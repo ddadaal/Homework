@@ -19,7 +19,7 @@ public class LRDFA {
     private List<LRDFANode> allNodes;
 
 
-    public static LRDFA constructDFA(ProductionList productionList) {
+    public static LRDFA constructLALRDFA(ProductionList productionList) {
 
 
         // 1. construct LR(0) item set
@@ -191,7 +191,7 @@ public class LRDFA {
 
         // 1. construct propagate map and spontaneously generated map.
         // during this process, all spontaneously generated lookahead symbol will be recorded into resultLookaheadsSymbolMap
-        // and propagated relation (lookaheads of Key StateSpecificLRItem will be propagated to the Value StateSpecficLRItem) will be recorded into propagatedMap
+        // and propagated relation (lookaheads of Key StateSpecificLRItem will be propagated to the Value StateSpecificLRItem) will be recorded into propagateMap
 
         var propagateMap = new HashMap<StateSpecificLRItem, List<StateSpecificLRItem>>();
         var resultLookaheadsSymbolMap = new HashMap<StateSpecificLRItem, List<Symbol>>();

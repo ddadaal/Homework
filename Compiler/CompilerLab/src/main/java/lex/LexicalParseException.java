@@ -6,7 +6,6 @@ import lombok.Setter;
 
 public class LexicalParseException extends RuntimeException {
 
-
     /**
      * Constructs a new runtime exception with the specified detail message.
      * The cause is not initialized, and may subsequently be initialized by a
@@ -18,5 +17,6 @@ public class LexicalParseException extends RuntimeException {
     public LexicalParseException(String message) {
         super(message);
     }
+
 
 }

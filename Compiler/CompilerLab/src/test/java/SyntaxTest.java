@@ -1,3 +1,4 @@
+import lex.token.Token;
 import lex.token.TokenType;
 import lombok.var;
 import org.junit.Test;
@@ -7,6 +8,8 @@ import syntax.internal.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -17,13 +20,13 @@ public class SyntaxTest {
 
     private LRDFA constructExample4dot45LR0DFA() {
         // example 4.45
-        var S = new Symbol("S");
-        var L = new Symbol("L");
-        var R = new Symbol("R");
+        var S = Symbol.nonterminal("S");
+        var L = Symbol.nonterminal("L");
+        var R = Symbol.nonterminal("R");
 
-        var ASSIGN = new Symbol(TokenType.ASSIGN);
-        var STAR = new Symbol(TokenType.STAR);
-        var ID = new Symbol(TokenType.IDENTIFIER);
+        var ASSIGN = Symbol.terminal(TokenType.ASSIGN);
+        var STAR = Symbol.terminal(TokenType.STAR);
+        var ID = Symbol.terminal(TokenType.IDENTIFIER);
 
 
         Production[] productions = {
@@ -59,11 +62,11 @@ public class SyntaxTest {
         // B -> assign B
         // B -> {nothing}
 
-        var A = new Symbol("A");
-        var B = new Symbol("B");
+        var A = Symbol.nonterminal("A");
+        var B = Symbol.nonterminal("B");
 
-        var INT = new Symbol(TokenType.INT);
-        var ASSIGN = new Symbol(TokenType.ASSIGN);
+        var INT = Symbol.terminal(TokenType.INT);
+        var ASSIGN = Symbol.terminal(TokenType.ASSIGN);
 
         Production[] productions = {
             new Production(A, B, A),
@@ -95,11 +98,11 @@ public class SyntaxTest {
         // C -> =
 
         // expect: Closure{S' -> S, $R} = { (S' -> ·S, $R), (S -> ·CC, $R), (C -> ·if C, if | =), ( C -> ·=, if | =) }
-        var S = new Symbol("S");
-        var C = new Symbol("C");
+        var S = Symbol.nonterminal("S");
+        var C = Symbol.nonterminal("C");
 
-        var IF = new Symbol(TokenType.IF);
-        var ASSIGN = new Symbol(TokenType.ASSIGN);
+        var IF = Symbol.terminal(TokenType.IF);
+        var ASSIGN = Symbol.terminal(TokenType.ASSIGN);
 
 
         var startProduction = new Production(AUGMENTED_START_SYMBOL, S);
@@ -136,13 +139,13 @@ public class SyntaxTest {
     @Test
     public void testLALRConstruction() {
 
-        var S = new Symbol("S");
-        var L = new Symbol("L");
-        var R = new Symbol("R");
+        var S = Symbol.nonterminal("S");
+        var L = Symbol.nonterminal("L");
+        var R = Symbol.nonterminal("R");
 
-        var ASSIGN = new Symbol(TokenType.ASSIGN);
-        var STAR = new Symbol(TokenType.STAR);
-        var ID = new Symbol(TokenType.IDENTIFIER);
+        var ASSIGN = Symbol.terminal(TokenType.ASSIGN);
+        var STAR = Symbol.terminal(TokenType.STAR);
+        var ID = Symbol.terminal(TokenType.IDENTIFIER);
 
 
         Production[] productions = {
@@ -168,15 +171,15 @@ public class SyntaxTest {
     public void syntaxAnalyzeFinalTest() {
         // example 4.31
 
-        var E = new Symbol("E");
-        var T = new Symbol("T");
-        var F = new Symbol("F");
+        var E = Symbol.nonterminal("E");
+        var T = Symbol.nonterminal("T");
+        var F = Symbol.nonterminal("F");
 
-        var plus = new Symbol(TokenType.PLUS);
-        var lparen = new Symbol(TokenType.LEFT_PARENTHESIS);
-        var rparen = new Symbol(TokenType.RIGHT_PARENTHESIS);
-        var star = new Symbol(TokenType.STAR);
-        var id = new Symbol(TokenType.IDENTIFIER);
+        var plus = Symbol.terminal(TokenType.PLUS);
+        var lparen = Symbol.terminal(TokenType.LEFT_PARENTHESIS);
+        var rparen = Symbol.terminal(TokenType.RIGHT_PARENTHESIS);
+        var star = Symbol.terminal(TokenType.STAR);
+        var id = Symbol.terminal(TokenType.IDENTIFIER);
 
         Production[] productions = {
             new Production(E, E, plus, T),
@@ -200,9 +203,9 @@ public class SyntaxTest {
             productions[0]
         );
 
-        var tokens = Arrays.asList(
+        Stream<Symbol> tokens = Stream.of(
             id, star, id, plus, id, DOLLAR_SYMBOL
-        );
+        ).map(x -> Symbol.terminal(x.getTokenType()));
 
         assertEquals(expected, analyzer.getProductionSequence(tokens.iterator()));
 

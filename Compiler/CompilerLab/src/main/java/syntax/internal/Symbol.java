@@ -14,11 +14,21 @@ public class Symbol {
     @Getter private String ntName;
     @Getter private TokenType tokenType;
 
-    public Symbol(String ntName) {
+
+    public static Symbol terminal(TokenType tokenType) {
+        return new Symbol(tokenType);
+    }
+
+    public static Symbol nonterminal(String name) {
+        return new Symbol(name);
+    }
+
+
+    private Symbol(String ntName) {
         this.ntName = ntName;
     }
 
-    public Symbol(TokenType tokenType) {
+    private Symbol(TokenType tokenType) {
         this.tokenType = tokenType;
     }
 

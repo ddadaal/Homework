@@ -8,9 +8,6 @@ import java.util.*;
 import static util.Constants.AUGMENTED_START_SYMBOL;
 
 
-/**
- * Production list
- */
 public class ProductionList {
 
     @Getter private List<Production> productions;

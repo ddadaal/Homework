@@ -2,6 +2,7 @@ package lex;
 
 import lex.internal.*;
 import lex.token.Token;
+import lex.token.TokenType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.var;
@@ -11,8 +12,8 @@ import util.Constants;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 public class LexicalAnalyzer implements Iterator<Token> {
+
 
     @Getter
     private ListIterator<Character> characterIterator;
@@ -22,6 +23,12 @@ public class LexicalAnalyzer implements Iterator<Token> {
 
     @Getter
     private DFA dfa;
+
+    public LexicalAnalyzer(ListIterator<Character> characterIterator, SymbolTable symbolTable, DFA dfa) {
+        this.characterIterator = characterIterator;
+        this.symbolTable = symbolTable;
+        this.dfa = dfa;
+    }
 
     public static LexicalAnalyzer construct(ListIterator<Character> characterIterator, SymbolTable symbolTable, List<Rule> rules) {
 
@@ -77,6 +84,7 @@ public class LexicalAnalyzer implements Iterator<Token> {
      */
     @Override
     public Token next() {
+
         StringBuilder buffer = new StringBuilder();
         DFANode position = dfa.getStart();
 

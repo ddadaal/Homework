@@ -1,12 +1,10 @@
 package lex;
 
 import lex.token.TokenType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-
+import lombok.*;
 
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Rule {
 
     @Getter
@@ -15,4 +13,8 @@ public class Rule {
     @Getter
     private TokenType tokenType;
 
+    @Override
+    public String toString() {
+        return regex + " " + tokenType.name();
+    }
 }
