@@ -22,6 +22,7 @@ public class Regex {
 
     static {
         escapedChars.put('n', '\n');
+        escapedChars.put('r', '\r');
         addRawEscaped('"');
         addRawEscaped('.');
         addRawEscaped('=');
@@ -159,7 +160,7 @@ public class Regex {
                 // escaped
 
                 if (i == regex.length()-1) {
-                    throw new LexicalParseException("Bad use of /: expect a escaped char.");
+                    throw new LexicalParseException("Bad use of \\: expect a escaped char.");
                 }
 
                 i++;

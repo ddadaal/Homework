@@ -27,20 +27,19 @@ public class DFA {
 
     public static DFA constructDFA(NFA nfa) {
 
-        Map<DFANode, Boolean> existingNodes = new HashMap<>();
+        var stack = new Stack<DFANode>();
 
-        // add initial state s0
+        var allNodes = new ArrayList<DFANode>();
 
-        var closure = epsilonClosure(Arrays.asList(nfa.getStart()));
+        var closure = epsilonClosure(Collections.singletonList(nfa.getStart()));
         DFANode s0 = new DFANode(closure);
-        existingNodes.put(s0, false);
+        allNodes.add(s0);
+        stack.push(s0);
 
-        DFANode node;
-        while ((node = getUnmarkedDFA(existingNodes)) != null) {
-            existingNodes.put(node, true);
+        while (!stack.empty()) {
+            var node = stack.pop();
 
             for (char c: node.getEdgeCharset()) {
-
                 // get move set
                 Set<NFANode> move = new HashSet<>();
                 for (NFANode nfaNode: node.getNfaNodes()) {
@@ -53,35 +52,32 @@ public class DFA {
                 // new state acquired
                 DFANode newNode = new DFANode(eclosure);
 
-                // if the state doesn't exist, add it
+                // try to find existing node
                 DFANode existing = null;
-                for (var entry : existingNodes.entrySet()) {
-                    if (entry.getKey().equals(newNode)) {
-                        existing = entry.getKey();
+                for (var existingNode : allNodes) {
+                    if (existingNode.equals(newNode)) {
+                        existing = existingNode;
                         break;
                     }
                 }
 
                 // not found. so it's a new state
                 if (existing == null) {
-                    existingNodes.put(newNode, false);
+                    allNodes.add(newNode);
+                    stack.push(newNode);
                     node.setTarget(c, newNode);
                 } else {
                     // found. connect them
                     node.setTarget(c, existing);
                 }
 
-
             }
-
-
-
         }
 
         // calculate end states
         List<DFANode> endStates = new ArrayList<>();
 
-        for (DFANode d: existingNodes.keySet()) {
+        for (DFANode d: allNodes) {
             List<TokenType> endStateTokenTypes = new ArrayList<>();
 
             for (NFANode nfaNode: d.getNfaNodes()) {
@@ -97,6 +93,77 @@ public class DFA {
         }
 
         return new DFA(s0, endStates);
+
+//        Map<DFANode, Boolean> existingNodes = new HashMap<>();
+//
+//        // add initial state s0
+//
+//        var closure = epsilonClosure(Arrays.asList(nfa.getStart()));
+//        DFANode s0 = new DFANode(closure);
+//        existingNodes.put(s0, false);
+//
+//        DFANode node;
+//        while ((node = getUnmarkedDFA(existingNodes)) != null) {
+//            existingNodes.put(node, true);
+//
+//            for (char c: node.getEdgeCharset()) {
+//
+//                // get move set
+//                Set<NFANode> move = new HashSet<>();
+//                for (NFANode nfaNode: node.getNfaNodes()) {
+//                    move.addAll(nfaNode.move(c));
+//                }
+//
+//                // e-closure
+//                var eclosure = epsilonClosure(new ArrayList<>(move));
+//
+//                // new state acquired
+//                DFANode newNode = new DFANode(eclosure);
+//
+//                // if the state doesn't exist, add it
+//                DFANode existing = null;
+//                for (var entry : existingNodes.entrySet()) {
+//                    if (entry.getKey().equals(newNode)) {
+//                        existing = entry.getKey();
+//                        break;
+//                    }
+//                }
+//
+//                // not found. so it's a new state
+//                if (existing == null) {
+//                    existingNodes.put(newNode, false);
+//                    node.setTarget(c, newNode);
+//                } else {
+//                    // found. connect them
+//                    node.setTarget(c, existing);
+//                }
+//
+//
+//            }
+//
+//
+//
+//        }
+//
+//        // calculate end states
+//        List<DFANode> endStates = new ArrayList<>();
+//
+//        for (DFANode d: existingNodes.keySet()) {
+//            List<TokenType> endStateTokenTypes = new ArrayList<>();
+//
+//            for (NFANode nfaNode: d.getNfaNodes()) {
+//                if (nfaNode.getEndStateToken() != null) {
+//                    endStateTokenTypes.add(nfaNode.getEndStateToken());
+//                }
+//            }
+//
+//            if (endStateTokenTypes.size() >0) {
+//                d.setEndStateTokenTypes(endStateTokenTypes);
+//                endStates.add(d);
+//            }
+//        }
+//
+//        return new DFA(s0, endStates);
     }
 
     private static List<NFANode> epsilonClosure(List<NFANode> kernel) {

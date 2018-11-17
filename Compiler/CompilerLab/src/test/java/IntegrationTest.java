@@ -1,13 +1,14 @@
 import lex.LexicalAnalyzer;
 import lex.MyLexReader;
+import lex.Rule;
 import lex.token.Token;
 import lex.token.TokenType;
 import lombok.var;
 import org.junit.Test;
-import symboltable.SymbolTable;
 import syntax.MyYaccReader;
 import syntax.SyntaxAnalyzer;
 import syntax.internal.Production;
+import syntax.internal.ProductionList;
 import syntax.internal.Symbol;
 import util.BufferedIterator;
 import util.FileUtil;
@@ -26,18 +27,20 @@ public class IntegrationTest {
         var yaccFile = "/example4.31/syn.myy";
         var inputFile = "/example4.31/input.c";
 
-        Iterator<String> lexReader = FileUtil.getLineIterator(lexFile);
-        Iterator<String> yaccReader = FileUtil.getLineIterator(yaccFile);
+        // 1. 解析myl和myy文件，获得正则匹配规则和产生式列表
+        List<Rule> rules = MyLexReader.read(FileUtil.getLineIterator(lexFile));
+        ProductionList productionList = MyYaccReader.read(FileUtil.getLineIterator(yaccFile));
 
+        // 2. 初始化输入文件读取迭代器
         ListIterator<Character> inputReader = new BufferedIterator<>(FileUtil.getCharIterator(inputFile));
 
-        var symbolTable = new SymbolTable();
+        // 3. 根据输入迭代器、正则匹配规则，生成词法分析器。词法分析器实现了Iterator<Token>接口，可以通过此词法分析器迭代Token
+        LexicalAnalyzer lex = LexicalAnalyzer.construct(inputReader, rules);
 
-        LexicalAnalyzer lex = LexicalAnalyzer.construct(inputReader, symbolTable, MyLexReader.read(lexReader));
-
+        // 4. 初始化Token序列列表
         var actualTokenSequence = new ArrayList<Token>();
 
-        // Token iterator to Symbol Iterator
+        // 5. 将Token迭代器转化为Symbol迭代器，并在过程中忽略掉IGNORED类型的Token（空白字符），并将分析出来的Token加入到Token序列列表
         Iterator<Symbol> symbolIterator = StreamSupport.stream(
             Spliterators.spliteratorUnknownSize(lex, Spliterator.ORDERED),
             false)
@@ -48,9 +51,11 @@ public class IntegrationTest {
             })
             .iterator();
 
+        // 6. 根据产生式列表，生成语法分析器
 
-        SyntaxAnalyzer syntax = SyntaxAnalyzer.construct(MyYaccReader.read(yaccReader));
+        SyntaxAnalyzer syntax = SyntaxAnalyzer.construct(productionList);
 
+        // 7. 输入Symbol迭代器，获得产生式规约序列
         List<Production> actualProductionSequence = syntax.getProductionSequence(symbolIterator);
 
         var E = Symbol.nonterminal("E");
@@ -96,4 +101,51 @@ public class IntegrationTest {
 
     }
 
+    @Test
+    public void bigTest() {
+        var lexFile = "/bigtest/lex.myl";
+        var yaccFile = "/bigtest/syn.myy";
+        var inputFile = "/bigtest/input.c";
+
+        // 1. 解析myl和myy文件，获得正则匹配规则和产生式列表
+        List<Rule> rules = MyLexReader.read(FileUtil.getLineIterator(lexFile));
+        ProductionList productionList = MyYaccReader.read(FileUtil.getLineIterator(yaccFile));
+
+        // 2. 初始化输入文件读取迭代器
+        ListIterator<Character> inputReader = new BufferedIterator<>(FileUtil.getCharIterator(inputFile));
+
+        // 3. 根据输入迭代器、正则匹配规则和符号表，生成词法分析器。词法分析器实现了Iterator<Token>接口，可以通过此词法分析器迭代Token
+        LexicalAnalyzer lex = LexicalAnalyzer.construct(inputReader, rules);
+
+        // 4. 初始化Token序列列表
+        var actualTokenSequence = new ArrayList<Token>();
+
+        // 5. 将Token迭代器转化为Symbol迭代器，并在过程中忽略掉IGNORED类型的Token（空白字符），并将分析出来的Token加入到Token序列列表
+        Iterator<Symbol> symbolIterator = StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(lex, Spliterator.ORDERED),
+            false)
+            .filter(x -> !x.getType().equals(TokenType.IGNORED))
+            .map(x -> {
+                actualTokenSequence.add(x);
+                return Symbol.terminal(x.getType());
+            })
+            .iterator();
+
+        // 6. 根据产生式列表，生成语法分析器
+
+        SyntaxAnalyzer syntax = SyntaxAnalyzer.construct(productionList);
+
+        // 7. 输入Symbol迭代器，获得产生式规约序列
+        List<Production> actualProductionSequence = syntax.getProductionSequence(symbolIterator);
+
+        // 这个太多了……不assert了，看看就好
+
+        System.out.println(String.format("Tokens (%d):", actualTokenSequence.size()));
+        System.out.println();
+        actualTokenSequence.forEach(System.out::println);
+
+        System.out.println("----------------------");
+        System.out.println(String.format("Production sequence (%d):", actualProductionSequence.size()));
+        actualProductionSequence.forEach(System.out::println);
+    }
 }

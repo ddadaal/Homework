@@ -30,11 +30,14 @@ public class MyYaccReader {
             // read the left non-terminal symbol and put into map
             var left = nonterminalMap.computeIfAbsent(s, Symbol::nonterminal);
 
-            // continuously read right productions until a empty line is read
-            while (lineIterator.hasNext() && (s = lineIterator.next()).length() != 0) {
+            // continuously read right productions until a line "%" is read
+            while (lineIterator.hasNext() && !(s = lineIterator.next()).trim().equals("%")) {
                 lineIndex++;
                 var rightList= new ArrayList<Symbol>();
                 for (var right: s.trim().split("\\s+")) {
+                    if (right.equals("")) {
+                        continue;
+                    }
                     try {
                         var tokenType = TokenType.valueOf(right);
                         rightList.add(Symbol.terminal(tokenType));

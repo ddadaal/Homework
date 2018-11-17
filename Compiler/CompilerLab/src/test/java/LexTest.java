@@ -7,7 +7,6 @@ import lex.token.Token;
 import lex.token.TokenType;
 import lombok.var;
 import org.junit.Test;
-import symboltable.SymbolTable;
 import util.FileUtil;
 import util.IteratorUtil;
 
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class LexTest {
 
@@ -76,7 +75,7 @@ public class LexTest {
     public void testConstructNFA() {
         String regex = "a*";
 
-        LexicalAnalyzer lex = new LexicalAnalyzer(null, null, null);
+        LexicalAnalyzer lex = new LexicalAnalyzer(null, null);
 
     }
 
@@ -89,10 +88,8 @@ public class LexTest {
         Rule rule2 = new Rule("[1-9]*b", TokenType.ASSIGN);
 
         List<Rule> rules = Arrays.asList(rule1, rule2);
-        SymbolTable symbolTable = new SymbolTable();
         LexicalAnalyzer analyzer = LexicalAnalyzer.construct(
             IteratorUtil.strToIterator("1234bbaaaaa1b"),
-            symbolTable,
             rules
         );
 
@@ -110,11 +107,9 @@ public class LexTest {
     }
 
     private List<Token> parse(String str, Rule... rules) {
-        SymbolTable symbolTable = new SymbolTable();
 
         LexicalAnalyzer analyzer = LexicalAnalyzer.construct(
             IteratorUtil.strToIterator(str),
-            symbolTable,
             Arrays.asList(rules)
         );
 
@@ -142,12 +137,6 @@ public class LexTest {
         Token expected = new Token("\"i is negative\\n\"", TokenType.STR_CONST);
 
         assertEquals(expected, actual.get(0));
-    }
-
-    @Test
-    public void testString() {
-//        expectString("123");
-        expectString("i");
     }
 
     @Test
@@ -186,12 +175,11 @@ public class LexTest {
             new Rule("[\\ \\n]", TokenType.IGNORED)
         ));
 
-        SymbolTable symbolTable = new SymbolTable();
 
         LexicalAnalyzer analyzer = LexicalAnalyzer.construct(
             IteratorUtil.strToIterator(FileUtil.getContentsOfResource("/input.c")),
-            symbolTable,
-            rules);
+            rules
+        );
 
         IteratorUtil.iterateAll(analyzer).stream()
             .filter(x -> !x.getType().equals(TokenType.IGNORED))

@@ -31,14 +31,14 @@ public enum TokenType {
     LE("<="),
 
     IDENTIFIER("id"),
-    FUNC_NAME("func_name"),
     INT_CONST("int_const"),
     STR_CONST("str_const"),
 
     IGNORED(""),
     DOLLAR_R("$R"),
     DOLLAR_L("$L"),
-    UNKNOWN("#");
+    UNKNOWN("#"),
+    EOF("$eof");
 
     @Getter private String str;
 

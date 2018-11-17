@@ -1,0 +1,395 @@
+Tokens (111):
+
+<VOID, void>
+<IDENTIFIER, printf>
+<LEFT_PARENTHESIS, (>
+<ELLIPSIS, ...>
+<RIGHT_PARENTHESIS, )>
+<SEMICOLON, ;>
+<INT, int>
+<IDENTIFIER, fib>
+<LEFT_PARENTHESIS, (>
+<INT, int>
+<IDENTIFIER, n>
+<RIGHT_PARENTHESIS, )>
+<LEFT_BRACE, {>
+<IF, if>
+<LEFT_PARENTHESIS, (>
+<IDENTIFIER, n>
+<EQUAL, ==>
+<INT_CONST, 0>
+<OR_OR, ||>
+<IDENTIFIER, n>
+<EQUAL, ==>
+<INT_CONST, 1>
+<RIGHT_PARENTHESIS, )>
+<LEFT_BRACE, {>
+<RETURN, return>
+<INT_CONST, 1>
+<SEMICOLON, ;>
+<RIGHT_BRACE, }>
+<ELSE, else>
+<LEFT_BRACE, {>
+<RETURN, return>
+<IDENTIFIER, fib>
+<LEFT_PARENTHESIS, (>
+<IDENTIFIER, n>
+<MINUS, ->
+<INT_CONST, 1>
+<RIGHT_PARENTHESIS, )>
+<PLUS, +>
+<IDENTIFIER, fib>
+<LEFT_PARENTHESIS, (>
+<IDENTIFIER, n>
+<MINUS, ->
+<INT_CONST, 2>
+<RIGHT_PARENTHESIS, )>
+<SEMICOLON, ;>
+<RIGHT_BRACE, }>
+<RIGHT_BRACE, }>
+<INT, int>
+<IDENTIFIER, main>
+<LEFT_PARENTHESIS, (>
+<RIGHT_PARENTHESIS, )>
+<LEFT_BRACE, {>
+<INT, int>
+<IDENTIFIER, i>
+<ASSIGN, =>
+<MINUS, ->
+<INT_CONST, 5>
+<SEMICOLON, ;>
+<WHILE, while>
+<LEFT_PARENTHESIS, (>
+<IDENTIFIER, i>
+<LT, <>
+<INT_CONST, 10>
+<RIGHT_PARENTHESIS, )>
+<LEFT_BRACE, {>
+<IF, if>
+<LEFT_PARENTHESIS, (>
+<IDENTIFIER, i>
+<LE, <=>
+<INT_CONST, 0>
+<RIGHT_PARENTHESIS, )>
+<LEFT_BRACE, {>
+<IDENTIFIER, printf>
+<LEFT_PARENTHESIS, (>
+<STR_CONST, "i is negative\n">
+<RIGHT_PARENTHESIS, )>
+<SEMICOLON, ;>
+<RIGHT_BRACE, }>
+<ELSE, else>
+<LEFT_BRACE, {>
+<IDENTIFIER, printf>
+<LEFT_PARENTHESIS, (>
+<STR_CONST, "fib(%d) = %d\n(%d+383)*2 = %d\n">
+<COMMA, ,>
+<IDENTIFIER, i>
+<COMMA, ,>
+<IDENTIFIER, fib>
+<LEFT_PARENTHESIS, (>
+<IDENTIFIER, i>
+<RIGHT_PARENTHESIS, )>
+<COMMA, ,>
+<IDENTIFIER, i>
+<COMMA, ,>
+<LEFT_PARENTHESIS, (>
+<IDENTIFIER, i>
+<PLUS, +>
+<INT_CONST, 383>
+<RIGHT_PARENTHESIS, )>
+<STAR, *>
+<INT_CONST, 2>
+<RIGHT_PARENTHESIS, )>
+<SEMICOLON, ;>
+<RIGHT_BRACE, }>
+<IDENTIFIER, i>
+<INC, ++>
+<SEMICOLON, ;>
+<RIGHT_BRACE, }>
+<RETURN, return>
+<INT_CONST, 0>
+<SEMICOLON, ;>
+<RIGHT_BRACE, }>
+----------------------
+Production sequence (280):
+start -> ε
+type -> VOID
+func_param -> ELLIPSIS
+func_prototype -> type IDENTIFIER LEFT_PARENTHESIS func_param RIGHT_PARENTHESIS
+func_declaration -> func_prototype SEMICOLON
+declaration -> func_declaration
+top_level_element -> declaration
+start -> start top_level_element
+type -> INT
+type -> INT
+func_param -> type IDENTIFIER
+func_prototype -> type IDENTIFIER LEFT_PARENTHESIS func_param RIGHT_PARENTHESIS
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> equality_expression EQUAL comparison_expression
+logical_expression -> equality_expression
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> equality_expression EQUAL comparison_expression
+logical_expression -> logical_expression OR_OR equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+return_statement -> RETURN expression SEMICOLON
+statement -> return_statement
+braced_statement_items -> statement
+braced_statement -> LEFT_BRACE braced_statement_items RIGHT_BRACE
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> add_minus_expression MINUS mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+func_call_parameters -> assignment_expression
+unary_expression -> IDENTIFIER LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> add_minus_expression MINUS mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+func_call_parameters -> assignment_expression
+unary_expression -> IDENTIFIER LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS
+mul_div_expression -> unary_expression
+add_minus_expression -> add_minus_expression PLUS mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+return_statement -> RETURN expression SEMICOLON
+statement -> return_statement
+braced_statement_items -> statement
+braced_statement -> LEFT_BRACE braced_statement_items RIGHT_BRACE
+if_statement -> IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS braced_statement ELSE braced_statement
+statement -> if_statement
+braced_statement_items -> statement
+braced_statement -> LEFT_BRACE braced_statement_items RIGHT_BRACE
+func_definition -> func_prototype braced_statement
+top_level_element -> func_definition
+start -> start top_level_element
+type -> INT
+func_param -> ε
+func_prototype -> type IDENTIFIER LEFT_PARENTHESIS func_param RIGHT_PARENTHESIS
+type -> INT
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+unary_expression -> MINUS unary_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+variable_declaration -> type IDENTIFIER ASSIGN expression SEMICOLON
+declaration -> variable_declaration
+statement -> declaration
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> comparison_expression LT add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> comparison_expression LE add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+atomic_expression -> STR_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+func_call_parameters -> assignment_expression
+unary_expression -> IDENTIFIER LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+statement -> expression SEMICOLON
+braced_statement_items -> statement
+braced_statement -> LEFT_BRACE braced_statement_items RIGHT_BRACE
+atomic_expression -> STR_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+func_call_parameters -> assignment_expression
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+func_call_parameters -> func_call_parameters COMMA assignment_expression
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+func_call_parameters -> assignment_expression
+unary_expression -> IDENTIFIER LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+func_call_parameters -> func_call_parameters COMMA assignment_expression
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+func_call_parameters -> func_call_parameters COMMA assignment_expression
+atomic_expression -> IDENTIFIER
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> add_minus_expression PLUS mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+atomic_expression -> LEFT_PARENTHESIS expression RIGHT_PARENTHESIS
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> mul_div_expression STAR unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+func_call_parameters -> func_call_parameters COMMA assignment_expression
+unary_expression -> IDENTIFIER LEFT_PARENTHESIS func_call_parameters RIGHT_PARENTHESIS
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+statement -> expression SEMICOLON
+braced_statement_items -> statement
+braced_statement -> LEFT_BRACE braced_statement_items RIGHT_BRACE
+if_statement -> IF LEFT_PARENTHESIS expression RIGHT_PARENTHESIS braced_statement ELSE braced_statement
+statement -> if_statement
+unary_expression -> IDENTIFIER INC
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+statement -> expression SEMICOLON
+braced_statement_items -> statement
+braced_statement_items -> statement braced_statement_items
+braced_statement -> LEFT_BRACE braced_statement_items RIGHT_BRACE
+while_statement -> WHILE LEFT_PARENTHESIS expression RIGHT_PARENTHESIS braced_statement
+statement -> while_statement
+atomic_expression -> INT_CONST
+unary_expression -> atomic_expression
+mul_div_expression -> unary_expression
+add_minus_expression -> mul_div_expression
+comparison_expression -> add_minus_expression
+equality_expression -> comparison_expression
+logical_expression -> equality_expression
+assignment_expression -> logical_expression
+expression -> assignment_expression
+return_statement -> RETURN expression SEMICOLON
+statement -> return_statement
+braced_statement_items -> statement
+braced_statement_items -> statement braced_statement_items
+braced_statement_items -> statement braced_statement_items
+braced_statement -> LEFT_BRACE braced_statement_items RIGHT_BRACE
+func_definition -> func_prototype braced_statement
+top_level_element -> func_definition
+start -> start top_level_element

@@ -1,40 +1,42 @@
 package lex;
 
-import lex.internal.*;
+import lex.internal.DFA;
+import lex.internal.DFANode;
+import lex.internal.NFA;
+import lex.internal.NFANode;
 import lex.token.Token;
 import lex.token.TokenType;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.var;
-import symboltable.SymbolTable;
 import util.Constants;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 public class LexicalAnalyzer implements Iterator<Token> {
 
+    @Getter
+    private Token prefetchedToken;
 
     @Getter
     private ListIterator<Character> characterIterator;
 
     @Getter
-    private SymbolTable symbolTable;
-
-    @Getter
     private DFA dfa;
 
-    public LexicalAnalyzer(ListIterator<Character> characterIterator, SymbolTable symbolTable, DFA dfa) {
+    public LexicalAnalyzer(ListIterator<Character> characterIterator, DFA dfa) {
         this.characterIterator = characterIterator;
-        this.symbolTable = symbolTable;
         this.dfa = dfa;
     }
 
-    public static LexicalAnalyzer construct(ListIterator<Character> characterIterator, SymbolTable symbolTable, List<Rule> rules) {
+    public static LexicalAnalyzer construct(ListIterator<Character> characterIterator, List<Rule> rules) {
 
         DFA dfa = constructDFA(rules);
 
-        return new LexicalAnalyzer(characterIterator, symbolTable, dfa);
+        return new LexicalAnalyzer(characterIterator, dfa);
     }
 
     public static DFA constructDFA(List<Rule> rules) {
@@ -65,15 +67,16 @@ public class LexicalAnalyzer implements Iterator<Token> {
      */
     @Override
     public boolean hasNext() {
-        try {
-            var token = next();
-            for (int i =0;i<token.getLexeme().length();i++) {
-                characterIterator.previous();
-            }
+        if (prefetchedToken != null) {
             return true;
-        } catch (LexicalParseException e) {
+        }
+        prefetchedToken = next();
+        if (prefetchedToken.getType().equals(TokenType.EOF)) {
+            prefetchedToken = null;
             return false;
         }
+
+        return true;
     }
 
     /**
@@ -84,6 +87,12 @@ public class LexicalAnalyzer implements Iterator<Token> {
      */
     @Override
     public Token next() {
+
+        if (prefetchedToken != null) {
+            var prefetched = prefetchedToken;
+            prefetchedToken = null;
+            return prefetched;
+        }
 
         StringBuilder buffer = new StringBuilder();
         DFANode position = dfa.getStart();
@@ -100,16 +109,28 @@ public class LexicalAnalyzer implements Iterator<Token> {
                 characterIterator.previous();
 
                 if (position.isEndState()) {
-                    return new Token(
-                        buffer.toString(),
-                        position.getEndStateTokenTypes().get(0)
+
+                    var possibleTokenTypes = position.getEndStateTokenTypes();
+
+                    for (var type : possibleTokenTypes) {
+                        if (!type.equals(TokenType.UNKNOWN)) {
+                            return new Token(
+                                buffer.toString(),
+                                type
+                            );
+                        }
+                    }
+
+                    // unknown character. raise error
+                    throw new LexicalParseException(
+                        "Unknown string " + buffer.toString()
                     );
                 } else {
                     // find the next expected chars
                     String more = position.getEdges().keySet().stream().map(Object::toString).collect(Collectors.joining(", "));
                     throw new LexicalParseException(
                         "Expect: " + more
-                        );
+                    );
                 }
             } else {
                 // can move. move one more
@@ -123,6 +144,10 @@ public class LexicalAnalyzer implements Iterator<Token> {
             return new Token(buffer.toString(), position.getEndStateTokenTypes().get(0));
         }
 
+        if (buffer.length() == 0) {
+            return new Token("", TokenType.EOF);
+        }
+
         String more = position.getEdges().keySet().stream().map(Object::toString).collect(Collectors.joining(", "));
         throw new LexicalParseException(
             String.format(
@@ -131,4 +156,5 @@ public class LexicalAnalyzer implements Iterator<Token> {
             )
         );
     }
+
 }

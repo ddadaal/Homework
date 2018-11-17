@@ -3,6 +3,7 @@ package syntax.internal;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import util.Constants;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,11 +28,15 @@ public class Production {
 
         sb.append(left.toString());
         sb.append(" ->");
-        for (Symbol rightSymbol: right) {
-            sb.append(" ");
-            sb.append(rightSymbol.toString());
-        }
 
+        if (rightSize() == 0) {
+            sb.append(" ").append(Constants.EPSILON);
+        } else {
+            for (Symbol rightSymbol: right) {
+                sb.append(" ");
+                sb.append(rightSymbol);
+            }
+        }
         return sb.toString();
 
     }

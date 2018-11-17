@@ -1,16 +1,16 @@
 package syntax;
 
-import lex.token.Token;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.var;
 import syntax.internal.*;
 import util.Constants;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 
 @AllArgsConstructor
@@ -85,7 +85,7 @@ public class SyntaxAnalyzer {
                 if (targetState != null) {
                     throw new SyntaxParseException(
                         String.format(
-                            "S/R conflict found.\nShift Target: %s\nReduce Production: %s",
+                            "S/R conflict found.\nShift target: %s\nReduce Production: %s",
                             targetState,
                             reducibleItem
                         )
@@ -95,8 +95,9 @@ public class SyntaxAnalyzer {
 
                     var production = reducibleItem.getProduction();
 
-                    // if it's accepted item (left is S' and is reducible). break
+                    // if it's accepted item (left is S'). break
                     if (production.getLeft().equals(productionList.getStartSymbol())) {
+
                         break;
                     }
 
@@ -121,10 +122,10 @@ public class SyntaxAnalyzer {
             // there is no such an entry (state, symbol) in the table.
             // raise error and show expected tokens
             if (targetState == null) {
-                var expectedTokens = stateStack.peek().getEdges().keySet().stream()
+                var expectedTokens = stateStack.peek().getMovableSymbols().stream()
                     .filter(x -> !x.isNonTerminalSymbol())
                     .map(x -> x.getTokenType().toString())
-                    .collect(Collectors.joining(", "));
+                    .collect(Collectors.joining(";"));
 
                 throw new SyntaxParseException(
                     String.format(
@@ -144,8 +145,8 @@ public class SyntaxAnalyzer {
 
             if (symbolIterator.hasNext()) {
                 symbol = symbolIterator.next();
-
             } else {
+                // read has complete. add a dollar symbol
                 symbol = Constants.DOLLAR_SYMBOL;
             }
         }

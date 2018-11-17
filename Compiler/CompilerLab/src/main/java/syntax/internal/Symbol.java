@@ -1,5 +1,6 @@
 package syntax.internal;
 
+import lex.token.Token;
 import lex.token.TokenType;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -13,6 +14,7 @@ import lombok.Getter;
 public class Symbol {
     @Getter private String ntName;
     @Getter private TokenType tokenType;
+
 
 
     public static Symbol terminal(TokenType tokenType) {
@@ -32,6 +34,7 @@ public class Symbol {
         this.tokenType = tokenType;
     }
 
+
     public boolean isNonTerminalSymbol() {
         return ntName != null;
     }
@@ -41,7 +44,7 @@ public class Symbol {
         if (isNonTerminalSymbol()) {
             return ntName;
         } else {
-            return tokenType.toString();
+            return tokenType.name();
         }
     }
 }

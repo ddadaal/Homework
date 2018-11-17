@@ -1,4 +1,3 @@
-import lex.token.Token;
 import lex.token.TokenType;
 import lombok.var;
 import org.junit.Test;
@@ -8,17 +7,16 @@ import syntax.internal.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static util.Constants.*;
+import static util.Constants.AUGMENTED_START_SYMBOL;
+import static util.Constants.DOLLAR_SYMBOL;
 
 
 public class SyntaxTest {
-
-    private LRDFA constructExample4dot45LR0DFA() {
+    @Test
+    public void testLR0DFA() {
         // example 4.45
         var S = Symbol.nonterminal("S");
         var L = Symbol.nonterminal("L");
@@ -42,13 +40,6 @@ public class SyntaxTest {
         var lr0dfa = LRDFA.constructLR0DFA(list);
 
         // manual check
-
-        return lr0dfa;
-    }
-
-    @Test
-    public void testLR0DFA() {
-        constructExample4dot45LR0DFA();
 
     }
 

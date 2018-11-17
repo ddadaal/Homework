@@ -5,6 +5,7 @@ import lombok.Setter;
 import util.CollectionUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class LRDFANode {
 
@@ -23,16 +24,8 @@ public class LRDFANode {
         this.lrItems = lrItems;
     }
 
-    public Set<Symbol> getMovableSymbols() {
-        Set<Symbol> result = new HashSet<>();
-        for (LRItem lrItem : lrItems) {
-            Symbol symbol = lrItem.getSymbolAfterDot();
-            if (symbol != null) {
-                result.add(symbol);
-            }
-        }
-
-        return result;
+    public List<Symbol> getMovableSymbols() {
+        return lrItems.stream().map(LRItem::getSymbolAfterDot).distinct().filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public LRDFANode goTo(Symbol symbol) {
