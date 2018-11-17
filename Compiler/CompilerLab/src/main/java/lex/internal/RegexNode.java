@@ -7,7 +7,7 @@ import util.Constants;
 
 @EqualsAndHashCode
 @ToString
-public class RENode {
+public class RegexNode {
 
 
     public enum RENodeType {
@@ -29,12 +29,12 @@ public class RENode {
     @Getter private char lexeme;
     @Getter private RENodeType type;
 
-    public RENode(char lexeme) {
+    public RegexNode(char lexeme) {
         this.lexeme = lexeme;
         this.type =RENodeType.CHAR;
     }
 
-    public RENode(RENodeType type) {
+    public RegexNode(RENodeType type) {
         this.type = type;
         this.lexeme = type.c;
 

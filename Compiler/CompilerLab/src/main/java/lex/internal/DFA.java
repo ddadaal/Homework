@@ -16,15 +16,6 @@ public class DFA {
     @Getter private List<DFANode> end;
 
 
-    private static DFANode getUnmarkedDFA(Map<DFANode, Boolean> map) {
-        for (var entry : map.entrySet()) {
-            if (!entry.getValue()) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
     public static DFA constructDFA(NFA nfa) {
 
         var stack = new Stack<DFANode>();

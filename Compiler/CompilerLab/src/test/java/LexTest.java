@@ -1,7 +1,7 @@
 import lex.LexicalAnalyzer;
 import lex.MyLexReader;
 import lex.Rule;
-import lex.internal.RENode;
+import lex.internal.RegexNode;
 import lex.internal.Regex;
 import lex.token.Token;
 import lex.token.TokenType;
@@ -25,13 +25,13 @@ public class LexTest {
 //         easy
         String regex1 = "a*|b";
 
-        List<RENode> expected1 = new ArrayList<>();
-        expected1.add(new RENode('a'));
-        expected1.add(new RENode(RENode.RENodeType.STAR));
-        expected1.add(new RENode(RENode.RENodeType.OR));
-        expected1.add(new RENode('b'));
+        List<RegexNode> expected1 = new ArrayList<>();
+        expected1.add(new RegexNode('a'));
+        expected1.add(new RegexNode(RegexNode.RENodeType.STAR));
+        expected1.add(new RegexNode(RegexNode.RENodeType.OR));
+        expected1.add(new RegexNode('b'));
 
-        List<RENode> actual1 = Regex.preprocess(regex1);
+        List<RegexNode> actual1 = Regex.preprocess(regex1);
 
         assertEquals(expected1, actual1);
 
@@ -42,7 +42,7 @@ public class LexTest {
         String expected2 = "0|((1|2|3|4|5|6|7|8|9))((0|1|2|3|4|5|6|7|8|9)|_)*";
 
 
-        List<RENode> result2 = Regex.preprocess(regex2);
+        List<RegexNode> result2 = Regex.preprocess(regex2);
 
         assertEquals(expected2, Regex.showRENodes(result2));
 

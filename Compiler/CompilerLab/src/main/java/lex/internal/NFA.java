@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import util.Constants;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 @AllArgsConstructor
@@ -21,7 +19,7 @@ public class NFA {
 
         Stack<NFA> stack = new Stack<>();
 
-        for (RENode node: regex.getNodes()) {
+        for (RegexNode node: regex.getNodes()) {
             switch (node.getType()) {
                 case CHAR:
                     stack.push(primitiveNFA(node.getLexeme()));
