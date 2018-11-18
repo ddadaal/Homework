@@ -50,8 +50,6 @@ public class SyntaxAnalyzer {
 
         while (true) {
 
-            // find the state transition target
-            var targetState = stateStack.peek().goTo(symbol);
 
             // find all reducibles
             List<LRItem> reducibles = new ArrayList<>();
@@ -74,6 +72,9 @@ public class SyntaxAnalyzer {
                     )
                 );
             }
+
+            // find the state transition target
+            var targetState = stateStack.peek().goTo(symbol);
 
             // there is a reducible production
 

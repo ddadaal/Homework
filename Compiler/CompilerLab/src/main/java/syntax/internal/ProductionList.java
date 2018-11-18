@@ -101,9 +101,9 @@ public class ProductionList {
                         return true;
                     }
                 }
+                return false;
             }
 
-            return true;
         });
     }
 

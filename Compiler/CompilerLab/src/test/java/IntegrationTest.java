@@ -96,6 +96,15 @@ public class IntegrationTest {
             new Token("s_25", TokenType.IDENTIFIER)
         );
 
+        System.out.println(String.format("Tokens (%d):", actualTokenSequence.size()));
+        System.out.println();
+        actualTokenSequence.forEach(System.out::println);
+
+        System.out.println("----------------------");
+        System.out.println(String.format("Production sequence (%d):", actualProductionSequence.size()));
+        actualProductionSequence.forEach(System.out::println);
+
+
         assertEquals(expectedTokenSeq, actualTokenSequence);
         assertEquals(expectedProductionSeq, actualProductionSequence);
 

@@ -1,0 +1,17 @@
+Tokens (5):
+
+<IDENTIFIER, abc>
+<STAR, *>
+<IDENTIFIER, ab123>
+<PLUS, +>
+<IDENTIFIER, s_25>
+----------------------
+Production sequence (8):
+F -> IDENTIFIER
+T -> F
+F -> IDENTIFIER
+T -> T STAR F
+E -> T
+F -> IDENTIFIER
+T -> F
+E -> E PLUS T
