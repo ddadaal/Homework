@@ -36,7 +36,6 @@ public enum TokenType {
 
     IGNORED(""),
     DOLLAR_R("$R"),
-    DOLLAR_L("$L"),
     UNKNOWN("#"),
     EOF("$eof");
 
