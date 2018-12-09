@@ -1,13 +1,13 @@
 # Homework
 
-This is the collection of all my class homework.
+This is the collection of all my homework in class.
 
 ## Includes
 
 order by time
 
 - Foundation of Computing System (计算系统基础)  
-- Software Engineering and Computing I (软工1，BrainFuck IDE)
+- Software Engineering and Computing I (软工1，BrainFuck IDE) as submodule to [this repo](https://github.com/viccrubs/BFIDE)
 - Computer Organization and System Architecture (计组，ALU Simulator)
 - Data Structure and Algorithm Analysis (数据结构)
 - C++ Programming Language (C++)
@@ -16,4 +16,4 @@ order by time
 - Technology of Database Development (数据库开发技术)
 - Compiling Techniques (编译原理)
 - Software Construction (软件构造，WPF做的画板)
-- Leetcode (easter egg DD)
+- Leetcode (easter egg XD)
