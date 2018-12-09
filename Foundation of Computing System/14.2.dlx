@@ -1,0 +1,38 @@
+            .DATA	x30000000
+DOCUMENT :  .ASCIIZ "asdIL1askfKzZ"
+SAVER1 :    .SPACE  4
+SAVER2 :    .SPACE  4
+SAVER4 :    .SPACE  4
+SAVER5 :    .SPACE  4
+            .TEXT   x00100000
+            .GLOBAL  MAIN
+		;R1 pointer
+
+MAIN :      SW      SAVER1(R0), R1
+            SW      SAVER2(R0), R2
+            SW      SAVER5(R0), R5
+            SW      SAVER4(R0), R4
+            ADDI    R1, R0, DOCUMENT
+            SUBI    R1, R1, #1
+LOOP :      ADDI    R1, R1, #1
+            LB      R2, 0(R1)
+            SEQI    R5, R2, #0
+            BNEZ    R5, EXIT
+            SLTI    R5, R2, #97
+            BNEZ    R5, LOOP
+            SLTI    R5, R2, #123
+            BEQZ    R5, LOOP
+            JAL     TOUPPER
+            SB      0(R1), R2
+            J       LOOP
+
+EXIT :      ADDI    R4, R0, DOCUMENT
+            TRAP    X08
+            LW      R1, SAVER1(R0)
+            LW      R2, SAVER2(R0)
+            LW      R5, SAVER5(R0)
+            LW      R4, SAVER4(R0)
+            TRAP    #0
+
+TOUPPER :   SUBI    R2, R2, x20
+            JR      R31

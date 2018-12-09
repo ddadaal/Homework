@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<DLXObject>
+<Data>
+	<DataTable Base='805306368' Length='30'>
+		<Symbol name='DOCUMENT' isGlobal='False' isExtern='False' >0</Symbol>
+		<Symbol name='SAVER1' isGlobal='False' isExtern='False' >14,15,16,17</Symbol>
+		<Symbol name='SAVER2' isGlobal='False' isExtern='False' >18,19,20,21</Symbol>
+		<Symbol name='SAVER4' isGlobal='False' isExtern='False' >22,23,24,25</Symbol>
+		<Symbol name='SAVER5' isGlobal='False' isExtern='False' >26,27,28,29</Symbol>
+	</DataTable>
+	<DataContent>617364494C3161736B664B7A5A0000000000000000000000000000000000</DataContent>
+</Data>
+<Text>
+
+	<TextTable Base='1048576' Length='376'>
+		<Symbol name='MAIN' isGlobal='True' isExtern='False' >0</Symbol>
+		<Symbol name='LOOP' isGlobal='False' isExtern='False' >160</Symbol>
+		<Symbol name='EXIT' isGlobal='False' isExtern='False' >204</Symbol>
+		<Symbol name='TOUPPER' isGlobal='False' isExtern='False' >368</Symbol>
+	</TextTable>
+	<TextContent>28 1 0 SAVER1 0 28 2 0 SAVER2 0 28 5 0 SAVER5 0 28 4 0 SAVER4 0 1 1 0 DOCUMENT 0 3 1 1 #1 1 1 1 #1 25 2 1 #0 21 5 2 #0 30 5 EXIT 17 5 2 #97 30 5 LOOP 17 5 2 #123 29 5 LOOP 32 TOUPPER 26 2 1 #0 31 LOOP 1 4 0 DOCUMENT 0 35 #8 27 1 0 SAVER1 0 27 2 0 SAVER2 0 27 5 0 SAVER5 0 27 4 0 SAVER4 0 35 #0 3 2 2 #32 33 31 </TextContent>
+</Text>
+</DLXObject>

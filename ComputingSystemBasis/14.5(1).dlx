@@ -1,8 +1,0 @@
-            .DATA	x30000000
-INTEGER :   .WORD   #203
-            .TEXT   x00100000
-            .GLOBAL  MAIN
-main: 
-
-
-

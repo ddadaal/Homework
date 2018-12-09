@@ -1,0 +1,22 @@
+            .DATA
+SAVER8 :    .SPACE  4
+SAVER13 :   .SPACE  4
+            .TEXT   
+            .GLOBAL  MAIN
+		;R9/R8=R10
+		;R9%R8=R11
+MAIN :      SW      SAVER13(R0), R13
+            ADDI    R10, R0, #0
+            ADDI    R13, R8, #0
+            SW      SAVER8(R0), R8
+LOOP :      SLE     R12, R8, R9
+            BEQZ    R12, NEXT
+            ADD     R8, R8, R13
+            ADDI    R10, R10, #1
+            J       LOOP
+NEXT :      SUB     R8, R8, R13
+            SUB     R11, R9, R8
+            LW      R13, SAVER13(R0)
+            LW      R8, SAVER8(R0)
+            TRAP    #0
+
