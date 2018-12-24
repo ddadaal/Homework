@@ -3,6 +3,8 @@
     "files.associations": {
         "vector": "cpp",
         "xstring": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "xhash": "cpp",
+        "utility": "cpp"
     }
 }
