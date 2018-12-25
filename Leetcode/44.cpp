@@ -14,6 +14,15 @@ public:
         return rec(s, p, 0, 0, memo);
 
     }
+    
+    bool allStar(string& str, int pi) {
+        for (int i=pi;i<str.size();i++) {
+            if (str[i] != '*') {
+                return false;
+            }
+        }
+        return true;
+    }
 
     bool rec(string& s, string& p, int si, int pi, int** memo) {
         if (memo[si][pi] != 0) {
@@ -23,6 +32,8 @@ public:
         bool ans;
         if (pi == p.size()) {
             ans = si == s.size();
+        } else if (si == s.size()) {
+            return pi == p.size() || allStar(p, pi);
         } else {
             char pattern = p[pi];
             if (pattern == '*') {
