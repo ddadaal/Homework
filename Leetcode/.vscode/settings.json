@@ -6,5 +6,6 @@
         "cmath": "cpp",
         "xhash": "cpp",
         "utility": "cpp"
-    }
+    },
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: LLVM, IndentWidth: 2 }"
 }
