@@ -4,78 +4,79 @@ class Solution {
 public:
   string minWindow(string s, string t) {
 
-    unordered_map<char, queue<int>> memo;
+    unordered_map<char, int> required;
+    unordered_map<char, int> count;
 
-    for (int i =0;i<t.length();i++) {
-        if (memo.find(t[i]) == memo.end()) {
-            memo[t[i]] = queue<int> { -1 };
-        } else {
-            memo[t[i]].push(-1);
-        }
+    for (char c : t) {
+      if (required.find(c) == required.end()) {
+        required[c] = 0;
+      }
+      required[c]++;
+      count[c] = 0;
     }
 
     int start = 0, end = 0;
-    int minStart = 0, minEnd = s.size() - 1;
-    int addCount = 0;
 
-    for (; end < s.size(); end++) {
+    int ansStart = 0, ansEnd = s.size();
 
+    int okCount = 0;
+
+    // init the first window
+    for (; end < s.size() && okCount < count.size(); end++) {
       char c = s[end];
-
-      if (memo.find(c) == memo.end()) {
-          continue;
-      }
-      // find length of the car
-      auto& indexes = memo[c];
-
-      // find if there is any N in memo
-      // if there is, set it to end and continue
-      bool any = false;
-      for (int i=0;i<indexes.size();i++) {
-        if (indexes.front() == -1) {
-          any = true;
-          indexes.pop();
-          indexes.push(end);
-          addCount++;
-          break;
-        }
-      }
-      bool stillNotComplete = addCount < t.size();
-      if (any && stillNotComplete) {
+      if (count.find(c) == count.end()) {
         continue;
       }
-
-      // there isn't N, find the least smallest
-
-      if (!any) {
-        indexes.pop();
-        indexes.push(end);
-      }
-      // set the minIndex to end
-
-      // find the start and end
-      if (!stillNotComplete) {
-        int minI = INT_MAX;
-        int maxI = INT_MIN;
-        
-        for (auto pair: memo) {
-            for (auto value: pair.second) {
-                minI = min(minI, value);
-                maxI = max(maxI, value);
-            }
-        }
-
-        if (maxI - minI < minEnd - minStart) {
-          minStart = minI;
-          minEnd = maxI;
-        }
+      count[c] += 1;
+      if (count[c] == required[c]) {
+        okCount++;
       }
     }
+  
 
-    if (addCount < t.size()) {
-        return "";
+    if (end == s.size() && okCount < count.size()) {
+      return "";
     }
 
-    return string(s.begin() + minStart, s.begin() + minEnd + 1);
+    // slide
+
+    while (true) {
+      // shrink
+      while (okCount == count.size()) {
+        start++;
+        char c = s[start-1];
+        if (count.find(c) != count.end()) {
+          count[c]--;
+          if (count[c] < required[c]) {
+            okCount--;
+          }
+        }
+      }
+
+      // update ans
+      if (end-start+1 <= ansEnd - ansStart) {
+        ansEnd = end;
+        ansStart = start-1;
+      }
+      
+      
+      if (end == s.size()) {
+        break;
+      }
+      
+      // expand
+      for(;end<s.size() && okCount < count.size();end++) {
+        char c= s[end];
+        if (count.find(c) != count.end()) {
+          count[c]++;
+          if (count[c] == required[c]) {
+            okCount++;
+          }
+        }
+      }
+
+    }
+
+    return string(s.begin()+ansStart, s.begin()+ansEnd);
   }
 };
