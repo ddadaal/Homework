@@ -1,7 +1,5 @@
 // 无重复字符的最长字串
-#include <string>
-#include <vector>
-using namespace std;
+#include "cppincludes.h"
 
 class Solution {
 public:

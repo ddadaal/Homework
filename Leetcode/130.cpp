@@ -18,36 +18,36 @@ public:
     vector<vector<int>> visited(m, vector<int>(n, 0));
 
     for (int i = 0; i < m; i++) {
-      for (int j = 0; j < n; j++) {
-        if (visited[i][j] == 0) {
-          flood(board, i, j, visited);
+      flood(board, i, 0);
+      flood(board, i, n-1);
+    }
+
+    for (int i=0;i<n;i++) {
+      flood(board, 0, i);
+      flood(board, m-1, i);
+    }
+
+    for (int i =0;i<m;i++) {
+      for (int j=0;j<n;j++) {
+        if (board[i][j] == 'O') {
+          board[i][j] = 'X';
+        } else if (board[i][j] == '$') {
+          board[i][j] = 'O';
         }
       }
     }
   }
 
-  bool flood(vector<vector<char>> &board, int x, int y,
-             vector<vector<int>> &visited) {
-
-    if (visited[x][y] != 0) {
-      return visited[x][y];
+  void flood(vector<vector<char>> &board, int x, int y) {
+    if (x < 0 || y < 0 || x == board.size() || y == board[0].size()) {
+      return;
     }
-
-    bool ans = false;
-
-    if (board[x][y] == 'X') {
-      ans = true;
-    } else if (x == 0 || y == 0 || x >= m - 1 || y >= n - 1) {
-      ans = false;
-    } else if (flood(board, x + 1, y, visited) &&
-               flood(board, x, y + 1, visited) &&
-               flood(board, x - 1, y, visited) &&
-               flood(board, x, y - 1, visited)) {
-      board[x][y] = 'X';
-      ans = true;
+    if (board[x][y] == 'O') {
+      board[x][y] = '$';
+      flood(board, x+1, y);
+      flood(board, x-1, y);
+      flood(board, x, y+1);
+      flood(board, x, y-1);
     }
-
-    visited[x][y] = ans ? 1 : -1;
-    return ans;
   }
 };

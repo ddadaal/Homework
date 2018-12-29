@@ -1,8 +1,4 @@
-#include <iostream>
-#include<string>
-#include<vector>
-#include<math.h>
-using namespace std;
+#include "cppincludes.h"
 
 class Solution {
 public:

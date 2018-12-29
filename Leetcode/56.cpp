@@ -19,18 +19,16 @@ public:
 			return a.start < b.start;
 		});
 		vector<Interval> merged;
-		int index = 0;
 		for (auto interval : intervals) {
 			if (merged.size() == 0) {
 				merged.push_back(interval);
 				continue;
 			}
-			if (interval.start <= merged[index].end) {
-				merged[index].end = max(merged[index].end, interval.end);
+			if (interval.start <= merged.back().end) {
+				merged.back().end = max(merged.back().end, interval.end);
 			}
 			else {
 				merged.push_back(interval);
-				index++;
 			}
 			
 		}
