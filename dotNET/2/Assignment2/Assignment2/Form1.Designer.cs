@@ -39,7 +39,7 @@ namespace Assignment2
             ((System.ComponentModel.ISupportInitialize)(this.wmpPlayer)).BeginInit();
 
             // Acquire the InfoControl in GAC
-            Assembly myControl = Assembly.Load("InfoControl, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ff57dd7195e544df");
+            Assembly myControl = Assembly.Load($"InfoControl, Version={InfoControlConfig.Version}.0.0.0, Culture=neutral, PublicKeyToken=ff57dd7195e544df");
             this.infoControl = (UserControl)myControl.CreateInstance("InfoControl.InfoControl");
 
             this.SuspendLayout();

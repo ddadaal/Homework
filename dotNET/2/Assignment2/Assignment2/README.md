@@ -4,16 +4,20 @@
 
 2. Generate Key and sign both control project with the strong name key
 
-3. Change assembly information of both versions of the control so that they both have the same assembly name(InfoControl), namespace name (InfoControl) and class name (InfoControl)
+3. Change assembly information of both versions of the control so that they both have the same assembly name(InfoControl), namespace name (InfoControl) and class name (InfoControl) but different version number(1.0.0.0 and 2.0.0.0)
 
 4. In the main application, reference the control by 
 
 ```csharp
-Assembly myControl = Assembly.Load("InfoControl, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ff57dd7195e544df");
+Assembly myControl = Assembly.Load($"InfoControl, Version={Version}.0.0.0, Culture=neutral, PublicKeyToken=ff57dd7195e544df");
 this.infoControl = (UserControl)myControl.CreateInstance("InfoControl.InfoControl");
 ```
 
-5. Dynamically install the dll of any version of the control by `gacutil -i InfoControl.dll` in different bin directory
+where `Version` denotes the specified version of the InfoControl that would be loaded, which is specified in `InfoControlConfig.xml`.
+
+5. Install the dll of both versions of the control by `gacutil -i InfoControl.dll` in different bin directory so that GAC contains 2 versions of the InfoControl
+
+6. Change the version number in `InfoControlConfig.xml` to dynamically switch the version of InfoControl. (Acceptable value: 1, 2)
 
 # References
 
