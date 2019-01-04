@@ -28,23 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.treeViewXml = new System.Windows.Forms.TreeView();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // openFileDialog1
+            // treeViewXml
             // 
-            this.openFileDialog1.FileName = "openFileDialog1";
-            // 
-            // treeView1
-            // 
-            this.treeView1.Location = new System.Drawing.Point(166, 16);
-            this.treeView1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(720, 567);
-            this.treeView1.TabIndex = 0;
+            this.treeViewXml.Location = new System.Drawing.Point(166, 16);
+            this.treeViewXml.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.treeViewXml.Name = "treeViewXml";
+            this.treeViewXml.Size = new System.Drawing.Size(720, 567);
+            this.treeViewXml.TabIndex = 0;
             // 
             // btnBrowse
             // 
@@ -69,12 +64,12 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(900, 600);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnBrowse);
-            this.Controls.Add(this.treeView1);
+            this.Controls.Add(this.treeViewXml);
             this.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MaximizeBox = false;
@@ -85,9 +80,7 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.TreeView treeViewXml;
         private System.Windows.Forms.Button btnBrowse;
         private System.Windows.Forms.Button btnSave;
     }
