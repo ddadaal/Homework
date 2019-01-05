@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace Assignment2
@@ -31,38 +32,42 @@ namespace Assignment2
         /// </summary>
         private void InitializeComponent()
         {
-
-
-
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.wmpPlayer = new AxWMPLib.AxWindowsMediaPlayer();
+
+            Assembly myControlAssembly = Assembly.Load($"InfoControl, Version={InfoControlConfig.Version}.0.0.0, Culture=neutral, PublicKeyToken=ff57dd7195e544df");
+            this.infoControl = (UserControl)myControlAssembly.CreateInstance("InfoControl.InfoControl");
+
+            
             ((System.ComponentModel.ISupportInitialize)(this.wmpPlayer)).BeginInit();
-
-            // Acquire the InfoControl in GAC
-            Assembly myControl = Assembly.Load($"InfoControl, Version={InfoControlConfig.Version}.0.0.0, Culture=neutral, PublicKeyToken=ff57dd7195e544df");
-            this.infoControl = (UserControl)myControl.CreateInstance("InfoControl.InfoControl");
-
             this.SuspendLayout();
             // 
             // wmpPlayer
             // 
             this.wmpPlayer.Enabled = true;
-            this.wmpPlayer.Location = new System.Drawing.Point(550, 200);
+            this.wmpPlayer.Location = new System.Drawing.Point(12, 12);
             this.wmpPlayer.Name = "wmpPlayer";
             this.wmpPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("wmpPlayer.OcxState")));
-            this.wmpPlayer.Size = new System.Drawing.Size(150, 150);
+            this.wmpPlayer.Size = new System.Drawing.Size(550, 550);
             this.wmpPlayer.TabIndex = 0;
+            this.wmpPlayer.MediaError += Player_MediaError;
             //
             // InfoControl
             //
             this.infoControl.Enabled = true;
-            this.infoControl.Location = new System.Drawing.Point(10, 10);
+            this.infoControl.Location = new System.Drawing.Point(580, 12);
+            this.infoControl.Size = new System.Drawing.Size(350, 550);
+            // Add Event
+            var fileChangedEventInfo = myControlAssembly.GetType("InfoControl.InfoControl").GetEvent("FileChanged");
+            Delegate handler = Delegate.CreateDelegate(fileChangedEventInfo.EventHandlerType, this, GetType().GetMethod(nameof(this.OnFileChanged)));
+            fileChangedEventInfo.AddEventHandler(this.infoControl, handler);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 500);
+            this.ClientSize = new System.Drawing.Size(934, 571);
+            //this.Font = new System.Drawing.Font("Microsoft YaHei", 8F);
             this.Controls.Add(this.wmpPlayer);
             this.Controls.Add(this.infoControl);
             this.Name = "Form1";
@@ -70,6 +75,11 @@ namespace Assignment2
             ((System.ComponentModel.ISupportInitialize)(this.wmpPlayer)).EndInit();
             this.ResumeLayout(false);
 
+        }
+
+        private void WmpPlayer_MediaError(object sender, AxWMPLib._WMPOCXEvents_MediaErrorEvent e)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

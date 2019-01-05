@@ -28,31 +28,47 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
+            this.treeViewDirectory = new System.Windows.Forms.TreeView();
+            this.btnChoosePath = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // button1
+            // treeViewDirectory
             // 
-            this.button1.Location = new System.Drawing.Point(235, 74);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(162, 48);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "FromVersion1";
-            this.button1.UseVisualStyleBackColor = true;
+            this.treeViewDirectory.Location = new System.Drawing.Point(0, 0);
+            this.treeViewDirectory.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.treeViewDirectory.Name = "treeViewDirectory";
+            this.treeViewDirectory.Size = new System.Drawing.Size(408, 352);
+            this.treeViewDirectory.TabIndex = 2;
+            this.treeViewDirectory.NodeMouseDoubleClick += TreeViewDirectory_NodeMouseDoubleClick;
+            // 
+            // btnChoosePath
+            // 
+            this.btnChoosePath.Location = new System.Drawing.Point(0, 727);
+            this.btnChoosePath.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnChoosePath.Name = "btnChoosePath";
+            this.btnChoosePath.Size = new System.Drawing.Size(408, 52);
+            this.btnChoosePath.TabIndex = 3;
+            this.btnChoosePath.Text = "选择目录";
+            this.btnChoosePath.UseVisualStyleBackColor = true;
+            this.btnChoosePath.Click += new System.EventHandler(this.button1_Click);
             // 
             // InfoControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnChoosePath);
+            this.Controls.Add(this.treeViewDirectory);
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "InfoControl";
-            this.Size = new System.Drawing.Size(600, 600);
+            this.Size = new System.Drawing.Size(408, 779);
+            this.Load += new System.EventHandler(this.InfoControl_Load);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TreeView treeViewDirectory;
+        private System.Windows.Forms.Button btnChoosePath;
     }
 }
