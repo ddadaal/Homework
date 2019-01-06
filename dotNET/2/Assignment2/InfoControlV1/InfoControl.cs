@@ -29,6 +29,13 @@ namespace InfoControl
         private void TreeViewDirectory_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             var file = e.Node.Name;
+
+            if (Directory.Exists(file))
+            {
+                MessageBox.Show("请选择文件！");
+                return;
+            }
+
             FileChanged(file);
         }
 

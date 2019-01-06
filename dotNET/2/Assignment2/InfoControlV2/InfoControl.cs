@@ -30,6 +30,11 @@ namespace InfoControl
         {
             var file = e.Node.Name;
 
+            if (Directory.Exists(file))
+            {
+                MessageBox.Show("请选择文件！");
+                return;
+            }
 
             if (UpdateFileDetail(file))
             {
@@ -40,19 +45,12 @@ namespace InfoControl
 
         public bool UpdateFileDetail(string path)
         {
-
-            if (Directory.Exists(path))
-            {
-                MessageBox.Show("请选择文件！");
-                return false;
-            }
-
-
             var file = new FileInfo(path);
 
             listViewDetail.BeginUpdate();
             listViewDetail.Items.Clear();
             AddInfoItem("文件名", file.Name);
+            AddInfoItem("文件格式", file.Extension);
             AddInfoItem("文件大小", file.Length / 1024.0 / 1024.0 + " MB");
             AddInfoItem("创建日期", file.CreationTime.ToString());
             AddInfoItem("修改日期", file.LastWriteTime.ToString());

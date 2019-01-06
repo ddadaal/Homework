@@ -1,22 +1,24 @@
 <?xml version="1.0"?>
 <family>
-<parent attr="attrName">id="grandfather"
-    <parent>id="father"
-         <parent >id="brother"
-            <child>id="niece"
+<parent attrName="attr">
+  id="grandfather"
+    <parent id="father">
+         <parent id="brother">
+            <child id="niece">
+              Mike
             </child>
          </parent>
-         <parent>id="me"
-            <child>id="son"</child>
-            <child>id="daughter"</child>
+         <parent id="me">
+            <child id="son">John</child>
+            <child id="daughter">Mary</child>
          </parent>
-         <child>id="sister"</child>
+         <child id="sister">Sarah</child>
      </parent>
-     <parent>id="uncle"
-         <parent>id="cousin sister"
-            <child>id="second cousin"</child>
+     <parent id="uncle">
+         <parent id="cousin sister">
+            <child id="second cousin"></child>
          </parent>
-         <child>id="cousin brother"</child>
+         <child id="cousin brother"></child>
      </parent>
 </parent>
 </family>

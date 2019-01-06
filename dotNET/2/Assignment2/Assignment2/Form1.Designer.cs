@@ -70,6 +70,8 @@ namespace Assignment2
             //this.Font = new System.Drawing.Font("Microsoft YaHei", 8F);
             this.Controls.Add(this.wmpPlayer);
             this.Controls.Add(this.infoControl);
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.wmpPlayer)).EndInit();
