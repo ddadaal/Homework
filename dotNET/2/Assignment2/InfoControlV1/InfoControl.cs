@@ -5,47 +5,28 @@ using System.Windows.Forms;
 namespace InfoControl
 {
 
-    public delegate void FileChangedHandler(string path);
     public partial class InfoControl : UserControl
     {
-        public event FileChangedHandler FileChanged;
 
         public InfoControl()
         {
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void SetFilePath(string path)
         {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                var path = dialog.SelectedPath;
-                ListDirectory(path);
-            }
-
+            ListDirectory(path);
         }
-
-        private void TreeViewDirectory_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-            var file = e.Node.Name;
-
-            if (Directory.Exists(file))
-            {
-                MessageBox.Show("请选择文件！");
-                return;
-            }
-
-            FileChanged(file);
-        }
-
 
 
         private void ListDirectory(string path)
         {
+            var dir = Path.GetDirectoryName(path);
+
             treeViewDirectory.Nodes.Clear();
-            var rootDirectoryInfo = new DirectoryInfo(path);
+            var rootDirectoryInfo = new DirectoryInfo(dir);
             treeViewDirectory.Nodes.Add(CreateDirectoryNode(rootDirectoryInfo));
+            treeViewDirectory.ExpandAll();
         }
 
         private TreeNode CreateDirectoryNode(DirectoryInfo directoryInfo)

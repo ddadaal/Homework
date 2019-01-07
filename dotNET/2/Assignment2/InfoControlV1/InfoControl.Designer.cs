@@ -29,38 +29,22 @@
         private void InitializeComponent()
         {
             this.treeViewDirectory = new System.Windows.Forms.TreeView();
-            this.btnChoosePath = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // treeViewDirectory
             // 
             this.treeViewDirectory.Location = new System.Drawing.Point(0, 0);
-            this.treeViewDirectory.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.treeViewDirectory.Name = "treeViewDirectory";
-            this.treeViewDirectory.Size = new System.Drawing.Size(408, 352);
+            this.treeViewDirectory.Size = new System.Drawing.Size(350, 250);
             this.treeViewDirectory.TabIndex = 2;
-            this.treeViewDirectory.NodeMouseDoubleClick += TreeViewDirectory_NodeMouseDoubleClick;
-            // 
-            // btnChoosePath
-            // 
-            this.btnChoosePath.Location = new System.Drawing.Point(0, 727);
-            this.btnChoosePath.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btnChoosePath.Name = "btnChoosePath";
-            this.btnChoosePath.Size = new System.Drawing.Size(408, 52);
-            this.btnChoosePath.TabIndex = 3;
-            this.btnChoosePath.Text = "选择目录";
-            this.btnChoosePath.UseVisualStyleBackColor = true;
-            this.btnChoosePath.Click += new System.EventHandler(this.button1_Click);
             // 
             // InfoControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.btnChoosePath);
             this.Controls.Add(this.treeViewDirectory);
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "InfoControl";
-            this.Size = new System.Drawing.Size(408, 779);
+            this.Size = new System.Drawing.Size(350, 550);
             this.Load += new System.EventHandler(this.InfoControl_Load);
             this.ResumeLayout(false);
 
@@ -69,6 +53,5 @@
         #endregion
 
         private System.Windows.Forms.TreeView treeViewDirectory;
-        private System.Windows.Forms.Button btnChoosePath;
     }
 }
