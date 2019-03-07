@@ -22,5 +22,15 @@
 			"#include \"cppincludes.h\""
 		],
 		"description": "Add common includes into a cpp file"
+	},
+	"print array": {
+		"scope": "cpp",
+		"prefix": "printarray",
+		"body": [
+			"for (auto& val: $1) {",
+			"	cout << val << \" \";",
+			"}",
+			"cout << endl; ",
+		]
 	}
 }

@@ -25,7 +25,7 @@ public:
         int curMin = prices[0]; // min for f= (prices[j]-dp[k-1, j-1])
         for (int i=1;i<size;i++) {
           // the min for k, i is min(curMin, f(i-1))
-          curMin = min(curMin, prices[i-1]-dp[k-1][i-2]);
+          curMin = min(curMin, prices[i]-dp[k-1][i-1]);
           dp[k][i] = max(dp[k][i-1], prices[i]-curMin);
           ans = max(ans, dp[k][i]);
         }
