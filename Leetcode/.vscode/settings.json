@@ -13,5 +13,5 @@
         "ostream": "cpp",
         "queue": "cpp"
     },
-    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: LLVM, IndentWidth: 2 }"
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: LLVM, IndentWidth: 4 }"
 }
