@@ -1,0 +1,3 @@
+Linux networks are becoming more and more common, but scurity is often an overlooked  issue. Unfortunately, in today’s environment all networks are potential hacker targets, fro0m tp-secret military research networks to small home LANs
+Linux Network Securty focuses on securing Linux in a networked environment, where the security of the entire network needs to be considered rather than just isolated machines.  
+It uses a mix of theory and practicl techniques to teach administrators how to install and use security applications, as well as how the applcations work and why they are necesary. 
