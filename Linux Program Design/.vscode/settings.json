@@ -1,0 +1,13 @@
+{
+  "files.associations": {
+    "xstring": "cpp",
+    "iostream": "cpp",
+    "ostream": "cpp",
+    "vector": "cpp",
+    "fstream": "cpp",
+    "string": "cpp",
+    "system_error": "cpp",
+    "xlocale": "cpp",
+    "fileblocks.c": "cpp"
+  }
+}
