@@ -1,11 +1,11 @@
 package viccrubs.appautotesting.models;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@AllArgsConstructor
-public class Model {
-    private @Getter @Setter String string;
-
+@Data
+public class Ui {
+    private String xmlSource;
 }
