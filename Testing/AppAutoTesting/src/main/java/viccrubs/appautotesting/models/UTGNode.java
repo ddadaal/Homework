@@ -13,17 +13,17 @@ import java.util.List;
 import java.util.Objects;
 
 public class UTGNode {
-    private @Getter String xmlSource;
-    private @Getter String activityName;
-    private @Getter List<AndroidElement> leaves;
+    private @Getter Ui ui;
     private @Getter List<UTGEdge> outEdges = new ArrayList<>();
 
-    public static UTGNode createCurrent(AndroidDriver<AndroidElement> driver) {
+    public static UTGNode create(Ui ui) {
         var node = new UTGNode();
-        node.xmlSource = driver.getPageSource();
-        node.activityName = driver.currentActivity();
-        node.leaves = AppiumUtils.findAllLeafElements(driver);
+        node.ui = ui;
         return node;
+    }
+
+    public static UTGNode create(AndroidDriver<AndroidElement> driver) {
+        return create(Ui.create(driver));
     }
 
     @Override
@@ -31,13 +31,12 @@ public class UTGNode {
         if (this == o) return true;
         if (!(o instanceof UTGNode)) return false;
         UTGNode utgNode = (UTGNode) o;
-        return getXmlSource().equals(utgNode.getXmlSource()) &&
-            getActivityName().equals(utgNode.getActivityName());
+        return getUi().equals(utgNode.getUi());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getXmlSource(), getActivityName());
+        return Objects.hash(getUi());
     }
 
     public void addOutEdge(UTGNode end, UiEvent event) {

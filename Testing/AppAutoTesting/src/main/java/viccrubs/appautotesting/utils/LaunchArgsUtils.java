@@ -9,17 +9,23 @@ import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.var;
 import lombok.experimental.UtilityClass;
+import viccrubs.appautotesting.log.Logger;
 
 @UtilityClass
-public class LaunchArgsUtils {
+public class LaunchArgsUtils implements Logger {
 
-    private static final String AAPT_TOOL_PATH = "C:\\Users\\viccrubs\\AppData\\Local\\Android\\Sdk\\build-tools\\29.0.0\\aapt.exe";
 
     private static final boolean MOCK = true;
 
+    private static final String AAPT_TOOL_PATH = MOCK
+        ? "C:\\Users\\viccrubs\\AppData\\Local\\Android\\Sdk\\build-tools\\29.0.0\\aapt.exe"
+        : "assets/aapt"
+        ;
+
+
     public LaunchArgs parseArgs(String[] args) {
 
-        var apkPath = new File(MOCK ? "apk/ithouse.apk" : args[0]).getAbsolutePath();
+        var apkPath = new File(MOCK ? "assets/ITHouse.apk" : args[0]).getAbsolutePath();
 
         // parse output
         String appPackage = null;

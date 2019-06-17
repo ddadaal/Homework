@@ -1,19 +1,17 @@
 package viccrubs.appautotesting;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.concurrent.Executors;
 
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import io.appium.java_client.AppiumDriver;
 import lombok.var;
+import viccrubs.appautotesting.crawlers.DFSCrawler;
+import viccrubs.appautotesting.log.Logger;
 import viccrubs.appautotesting.models.UTG;
 import viccrubs.appautotesting.models.UTGNode;
 import viccrubs.appautotesting.utils.AppiumUtils;
@@ -22,7 +20,7 @@ import viccrubs.appautotesting.utils.LaunchArgsUtils;
 /**
  * Hello world!
  */
-public final class App {
+public final class App implements Logger {
 
     private App(String[] args) {
         launch(args);
@@ -34,7 +32,7 @@ public final class App {
 
         var launchProps = LaunchArgsUtils.parseArgs(args);
 
-        DesiredCapabilities capabilities = new DesiredCapabilities();
+        var capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "");
         capabilities.setCapability("platformName", "Android");
         capabilities.setCapability("deviceName", launchProps.getDeviceUdid());
@@ -49,53 +47,46 @@ public final class App {
         capabilities.setCapability("unicodeKeyboard", "true");
         //设置用例执行完成后重置键盘
         capabilities.setCapability("resetKeyboard", "true");
+        capabilities.setCapability("newCommandTimeout", 100000);
 
         val driver = new AndroidDriver<AndroidElement>(new URL(String.format("http://127.0.0.1:%s/wd/hub", launchProps.getPort())), capabilities);
 
+        AppiumUtils.setDriver(driver);
+
+        verbose("Driver initialized.");
+
+
         // 最长运行时间timer
+        startTerminationTimer(launchProps.getMaxRuntime());
+
+        // 等待应用启动完成
+
+        verbose("Wait for app launch...");
+
+        AppiumUtils.sleep(2000);
+
+        verbose("App launched.");
+
+
+        verbose("UTG initialized. ");
+
+        // 开始遍历
+        new DFSCrawler(driver).run();
+
+    }
+
+
+
+    private void startTerminationTimer(int maxRuntimeSeconds) {
         Executors.newSingleThreadExecutor().submit(() -> {
             try {
-                Thread.sleep(launchProps.getMaxRuntime() * 1000);
+                Thread.sleep(maxRuntimeSeconds * 1000);
                 System.exit(0);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         });
-
-        // 等待应用启动完成
-        AppiumUtils.sleep(7000);
-
-        // 以目前的activity创建UTG以及其第一个节点
-//        val utg = new UTG(UTGNode.createCurrent(driver));
-
-        // 先随便试试，直接DFS
-
-        val accessedActivities = new HashSet<String>();
-
-        dfs(driver, accessedActivities);
-    }
-
-    void dfs(AndroidDriver<AndroidElement> driver, HashSet<String> accessed) {
-        val currentActivity = driver.currentActivity();
-        if (accessed.add(currentActivity)) {
-            // 第一次访问这个activity
-            val leaves = AppiumUtils.findAllLeafElements(driver);
-
-            for (val leaf: leaves) {
-                try {
-                    leaf.click();
-                    AppiumUtils.sleep(2000);
-                    if (!driver.currentActivity().equals(currentActivity)) {
-                        dfs(driver, accessed);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            driver.navigate().back();
-        }
-
+        verbose(String.format("Program will terminate after %d seconds", maxRuntimeSeconds));
     }
 
     public static void main(String[] args) throws Exception {
