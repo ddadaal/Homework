@@ -9,43 +9,33 @@ import org.w3c.dom.Node;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
 public class UiElement {
-    private @Getter
-    final List<UiHierarchyLevel> hierarchy;
+    private @Getter final UiHierarchy hierarchy;
 
     private @Getter final Ui ui;
 
     private @Getter final Node node;
 
-    public String getXPath() {
-        var sb = new StringBuilder("/hierarchy");
-        for (var hierarchyLevel : hierarchy) {
-            sb.append("/").append(
-                hierarchyLevel.toString()
-                    .replace("$", "\\$") // escape
-            );
-        }
-        return sb.toString();
+    private @Getter @Setter boolean accessed = false;
+
+    public UiElement(UiHierarchy parentHierarchy, String tagName, int index, Ui ui, Node node) {
+        hierarchy = new UiHierarchy(parentHierarchy, tagName, index);
+        this.ui = ui;
+        this.node = node;
     }
 
-    private @Getter @Setter boolean accessed;
+    public String getXPath() {
+        return hierarchy.getXPath();
+    }
 
-    public UiHierarchyLevel getSelfLevel() {
-        return hierarchy.get(hierarchy.size() - 1);
+
+
+    public int getIndex() {
+        return hierarchy.getSelf().getIndex();
     }
 
     public String getTagName() {
-        return getSelfLevel().getTagName();
-    }
-
-    public static UiElement create(
-        List<UiHierarchyLevel> parentHierarchy, Ui ui, String tagName, int index,
-        Node node
-    ) {
-        var selfHierarchy = new ArrayList<UiHierarchyLevel>(parentHierarchy);
-        selfHierarchy.add(new UiHierarchyLevel(tagName, index));
-        return new UiElement(selfHierarchy, ui, node, false);
+        return hierarchy.getSelf().getTagName();
     }
 
     public boolean getClickable() {
@@ -82,7 +72,8 @@ public class UiElement {
 
     @Override
     public String toString() {
-        return String.format("tag: %s, resource-id: %s, text: %s", getTagName(), getResourceId(), getText());
+        return String.format("tag: %s, resource-id: %s, text: %s, path: %s",
+            getTagName(), getResourceId(), getText(), hierarchy.getShortenedPath());
 
     }
 }

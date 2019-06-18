@@ -10,19 +10,25 @@ import viccrubs.appautotesting.utils.AppiumUtils;
 import javax.annotation.Nullable;
 
 @Data
-public class UiEvent implements Logger {
+public class UiAction implements Logger {
 
     private final Type type;
     private final @Nullable String inputText;
     private final UiElement element;
 
     public void perform(AndroidDriver<AndroidElement> driver) {
-        verbose("Find element %s. XPath: %s", element, element.getXPath());
-        val androidElement = driver.findElementByXPath(element.getXPath());
 
-        if (type == Type.CLICK) {
-            verbose("Click the found element.");
-            androidElement.click();
+        if (type == Type.BACK) {
+            verbose("Execute back.");
+            driver.navigate().back();
+        } else {
+            verbose("Find element %s.", element, element.getXPath());
+            val androidElement = driver.findElementByXPath(element.getXPath());
+
+            if (type == Type.CLICK) {
+                verbose("Click the found element.");
+                androidElement.click();
+            }
         }
 
         AppiumUtils.sleep(500);
@@ -30,6 +36,9 @@ public class UiEvent implements Logger {
 
     public enum Type {
         CLICK,
+        BACK
     }
+
+    public static UiAction BACK = new UiAction(Type.BACK, null, null);
 
 }

@@ -6,5 +6,5 @@ import lombok.Data;
 public class UTGEdge {
     private final UTGNode start;
     private final UTGNode end;
-    private final UiEvent event;
+    private final UiAction action;
 }

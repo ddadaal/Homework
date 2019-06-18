@@ -22,7 +22,7 @@ public class Ui {
 
     private @Getter final String xmlSource;
 
-    // xml source may change s
+    // xml source may change automatically
     // use more stable classname hierarchy as signature
     private @Getter String signature = "";
 
@@ -57,7 +57,7 @@ public class Ui {
 
     @Override
     public String toString() {
-        return String.format("%d %s", hashCode(), activityName);
+        return String.format("code: %d, activity: %s", hashCode(), activityName);
     }
 
     @Override
@@ -73,8 +73,9 @@ public class Ui {
         return Objects.hash(getSignature());
     }
 
+    // fill signature and leaf elements
     @SneakyThrows
-    public void initialize() {
+    private void initialize() {
         leafElements = new ArrayList<>();
 
         DocumentBuilderFactory dbFactory =
@@ -84,7 +85,7 @@ public class Ui {
 
         Node root = xmlDocument.getFirstChild().getFirstChild(); // hierarchy is the first child
 
-        UiElement rootElement = UiElement.create(new ArrayList<>(), this, root.getNodeName(), 1, root);
+        var rootElement = new UiElement(new UiHierarchy(), root.getNodeName(), 1, this, root);
 
         // dfs scan all leaf elements
         initializeRec(root, rootElement, leafElements);
@@ -109,7 +110,7 @@ public class Ui {
         } else {
             // is not, continue recurse
 
-            // generate all uielements
+            // generate all UIElement
             val childrenUiElements = new ArrayList<UiElement>();
             for (int i = 0; i < children.getLength(); i++) {
                 Node child = children.item(i);
@@ -122,8 +123,9 @@ public class Ui {
                 }
 
                 childrenUiElements.add(
-                    UiElement.create(rootElement.getHierarchy(), rootElement.getUi(), child.getNodeName(),
-                        lastSameElement == null ? 1 : lastSameElement.getSelfLevel().getIndex() + 1,
+                    new UiElement(rootElement.getHierarchy(), child.getNodeName(),
+                        lastSameElement == null ? 1 : lastSameElement.getIndex() + 1,
+                        rootElement.getUi(),
                         child
                     ));
             }

@@ -1,12 +1,9 @@
 package viccrubs.appautotesting.models;
 
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import lombok.Getter;
 import lombok.var;
-import viccrubs.appautotesting.utils.AppiumUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +41,7 @@ public class UTGNode {
         return Objects.hash(getUi());
     }
 
-    public void addOutEdge(UTGNode end, UiEvent event) {
-        outEdges.add(new UTGEdge(this, end, event));
+    public void addOutEdge(UTGNode end, UiAction action) {
+        outEdges.add(new UTGEdge(this, end, action));
     }
 }
