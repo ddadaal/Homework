@@ -27,6 +27,11 @@ public class UTGNode {
     }
 
     @Override
+    public String toString() {
+        return getUi().toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UTGNode)) return false;

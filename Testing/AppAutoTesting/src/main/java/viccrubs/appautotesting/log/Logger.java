@@ -19,8 +19,8 @@ public interface Logger {
         log(message, LogSeverity.WARNING);
     }
 
-    default void error(String message) {
-        log(message, LogSeverity.ERROR);
+    default void error(String message, Object... params) {
+        log(String.format(message, params), LogSeverity.ERROR);
     }
 
     public static Logger getInstance(String tag) {

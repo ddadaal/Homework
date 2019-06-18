@@ -1,6 +1,7 @@
 package viccrubs.appautotesting;
 
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.appium.java_client.android.AndroidDriver;
@@ -21,6 +22,8 @@ import viccrubs.appautotesting.utils.LaunchArgsUtils;
  * Hello world!
  */
 public final class App implements Logger {
+
+    private ExecutorService terminationThread;
 
     private App(String[] args) {
         launch(args);
@@ -63,22 +66,26 @@ public final class App implements Logger {
 
         verbose("Wait for app launch...");
 
-        AppiumUtils.sleep(2000);
+        AppiumUtils.sleep(5000);
 
         verbose("App launched.");
 
 
-        verbose("UTG initialized. ");
 
         // 开始遍历
         new DFSCrawler(driver).run();
+
+        verbose("App completed. Shutting down");
+        terminationThread.shutdown();
 
     }
 
 
 
     private void startTerminationTimer(int maxRuntimeSeconds) {
-        Executors.newSingleThreadExecutor().submit(() -> {
+        terminationThread = Executors.newSingleThreadExecutor();
+
+        terminationThread.submit(() -> {
             try {
                 Thread.sleep(maxRuntimeSeconds * 1000);
                 System.exit(0);

@@ -20,12 +20,17 @@ public class UTG {
         nodes.add(startNode);
     }
 
-    public boolean addNode(UTGNode node) {
-        if (hasNode(node)) {
-            return false;
+    public UTGNode getNode(UTGNode node) {
+        for (UTGNode existingNode: nodes) {
+            if (existingNode.equals(node)) {
+                return existingNode;
+            }
         }
+        return null;
+    }
+
+    public void addNode(UTGNode node) {
         nodes.add(node);
-        return true;
     }
 
     public boolean hasNode(UTGNode node) {
