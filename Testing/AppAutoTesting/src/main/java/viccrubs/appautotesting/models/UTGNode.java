@@ -1,15 +1,18 @@
 package viccrubs.appautotesting.models;
 
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
+import io.appium.java_client.AppiumDriver;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.var;
-import org.apache.commons.collections.map.HashedMap;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class UTGNode {
-    private @Getter Ui ui;
+
+    private @Getter @Setter int id;
+    private @Getter @Setter Ui ui;
     private @Getter Map<UiAction, UTGNode> outEdges = new HashMap<>();
 
     public static UTGNode create(Ui ui) {
@@ -18,13 +21,13 @@ public class UTGNode {
         return node;
     }
 
-    public static UTGNode create(AndroidDriver<AndroidElement> driver) {
+    public static UTGNode create(AppiumDriver driver) {
         return create(Ui.create(driver));
     }
 
     @Override
     public String toString() {
-        return getUi().toString();
+        return String.format("id: %d, ui: %s", id, getUi());
     }
 
     @Override

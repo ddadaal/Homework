@@ -1,12 +1,8 @@
 package viccrubs.appautotesting.models;
 
-import lombok.Data;
 import lombok.Getter;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class UTG {

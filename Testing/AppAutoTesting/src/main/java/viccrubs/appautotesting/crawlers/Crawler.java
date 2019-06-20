@@ -1,7 +1,6 @@
 package viccrubs.appautotesting.crawlers;
 
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
+import io.appium.java_client.AppiumDriver;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import viccrubs.appautotesting.log.Logger;
@@ -9,7 +8,7 @@ import viccrubs.appautotesting.log.Logger;
 @AllArgsConstructor
 public abstract class Crawler implements Logger {
 
-    protected AndroidDriver<AndroidElement> driver;
+    protected AppiumDriver driver;
 
     @SneakyThrows
     public void sleep(int ms) {

@@ -1,15 +1,15 @@
 package viccrubs.appautotesting.utils;
 
+import lombok.Data;
+import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
+import lombok.var;
+import viccrubs.appautotesting.log.Logger;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-
-import lombok.Data;
-import lombok.SneakyThrows;
-import lombok.var;
-import lombok.experimental.UtilityClass;
-import viccrubs.appautotesting.log.Logger;
 
 @UtilityClass
 public class LaunchArgsUtils implements Logger {
@@ -25,7 +25,7 @@ public class LaunchArgsUtils implements Logger {
 
     public LaunchArgs parseArgs(String[] args) {
 
-        var apkPath = new File(MOCK ? "assets/Bihudaily.apk" : args[0]).getAbsolutePath();
+        var apkPath = new File(MOCK ? "assets/Bilibili.apk" : args[0]).getAbsolutePath();
 
         // parse output
         String appPackage = null;

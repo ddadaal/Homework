@@ -1,14 +1,12 @@
 package viccrubs.appautotesting.models;
 
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
-import lombok.*;
-import org.w3c.dom.Document;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.val;
 import org.w3c.dom.Node;
+import viccrubs.appautotesting.config.Config;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 public class UiElement {
@@ -25,13 +23,16 @@ public class UiElement {
         this.ui = ui;
         this.node = node;
 
-        this.hashCode = Objects.hash(getUi().getActivityName(), getNode());
+        this.hashCode = Objects.hash(getUi().getActivityName(), getHierarchy().getShortenedPath());
     }
 
     public String getXPath() {
         return hierarchy.getXPath();
     }
 
+    public boolean matchConfigElement(Config.Element configElement) {
+        return getAttr(configElement.getKey()).equals(configElement.getValue());
+    }
 
 
     public int getIndex() {
@@ -90,13 +91,14 @@ public class UiElement {
 
     }
 
+    // activity和path一样，就说明是同样的元素
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UiElement)) return false;
         UiElement uiElement = (UiElement) o;
         return Objects.equals(getUi().getActivityName(), uiElement.getUi().getActivityName()) &&
-            Objects.equals(getNode(), uiElement.getNode());
+            Objects.equals(hierarchy.getShortenedPath(), uiElement.hierarchy.getShortenedPath());
     }
 
     private int hashCode;

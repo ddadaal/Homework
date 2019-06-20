@@ -1,23 +1,27 @@
 package viccrubs.appautotesting.models;
 
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
-import lombok.*;
+import io.appium.java_client.AppiumDriver;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.val;
+import lombok.var;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import viccrubs.appautotesting.config.Config;
+import viccrubs.appautotesting.log.Logger;
 
-import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-public class Ui {
+public class Ui implements Logger {
+
     private @Getter final String activityName;
 
     private @Getter final String xmlSource;
@@ -36,7 +40,7 @@ public class Ui {
         return leafElements.stream().allMatch(UiElement::isAccessed);
     }
 
-    public static Ui create(AndroidDriver<AndroidElement> driver) {
+    public static Ui create(AppiumDriver driver) {
         return new Ui(driver.currentActivity(), driver.getPageSource());
     }
 
@@ -48,7 +52,7 @@ public class Ui {
         initialize();
     }
 
-    public @Nullable UiElement getNextUnaccessedElement() {
+    public UiElement getNextUnaccessedElement() {
         for (val element: leafElements) {
             if (!element.isAccessed()) {
                 return element;
@@ -57,9 +61,13 @@ public class Ui {
         return null;
     }
 
+    public Optional<UiElement> findConfigElement(Config.Element configElement) {
+        return leafElements.stream().filter(x -> x.matchConfigElement(configElement)).findFirst();
+    }
+
     @Override
     public String toString() {
-        return String.format("code: %d, activity: %s.%s", hashCode(), currentPackage, activityName);
+        return String.format("code: %d, activity: %s", hashCode(), activityName);
     }
 
     @Override
@@ -98,7 +106,7 @@ public class Ui {
     private void initializeRec(Node root, UiElement rootElement, List<UiElement> result) {
 
         // ignore specified elements
-        if (Config.IGNORED_ELEMENTS.stream().anyMatch(x -> x.match(rootElement))) {
+        if (Config.IGNORED_ELEMENTS.stream().anyMatch(rootElement::matchConfigElement)) {
             return;
         }
 

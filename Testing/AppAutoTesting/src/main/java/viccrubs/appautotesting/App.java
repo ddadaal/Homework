@@ -1,22 +1,19 @@
 package viccrubs.appautotesting;
 
+import io.appium.java_client.AppiumDriver;
+import lombok.SneakyThrows;
+import lombok.val;
+import lombok.var;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import viccrubs.appautotesting.crawlers.DFSCrawler;
+import viccrubs.appautotesting.log.Logger;
+import viccrubs.appautotesting.utils.AppiumUtils;
+import viccrubs.appautotesting.utils.LaunchArgsUtils;
+
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
-import lombok.SneakyThrows;
-import lombok.val;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
-import lombok.var;
-import viccrubs.appautotesting.crawlers.DFSCrawler;
-import viccrubs.appautotesting.log.Logger;
-import viccrubs.appautotesting.models.UTG;
-import viccrubs.appautotesting.models.UTGNode;
-import viccrubs.appautotesting.utils.AppiumUtils;
-import viccrubs.appautotesting.utils.LaunchArgsUtils;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Hello world!
@@ -45,7 +42,7 @@ public final class App implements Logger {
             capabilities.setCapability("udid", props.getDeviceUdid());
         }
         capabilities.setCapability("noSign", "true");
-        capabilities.setCapability("autoGrantPermissions", "true");
+        capabilities.setCapability("autoGrantPermissions", true);
         capabilities.setCapability("automationName", "UiAutomator1");
         capabilities.setCapability("app", props.getAppPath());
 
@@ -55,9 +52,9 @@ public final class App implements Logger {
         capabilities.setCapability("resetKeyboard", "true");
         capabilities.setCapability("newCommandTimeout", 100000);
 
-        val driver = new AndroidDriver<AndroidElement>(new URL(String.format("http://127.0.0.1:%s/wd/hub", props.getPort())), capabilities);
+        val driver = new AppiumDriver(new URL(String.format("http://127.0.0.1:%s/wd/hub", props.getPort())), capabilities);
 
-        AppiumUtils.setDriver(driver);
+        driver.manage().timeouts().implicitlyWait(5000, TimeUnit.MILLISECONDS);
 
         verbose("Driver initialized.");
 

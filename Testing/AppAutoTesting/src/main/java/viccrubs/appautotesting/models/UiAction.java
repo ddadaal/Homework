@@ -1,13 +1,10 @@
 package viccrubs.appautotesting.models;
 
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
+import io.appium.java_client.AppiumDriver;
 import lombok.Data;
 import lombok.val;
 import viccrubs.appautotesting.log.Logger;
 import viccrubs.appautotesting.utils.AppiumUtils;
-
-import javax.annotation.Nullable;
 
 @Data
 public class UiAction implements Logger {
@@ -20,7 +17,7 @@ public class UiAction implements Logger {
         AppiumUtils.sleep(500);
     }
 
-    public void perform(AndroidDriver<AndroidElement> driver) {
+    public void perform(AppiumDriver driver) {
 
         if (type == Type.DOUBLE_BACK) {
             verbose("Execute double back.");
