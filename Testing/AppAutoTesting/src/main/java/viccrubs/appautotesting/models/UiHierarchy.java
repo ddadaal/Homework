@@ -5,6 +5,7 @@ import lombok.var;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UiHierarchy {
     private List<UiHierarchyLevel> levels;
@@ -49,5 +50,18 @@ public class UiHierarchy {
 
     public UiHierarchy() {
         levels = new ArrayList<>();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UiHierarchy)) return false;
+        UiHierarchy that = (UiHierarchy) o;
+        return Objects.equals(levels, that.levels);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(levels);
     }
 }

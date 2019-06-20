@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
-@AllArgsConstructor
+@Data
 public class UiHierarchyLevel {
     @Getter
     private final String tagName;
@@ -16,4 +16,6 @@ public class UiHierarchyLevel {
     public String toString() {
         return String.format("%s[%d]", tagName, index);
     }
+
+
 }

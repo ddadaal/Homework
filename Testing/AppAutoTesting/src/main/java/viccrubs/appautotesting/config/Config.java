@@ -24,4 +24,9 @@ public class Config {
         new Element("resource-id", "android:id/navigationBarBackground"),
         new Element("class", "android.webkit.WebView")
     );
+
+    public static final List<String> INPUTS = Arrays.asList(
+        "Hello",
+        "你好"
+    );
 }

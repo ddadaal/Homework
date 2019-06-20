@@ -33,18 +33,21 @@ public final class App implements Logger {
     private void launch(String[] args) {
         // start
 
-        var launchProps = LaunchArgsUtils.parseArgs(args);
+        var props = LaunchArgsUtils.parseArgs(args);
 
         var capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "");
         capabilities.setCapability("platformName", "Android");
-        capabilities.setCapability("deviceName", launchProps.getDeviceUdid());
-        capabilities.setCapability("appPackage", launchProps.getAppPackage());
-        capabilities.setCapability("appActivity", launchProps.getMainActivity());
+        capabilities.setCapability("deviceName", props.getDeviceUdid());
+        capabilities.setCapability("appPackage", props.getAppPackage());
+        capabilities.setCapability("appActivity", props.getMainActivity());
+        if (!props.getDeviceUdid().equals("Android Emulator")) {
+            capabilities.setCapability("udid", props.getDeviceUdid());
+        }
         capabilities.setCapability("noSign", "true");
         capabilities.setCapability("autoGrantPermissions", "true");
         capabilities.setCapability("automationName", "UiAutomator1");
-        capabilities.setCapability("app", launchProps.getAppPath());
+        capabilities.setCapability("app", props.getAppPath());
 
         //设置使用unicode键盘，支持输入中文和特殊字符
         capabilities.setCapability("unicodeKeyboard", "true");
@@ -52,7 +55,7 @@ public final class App implements Logger {
         capabilities.setCapability("resetKeyboard", "true");
         capabilities.setCapability("newCommandTimeout", 100000);
 
-        val driver = new AndroidDriver<AndroidElement>(new URL(String.format("http://127.0.0.1:%s/wd/hub", launchProps.getPort())), capabilities);
+        val driver = new AndroidDriver<AndroidElement>(new URL(String.format("http://127.0.0.1:%s/wd/hub", props.getPort())), capabilities);
 
         AppiumUtils.setDriver(driver);
 
@@ -60,7 +63,7 @@ public final class App implements Logger {
 
 
         // 最长运行时间timer
-        startTerminationTimer(launchProps.getMaxRuntime());
+        startTerminationTimer(props.getMaxRuntime());
 
         // 等待应用启动完成
 
@@ -73,10 +76,12 @@ public final class App implements Logger {
 
 
         // 开始遍历
-        new DFSCrawler(driver).run();
+        new DFSCrawler(driver, props.getAppPackage()).run();
 
         verbose("App completed. Shutting down");
         terminationThread.shutdown();
+
+        System.exit(0);
 
     }
 

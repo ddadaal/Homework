@@ -7,7 +7,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class UiElement {
     private @Getter final UiHierarchy hierarchy;
@@ -22,6 +24,8 @@ public class UiElement {
         hierarchy = new UiHierarchy(parentHierarchy, tagName, index);
         this.ui = ui;
         this.node = node;
+
+        this.hashCode = Objects.hash(getUi().getActivityName(), getNode());
     }
 
     public String getXPath() {
@@ -62,6 +66,15 @@ public class UiElement {
         return getAttr("text");
     }
 
+    public String getPackage() {
+        return getAttr("package");
+    }
+
+    public boolean getInputable() {
+        val tagNames = Arrays.asList("EditText", "ExtractEditText", "AutoCompleteTextView");
+        return tagNames.stream().anyMatch(x -> getTagName().endsWith(x));
+    }
+
     private boolean getAttrBoolean(String key) {
         return Boolean.getBoolean(getAttr(key));
     }
@@ -75,5 +88,21 @@ public class UiElement {
         return String.format("tag: %s, resource-id: %s, text: %s, path: %s",
             getTagName(), getResourceId(), getText(), hierarchy.getShortenedPath());
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UiElement)) return false;
+        UiElement uiElement = (UiElement) o;
+        return Objects.equals(getUi().getActivityName(), uiElement.getUi().getActivityName()) &&
+            Objects.equals(getNode(), uiElement.getNode());
+    }
+
+    private int hashCode;
+
+    @Override
+    public int hashCode() {
+        return hashCode;
     }
 }

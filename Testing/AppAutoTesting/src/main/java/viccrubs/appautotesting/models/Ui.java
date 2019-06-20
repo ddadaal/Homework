@@ -22,6 +22,8 @@ public class Ui {
 
     private @Getter final String xmlSource;
 
+    private @Getter String currentPackage;
+
     // xml source may change automatically
     // use more stable classname hierarchy as signature
     private @Getter String signature = "";
@@ -57,7 +59,7 @@ public class Ui {
 
     @Override
     public String toString() {
-        return String.format("code: %d, activity: %s", hashCode(), activityName);
+        return String.format("code: %d, activity: %s.%s", hashCode(), currentPackage, activityName);
     }
 
     @Override
@@ -78,14 +80,16 @@ public class Ui {
     private void initialize() {
         leafElements = new ArrayList<>();
 
-        DocumentBuilderFactory dbFactory =
-            DocumentBuilderFactory.newInstance();
+        var dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = dbFactory.newDocumentBuilder();
         xmlDocument = builder.parse(new InputSource(new StringReader(xmlSource)));
 
         Node root = xmlDocument.getFirstChild().getFirstChild(); // hierarchy is the first child
 
         var rootElement = new UiElement(new UiHierarchy(), root.getNodeName(), 1, this, root);
+
+        // set package
+        this.currentPackage = rootElement.getPackage();
 
         // dfs scan all leaf elements
         initializeRec(root, rootElement, leafElements);

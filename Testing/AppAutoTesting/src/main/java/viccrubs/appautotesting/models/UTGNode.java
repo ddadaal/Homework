@@ -4,14 +4,13 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import lombok.Getter;
 import lombok.var;
+import org.apache.commons.collections.map.HashedMap;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class UTGNode {
     private @Getter Ui ui;
-    private @Getter List<UTGEdge> outEdges = new ArrayList<>();
+    private @Getter Map<UiAction, UTGNode> outEdges = new HashMap<>();
 
     public static UTGNode create(Ui ui) {
         var node = new UTGNode();
@@ -42,6 +41,6 @@ public class UTGNode {
     }
 
     public void addOutEdge(UTGNode end, UiAction action) {
-        outEdges.add(new UTGEdge(this, end, action));
+        outEdges.put(action, end);
     }
 }
