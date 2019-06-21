@@ -4,22 +4,28 @@ import io.appium.java_client.AppiumDriver;
 import lombok.Getter;
 import lombok.val;
 import lombok.var;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import viccrubs.appautotesting.config.Config;
 import viccrubs.appautotesting.models.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 public class DFSCrawler extends Crawler {
 
     private int id = 0;
 
-    private @Getter
-    UTG utg;
+    private @Getter UTG utg;
 
     private UTGNode currentNode;
 
     private final String appPackage;
+
+
+    // 上次的操作
+
 
     public DFSCrawler(AppiumDriver driver, String appPackage) {
         super(driver);
@@ -73,12 +79,12 @@ public class DFSCrawler extends Crawler {
         if (utg.hasNode(nowNode)) {
             // 之前到过这个界面，返回之前的界面node
             val oldNode = utg.getNode(nowNode);
-            verbose("Currently on previous node %s", oldNode);
+            verbose("On old node %s", oldNode);
             return oldNode;
         } else {
             // 第一次到这个界面
             nowNode.setId(id++);
-            verbose("Currently on new node %s", nowNode);
+            verbose("On new node %s", nowNode);
             utg.addNode(nowNode);
             return nowNode;
         }
@@ -89,10 +95,40 @@ public class DFSCrawler extends Crawler {
     public void run() {
         main: while (true) {
 
-            // 如果意外退出了应用，就结束程序
+            // 如果意外退出了应用，就依次处理
             // TODO 处理分享请求
             if (!currentNode.getUi().getCurrentPackage().equals(appPackage)) {
-                verbose("Unexpectedly go to activity %s. Exiting program.", currentNode.getUi().getActivityName());
+                val currentPackage = currentNode.getUi().getCurrentPackage();
+                val currentActivity = currentNode.getUi().getActivityName();
+
+                verbose("Unexpectedly go to package %s activity %s.", currentPackage, currentActivity);
+
+                // 看是不是分享界面
+                if (currentPackage.equals("android") && currentActivity.equals("com.android.internal.app.ChooserActivity")) {
+                    verbose("On share panel. Back.");
+
+                    // 是分享界面，设置Node的类型，点击返回，设置新的当前Node
+                    currentNode.setType(UTGNode.Type.SHARE);
+                    UiAction.BACK.perform(driver);
+                    currentNode = getCurrentNode();
+                    continue;
+                }
+
+                // 看是不是crash了
+                if (currentActivity.equals(".Launcher")) {
+                    verbose("On launcher. App might have crashed. Relaunch it and set back to the start node.");
+                    currentNode.setType(UTGNode.Type.CRASH);
+                    driver.closeApp();
+                    driver.launchApp();
+                    currentNode = utg.getStartNode();
+
+                    // 等待启动
+//                    new WebDriverWait(driver, 5000).until((AppiumDriver driver) -> driver.currentActivity().equals(utg.getStartNode().getUi().getActivityName()));
+                    sleep(3000);
+                    continue;
+                }
+
+
                 break;
             }
 
@@ -150,10 +186,12 @@ public class DFSCrawler extends Crawler {
             }
 
             // 一个UI已经遍历结束了，尝试去其他没有遍历过的界面继续
-            verbose("Ui %s completed.", currentNode);
+
+            // 先找一步就能到的
+            verbose("Ui %s completed. Find direct jump to another UI.", currentNode);
 
             for (val edge: currentNode.getOutEdges().entrySet()) {
-                if (!edge.getValue().getUi().completed()) {
+                if (!edge.getValue().completed()) {
                     verbose("To uncompleted UI %s with action %s", edge.getValue().getUi(), edge.getKey());
                     edge.getKey().perform(driver);
 
@@ -167,17 +205,43 @@ public class DFSCrawler extends Crawler {
                 }
             }
 
-            // 这个界面能到的界面都结束了。
-            verbose("No pre-found jump-out to uncompleted UI possible. Try state breaking.");
+            // 这个界面能通过一步到的界面都结束了。
+            // 尝试找一下从另一个界面能跳到未完成的界面
+            verbose("No direct jump to uncompleted UI possible. Try to indirect jump to uncompleted UI.");
 
+            for (val node: utg.getNodes()) {
+                if (!node.completed()) {
+                    // 有一个未完成的界面，找一条路径过去
+                    verbose("Found an uncompleted node %s. Going to it.", node);
+                    val path = utg.findPath(currentNode, node);
+
+                    if (path.isEmpty()) {
+                        // 找不到过去的路，说明还有其他UI。继续找
+                        continue;
+                    }
+
+                    // TODO 可以只进行第一步
+                    // 依次进行每一步
+                    for (val edge: path) {
+                        edge.getAction().perform(driver);
+                    }
+
+                    // 继续
+                    currentNode = getCurrentNode();
+                    continue main;
+                }
+            }
+
+            // 现在这个节点能到的所有界面都已经完成了，尝试用其他方法去其他界面
             // TODO 使用滑动等尝试继续遍历
+            verbose("Can not to uncompleted node. Try state break");
 
             // 尝试右滑
 //            verbose("Try right swipe");
 //            driver.
 
             // 返回
-            verbose("Try back");
+            verbose("Try back。");
             UiAction.BACK.perform(driver);
             var newNode = UTGNode.create(driver);
             if (newNode.equals(currentNode)) {
@@ -204,4 +268,6 @@ public class DFSCrawler extends Crawler {
             break;
         }
     }
+
+
 }
