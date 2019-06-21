@@ -92,7 +92,7 @@ public class DFSCrawler extends Crawler {
             // 如果意外退出了应用，就结束程序
             // TODO 处理分享请求
             if (!currentNode.getUi().getCurrentPackage().equals(appPackage)) {
-                verbose("Unexpectedly go to package %s. Exiting program.", currentNode.getUi().getCurrentPackage());
+                verbose("Unexpectedly go to activity %s. Exiting program.", currentNode.getUi().getActivityName());
                 break;
             }
 

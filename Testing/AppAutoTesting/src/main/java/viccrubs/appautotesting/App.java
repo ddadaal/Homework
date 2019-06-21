@@ -32,6 +32,8 @@ public final class App implements Logger {
 
         var props = LaunchArgsUtils.parseArgs(args);
 
+        verbose("Parsed launch args: %s", props);
+
         var capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "");
         capabilities.setCapability("platformName", "Android");
