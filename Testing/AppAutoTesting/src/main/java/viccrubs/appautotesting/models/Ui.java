@@ -9,6 +9,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXParseException;
 import viccrubs.appautotesting.config.Config;
 import viccrubs.appautotesting.log.Logger;
 
@@ -86,24 +87,37 @@ public class Ui implements Logger {
     // fill signature and leaf elements
     @SneakyThrows
     private void initialize() {
+
         // https://stackoverflow.com/a/11264294/2725415
-        xmlSource = xmlSource.replaceFirst("<\\?xml version=\"1\\.0\" encoding=\"UTF-8\"\\?>", "<?xml version=\"1.1\" encoding=\"UTF-8\"?>");
+        // https://stackoverflow.com/questions/4237625/removing-invalid-xml-characters-from-a-string-in-java
+        xmlSource = xmlSource
+            .replaceFirst("<\\?xml version=\"1\\.0\" encoding=\"UTF-8\"\\?>", "<?xml version=\"1.1\" encoding=\"UTF-8\"?>")
+            .replaceAll("[^"
+                + "\u0001-\uD7FF"
+                + "\uE000-\uFFFD"
+                + "\ud800\udc00-\udbff\udfff"
+                + "]+", "");
 
         leafElements = new ArrayList<>();
 
         var dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = dbFactory.newDocumentBuilder();
-        xmlDocument = builder.parse(new InputSource(new StringReader(xmlSource)));
 
-        Node root = xmlDocument.getFirstChild().getFirstChild(); // hierarchy is the first child
+        try {
+            xmlDocument = builder.parse(new InputSource(new StringReader(xmlSource)));
 
-        var rootElement = new UiElement(new UiHierarchy(), root.getNodeName(), 1, this, root);
+            Node root = xmlDocument.getFirstChild().getFirstChild(); // hierarchy is the first child
 
-        // set package
-        this.currentPackage = rootElement.getPackage();
+            var rootElement = new UiElement(new UiHierarchy(), root.getNodeName(), 1, this, root);
 
-        // dfs scan all leaf elements
-        initializeRec(root, rootElement, leafElements);
+            // set package
+            this.currentPackage = rootElement.getPackage();
+
+            // dfs scan all leaf elements
+            initializeRec(root, rootElement, leafElements);
+        } catch (SAXParseException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initializeRec(Node root, UiElement rootElement, List<UiElement> result) {

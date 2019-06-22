@@ -23,6 +23,10 @@ public interface Logger {
         log(String.format(message, params), LogSeverity.ERROR);
     }
 
+    default void report(String message, Object... params) {
+        log(String.format(message, params), LogSeverity.REPORT);
+    }
+
     public static Logger getInstance(String tag) {
         return new Logger() {
             @Override

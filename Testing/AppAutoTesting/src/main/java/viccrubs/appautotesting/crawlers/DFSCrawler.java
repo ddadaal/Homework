@@ -30,6 +30,12 @@ public class DFSCrawler extends Crawler {
 
     private final String appPackage;
 
+    public void doReport() {
+        report("UI detected %d, completed %d",
+            utg.getNodes().size(),
+            utg.getNodes().stream().filter(UTGNode::completed).count()
+        );
+    }
 
     // 上次的操作
 
@@ -99,7 +105,8 @@ public class DFSCrawler extends Crawler {
 
 
     @Override
-    public void run() {
+    public void doCrawl() {
+
         main:
         while (true) {
 
@@ -109,7 +116,7 @@ public class DFSCrawler extends Crawler {
                 val currentPackage = currentNode.getUi().getCurrentPackage();
                 val currentActivity = currentNode.getUi().getActivityName();
 
-                verbose("Unexpectedly go to package %s activity %s.", currentPackage, currentActivity);
+                verbose("On package %s activity %s.", currentPackage, currentActivity);
 
                 // 看是不是分享界面
                 if (currentPackage.equals("android") && currentActivity.equals("com.android.internal.app.ChooserActivity")) {
@@ -122,7 +129,9 @@ public class DFSCrawler extends Crawler {
                     continue;
                 }
 
-                // 那应该是挂了
+                // TODO 判断浏览器
+
+                // 那应该是挂了，重启试试
                 verbose("App might have crashed. Relaunch it and set back to the start node.");
                 currentNode.setType(UTGNode.Type.CRASH);
                 driver.closeApp();
@@ -177,25 +186,20 @@ public class DFSCrawler extends Crawler {
 
             while ((element = getNextUnaccessedElement()) != null) {
                 setAccessed(element);
-                try {
+                val action = getAction(element);
 
-                    val action = getAction(element);
+                action.perform(driver);
 
-                    action.perform(driver);
+                UTGNode newNode = getCurrentNode();
 
-                    UTGNode newNode = getCurrentNode();
-
-                    // 如果发现UI变了，就加一条新的边到图中，表明在之前的界面发生什么事件能够触发UI转移
-                    // 并进行进入新界面继续搜索
-                    if (!currentNode.equals(newNode)) {
-                        verbose("New transition added: %s to %s by %s", currentNode, newNode, action);
-                        handleNodeChange(newNode, action);
-                        continue main;
-                    }
-
-                } catch (Exception e) {
-                    error("Error occurred.\n%s", e.toString());
+                // 如果发现UI变了，就加一条新的边到图中，表明在之前的界面发生什么事件能够触发UI转移
+                // 并进行进入新界面继续搜索
+                if (!currentNode.equals(newNode)) {
+                    verbose("New transition added: %s to %s by %s", currentNode, newNode, action);
+                    handleNodeChange(newNode, action);
+                    continue main;
                 }
+
             }
 
             // 一个UI已经遍历结束了，尝试去其他没有遍历过的界面继续
@@ -289,6 +293,7 @@ public class DFSCrawler extends Crawler {
             verbose("State break failed. Exiting program");
             break;
         }
+
     }
 
 

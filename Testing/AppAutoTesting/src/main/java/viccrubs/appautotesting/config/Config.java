@@ -44,6 +44,8 @@ public class Config {
         "你好"
     );
 
+    public static final long REPORT_INTERVAL_MS = 20 * 1000;
+
     public static final Map<String, LoginInfo> LOGIN_INFO_MAP = new HashMap<>();
 
     static {
