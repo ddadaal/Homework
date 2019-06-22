@@ -30,7 +30,13 @@ public class Config {
     public static final List<Element> IGNORED_ELEMENTS = Arrays.asList(
         new Element("resource-id", "android:id/statusBarBackground"),
         new Element("resource-id", "android:id/navigationBarBackground"),
-        new Element("class", "android.webkit.WebView")
+        new Element("class", "android.webkit.WebView"),
+
+        // 输入框的清除按钮
+        new Element("resource-id", "name.gudong.translate:id/tv_clear")
+
+        // 回到上一级的按钮，不能忽略，有的app把划出侧边栏的也用Navigate up当做content-desc
+//        new Element("content-desc", "Navigate up")
     );
 
     public static final List<String> INPUTS = Arrays.asList(

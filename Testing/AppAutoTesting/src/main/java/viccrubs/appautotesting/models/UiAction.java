@@ -3,6 +3,8 @@ package viccrubs.appautotesting.models;
 import io.appium.java_client.AppiumDriver;
 import lombok.Data;
 import lombok.val;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import viccrubs.appautotesting.log.Logger;
 import viccrubs.appautotesting.utils.AppiumUtils;
 
@@ -13,8 +15,12 @@ public class UiAction implements Logger {
     private final String inputText;
     private final UiElement element;
 
-    private void sleep() {
-        AppiumUtils.sleep(500);
+    private void sleep(AppiumDriver driver) {
+        // 等1s，或者界面改变
+//        new WebDriverWait(driver, 1000).until((ExpectedCondition) driver -> {
+//
+//        });
+    AppiumUtils.sleep(500);
     }
 
     public void perform(AppiumDriver driver) {
@@ -22,10 +28,8 @@ public class UiAction implements Logger {
         if (type == Type.DOUBLE_BACK) {
             verbose("Execute double back.");
             driver.navigate().back();
-            sleep();
             driver.navigate().back();
-        }
-        if (type == Type.BACK) {
+        } else if (type == Type.BACK) {
             verbose("Execute back.");
             driver.navigate().back();
         } else {
@@ -42,7 +46,7 @@ public class UiAction implements Logger {
             }
         }
 
-        sleep();
+        sleep(driver);
     }
 
     public enum Type {

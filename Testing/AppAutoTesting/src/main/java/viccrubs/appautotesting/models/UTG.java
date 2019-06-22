@@ -47,11 +47,11 @@ public class UTG {
 
     public List<UTGEdge> findPath(UTGNode startNode, UTGNode endNode) {
         val path = new ArrayList<UTGEdge>();
-        findPathRec(startNode, endNode, path);
+        findPathRec(startNode, endNode, path, new HashSet<>());
         return path;
     }
 
-    private boolean findPathRec(UTGNode node, UTGNode target, List<UTGEdge> result) {
+    private boolean findPathRec(UTGNode node, UTGNode target, List<UTGEdge> result, Set<UTGNode> intermediateNodes) {
         if (node.equals(target)) {
             // reached target. return
             return true;
@@ -59,13 +59,28 @@ public class UTG {
 
         // 看从这个点的下一个的哪一点可以到目标
         for (val edge: node.getEdges()) {
+
+            // 中间点
+            val intermediateNote = edge.getEndNode();
+
+            // 看是否成环
+            if (intermediateNodes.contains(intermediateNote)) {
+                continue;
+            }
+
+            // 尝试增加这条边和中间点
             result.add(edge);
-            if (findPathRec(edge.getEndNode(), target, result)) {
+            intermediateNodes.add(intermediateNote);
+
+            // 继续
+            if (findPathRec(intermediateNote, target, result, intermediateNodes)) {
                 // 从这个edge可以到，返回true
                 return true;
             }
-            // 不能到，删掉这个edge
-            result.remove(edge);
+
+            // 不能到，删掉这个edge和中间点
+            result.remove(result.size()-1);
+            intermediateNodes.remove(intermediateNote);
         }
 
         // 这个点并不能到目标

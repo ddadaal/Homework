@@ -87,7 +87,7 @@ public class Ui implements Logger {
     @SneakyThrows
     private void initialize() {
         // https://stackoverflow.com/a/11264294/2725415
-        xmlSource = xmlSource.replaceFirst("<\\?xml version=\"1.0\" encoding=\"UTF-8\"\\?>", "<?xml version=\"1.1\" encoding=\"UTF-8\"?>");
+        xmlSource = xmlSource.replaceFirst("<\\?xml version=\"1\\.0\" encoding=\"UTF-8\"\\?>", "<?xml version=\"1.1\" encoding=\"UTF-8\"?>");
 
         leafElements = new ArrayList<>();
 

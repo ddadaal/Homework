@@ -1,12 +1,18 @@
 package viccrubs.appautotesting.crawlers;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import io.appium.java_client.AppiumDriver;
 import lombok.Getter;
 import lombok.val;
 import lombok.var;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import viccrubs.appautotesting.config.Config;
 import viccrubs.appautotesting.models.*;
+import viccrubs.appautotesting.utils.AppiumUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +23,8 @@ public class DFSCrawler extends Crawler {
 
     private int id = 0;
 
-    private @Getter UTG utg;
+    private @Getter
+    UTG utg;
 
     private UTGNode currentNode;
 
@@ -45,7 +52,7 @@ public class DFSCrawler extends Crawler {
 
     private UiElement getNextUnaccessedElement() {
         val accessed = accessedElementMap.computeIfAbsent(currentNode.getUi().getActivityName(), k -> new HashSet<>());
-        for (val element: currentNode.getUi().getLeafElements()) {
+        for (val element : currentNode.getUi().getLeafElements()) {
             if (!element.isAccessed()) {
                 if (accessed.contains(element)) {
                     element.setAccessed(true);
@@ -93,7 +100,8 @@ public class DFSCrawler extends Crawler {
 
     @Override
     public void run() {
-        main: while (true) {
+        main:
+        while (true) {
 
             // 如果意外退出了应用，就依次处理
             // TODO 处理分享请求
@@ -114,22 +122,22 @@ public class DFSCrawler extends Crawler {
                     continue;
                 }
 
-                // 看是不是crash了
-                if (currentActivity.equals(".Launcher")) {
-                    verbose("On launcher. App might have crashed. Relaunch it and set back to the start node.");
-                    currentNode.setType(UTGNode.Type.CRASH);
-                    driver.closeApp();
-                    driver.launchApp();
-                    currentNode = utg.getStartNode();
+                // 那应该是挂了
+                verbose("App might have crashed. Relaunch it and set back to the start node.");
+                currentNode.setType(UTGNode.Type.CRASH);
+                driver.closeApp();
+                driver.launchApp();
+                currentNode = utg.getStartNode();
 
-                    // 等待启动
-//                    new WebDriverWait(driver, 5000).until((AppiumDriver driver) -> driver.currentActivity().equals(utg.getStartNode().getUi().getActivityName()));
-                    sleep(3000);
-                    continue;
-                }
+                // 等待启动
+                new WebDriverWait(driver, 5000).until((ExpectedCondition<Boolean>) driver -> {
+                    if (driver instanceof AppiumDriver) {
+                        return ((AppiumDriver) driver).currentActivity().equals(utg.getStartNode().getUi().getActivityName());
+                    }
+                    return false;
+                });
 
 
-                break;
             }
 
             // 处理登录界面
@@ -154,7 +162,12 @@ public class DFSCrawler extends Crawler {
                     });
 
                 // 等待登录成功
-                sleep(3000);
+                new WebDriverWait(driver, 5000).until((ExpectedCondition<Boolean>) driver -> {
+                    if (driver instanceof AppiumDriver) {
+                        return !((AppiumDriver) driver).currentActivity().equals(utg.getStartNode().getUi().getActivityName());
+                    }
+                    return false;
+                });
 
                 // 修改当前node的UI为现在的UI
                 currentNode.setUi(Ui.create(driver));
@@ -175,7 +188,7 @@ public class DFSCrawler extends Crawler {
                     // 如果发现UI变了，就加一条新的边到图中，表明在之前的界面发生什么事件能够触发UI转移
                     // 并进行进入新界面继续搜索
                     if (!currentNode.equals(newNode)) {
-                        verbose("New edge added: %s to %s by %s", currentNode, newNode, action);
+                        verbose("New transition added: %s to %s by %s", currentNode, newNode, action);
                         handleNodeChange(newNode, action);
                         continue main;
                     }
@@ -188,9 +201,9 @@ public class DFSCrawler extends Crawler {
             // 一个UI已经遍历结束了，尝试去其他没有遍历过的界面继续
 
             // 先找一步就能到的
-            verbose("Ui %s completed. Find direct jump to another UI.", currentNode);
+            verbose("On completed UI %s. Find direct jump to another UI.", currentNode);
 
-            for (val edge: currentNode.getOutEdges().entrySet()) {
+            for (val edge : currentNode.getOutEdges().entrySet()) {
                 if (!edge.getValue().completed()) {
                     verbose("To uncompleted UI %s with action %s", edge.getValue().getUi(), edge.getKey());
                     edge.getKey().perform(driver);
@@ -207,23 +220,32 @@ public class DFSCrawler extends Crawler {
 
             // 这个界面能通过一步到的界面都结束了。
             // 尝试找一下从另一个界面能跳到未完成的界面
-            verbose("No direct jump to uncompleted UI possible. Try to indirect jump to uncompleted UI.");
+            verbose("No direct jump to uncompleted UI possible. Try indirect jump to uncompleted UI.");
 
-            for (val node: utg.getNodes()) {
+            for (val node : utg.getNodes()) {
                 if (!node.completed()) {
                     // 有一个未完成的界面，找一条路径过去
-                    verbose("Found an uncompleted node %s. Going to it.", node);
-                    val path = utg.findPath(currentNode, node);
+                    verbose("Finding a way to UI %s", node);
 
-                    if (path.isEmpty()) {
-                        // 找不到过去的路，说明还有其他UI。继续找
-                        continue;
-                    }
+                    try {
 
-                    // TODO 可以只进行第一步
-                    // 依次进行每一步
-                    for (val edge: path) {
-                        edge.getAction().perform(driver);
+                        val path = utg.findPath(currentNode, node);
+
+                        if (path.isEmpty()) {
+                            verbose("Can not find such a way. Retry another UI.");
+                            // 找不到过去的路，找其他没完成的UI。继续找
+                            continue;
+                        }
+
+                        verbose("Found a way to uncompleted node %s. Going to it.", node);
+
+                        // TODO 可以只进行第一步
+                        // 依次进行每一步
+                        for (val edge : path) {
+                            edge.getAction().perform(driver);
+                        }
+                    } catch (Throwable e) {
+                        e.printStackTrace();
                     }
 
                     // 继续
@@ -234,7 +256,7 @@ public class DFSCrawler extends Crawler {
 
             // 现在这个节点能到的所有界面都已经完成了，尝试用其他方法去其他界面
             // TODO 使用滑动等尝试继续遍历
-            verbose("Can not to uncompleted node. Try state break");
+            verbose("Can not go to uncompleted node. Try state break");
 
             // 尝试右滑
 //            verbose("Try right swipe");
@@ -243,12 +265,12 @@ public class DFSCrawler extends Crawler {
             // 返回
             verbose("Try back。");
             UiAction.BACK.perform(driver);
-            var newNode = UTGNode.create(driver);
+            var newNode = getCurrentNode();
             if (newNode.equals(currentNode)) {
                 // 再次返回
                 verbose("Back not working. Try back again.");
                 UiAction.BACK.perform(driver);
-                newNode = UTGNode.create(driver);
+                newNode = getCurrentNode();
                 if (newNode.equals(currentNode)) {
                     // 再次返回无效，算了算了
                     verbose("Double back not working.");
