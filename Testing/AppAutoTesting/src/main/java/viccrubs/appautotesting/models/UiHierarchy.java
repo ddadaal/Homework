@@ -2,6 +2,7 @@ package viccrubs.appautotesting.models;
 
 import lombok.val;
 import lombok.var;
+import viccrubs.appautotesting.utils.Lazy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class UiHierarchy {
         return levels.get(levels.size()-1);
     }
 
-    public String getXPath() {
+    private Lazy<String> xpath = new Lazy<>(() -> {
         var sb = new StringBuilder("/hierarchy");
         for (var hierarchyLevel : levels) {
             sb.append("/").append(
@@ -23,9 +24,9 @@ public class UiHierarchy {
             );
         }
         return sb.toString();
-    }
+    });
 
-    public String getShortenedPath() {
+    private Lazy<String> shortenedPath = new Lazy<>(() -> {
         var path = new StringBuilder();
         for (int i=1;i<levels.size();i++) {
             val item = levels.get(i);
@@ -41,11 +42,19 @@ public class UiHierarchy {
         }
 
         return path.toString();
+    });
+
+    public String getXPath() {
+        return xpath.get();
     }
 
-    public UiHierarchy(UiHierarchy parent, String tagName, int index) {
+    public String getShortenedPath() {
+        return shortenedPath.get();
+    }
+
+    public UiHierarchy(UiHierarchy parent, String className, int index) {
         levels = new ArrayList<>(parent.levels);
-        levels.add(new UiHierarchyLevel(tagName, index));
+        levels.add(new UiHierarchyLevel(className, index));
     }
 
     public UiHierarchy() {
@@ -60,8 +69,10 @@ public class UiHierarchy {
         return Objects.equals(levels, that.levels);
     }
 
+    private Lazy<Integer> hashCode = new Lazy<>(() -> Objects.hash(levels));
+
     @Override
     public int hashCode() {
-        return Objects.hash(levels);
+        return hashCode.get();
     }
 }

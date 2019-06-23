@@ -2,6 +2,8 @@ package viccrubs.appautotesting.crawlers;
 
 import io.appium.java_client.AppiumDriver;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import viccrubs.appautotesting.config.Config;
 import viccrubs.appautotesting.log.Logger;
@@ -9,10 +11,14 @@ import viccrubs.appautotesting.log.Logger;
 import java.util.Timer;
 import java.util.TimerTask;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public abstract class Crawler implements Logger {
 
-    protected AppiumDriver driver;
+    protected final AppiumDriver driver;
+
+
+
+    protected @Getter long startTime;
 
     @SneakyThrows
     public void sleep(int ms) {
@@ -24,7 +30,12 @@ public abstract class Crawler implements Logger {
 
     }
 
+    protected long getRunningTime() {
+        return System.currentTimeMillis() - startTime;
+    }
+
     public void startReport() {
+        startTime = System.currentTimeMillis();
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {

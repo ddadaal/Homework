@@ -31,9 +31,10 @@ public class DFSCrawler extends Crawler {
     private final String appPackage;
 
     public void doReport() {
-        report("UI detected %d, completed %d",
+        report("UI detected %d, completed %d, running time in sec: %d",
             utg.getNodes().size(),
-            utg.getNodes().stream().filter(UTGNode::completed).count()
+            utg.getNodes().stream().filter(UTGNode::completed).count(),
+            getRunningTime() / 1000
         );
     }
 
@@ -96,11 +97,15 @@ public class DFSCrawler extends Crawler {
             return oldNode;
         } else {
             // 第一次到这个界面
-            nowNode.setId(id++);
+            nowNode.setId(++id);
             verbose("On new node %s", nowNode);
             utg.addNode(nowNode);
             return nowNode;
         }
+    }
+
+    private boolean isOutOfApp(UTGNode node) {
+        return !node.getUi().getCurrentPackage().equals(appPackage);
     }
 
 
@@ -111,8 +116,7 @@ public class DFSCrawler extends Crawler {
         while (true) {
 
             // 如果意外退出了应用，就依次处理
-            // TODO 处理分享请求
-            if (!currentNode.getUi().getCurrentPackage().equals(appPackage)) {
+            if (isOutOfApp(currentNode)) {
                 val currentPackage = currentNode.getUi().getCurrentPackage();
                 val currentActivity = currentNode.getUi().getActivityName();
 
@@ -129,24 +133,33 @@ public class DFSCrawler extends Crawler {
                     continue;
                 }
 
-                // TODO 判断浏览器
+                // 看能不能返回回来
 
-                // 那应该是挂了，重启试试
-                verbose("App might have crashed. Relaunch it and set back to the start node.");
+                verbose("Try back to app.");
+                UiAction.BACK.perform(driver);
+                val nowNode = getCurrentNode();
+                if (!isOutOfApp(nowNode)) {
+                    verbose("Back to app. Continue");
+                    // 设置Node类型
+                    currentNode.setType(UTGNode.Type.CALL_TO_OTHER_APP);
+                    currentNode = nowNode;
+                    continue;
+                }
+
+                // 都不能返回回来，那应该是挂了，重启试试
+                verbose("Can not back to app. App might have crashed. Relaunch it and set back to the start node.");
                 currentNode.setType(UTGNode.Type.CRASH);
                 driver.closeApp();
                 driver.launchApp();
-                currentNode = utg.getStartNode();
 
                 // 等待启动
-                new WebDriverWait(driver, 5000).until((ExpectedCondition<Boolean>) driver -> {
-                    if (driver instanceof AppiumDriver) {
-                        return ((AppiumDriver) driver).currentActivity().equals(utg.getStartNode().getUi().getActivityName());
-                    }
-                    return false;
-                });
+                long startTime = System.currentTimeMillis();
+                new WebDriverWait(driver, 100).until((ExpectedCondition<Boolean>) d ->
+                    driver.currentActivity().equals(utg.getStartNode().getUi().getActivityName())
+                );
 
-
+                currentNode = getCurrentNode();
+                verbose("App relaunched. Took %d ms", System.currentTimeMillis() - startTime);
             }
 
             // 处理登录界面
@@ -171,7 +184,7 @@ public class DFSCrawler extends Crawler {
                     });
 
                 // 等待登录成功
-                new WebDriverWait(driver, 5000).until((ExpectedCondition<Boolean>) driver -> {
+                new WebDriverWait(driver, 10).until((ExpectedCondition<Boolean>) driver -> {
                     if (driver instanceof AppiumDriver) {
                         return !((AppiumDriver) driver).currentActivity().equals(utg.getStartNode().getUi().getActivityName());
                     }
@@ -212,6 +225,7 @@ public class DFSCrawler extends Crawler {
                     verbose("To uncompleted UI %s with action %s", edge.getValue().getUi(), edge.getKey());
                     edge.getKey().perform(driver);
 
+                    // 路径已经改变了，修改路径
                     val nowNode = getCurrentNode();
                     if (!nowNode.equals(edge.getValue())) {
                         verbose("Edge changed, now to UI %s", currentNode);
@@ -229,24 +243,30 @@ public class DFSCrawler extends Crawler {
             for (val node : utg.getNodes()) {
                 if (!node.completed()) {
                     // 有一个未完成的界面，找一条路径过去
-                    verbose("Finding a way to UI %s", node);
+//                    verbose("Finding a way to UI %s", node);
 
                     try {
 
                         val path = utg.findPath(currentNode, node);
 
                         if (path.isEmpty()) {
-                            verbose("Can not find such a way. Retry another UI.");
+//                            verbose("Can not find such a way. Retry another UI.");
                             // 找不到过去的路，找其他没完成的UI。继续找
                             continue;
                         }
 
                         verbose("Found a way to uncompleted node %s. Going to it.", node);
 
-                        // TODO 可以只进行第一步
                         // 依次进行每一步
                         for (val edge : path) {
                             edge.getAction().perform(driver);
+                            val nowNode = getCurrentNode();
+                            if (!nowNode.equals(edge.getEndNode())) {
+                                // 路径已经改变了，修改记录值，并不要继续操作了，重新开始
+                                edge.getStartNode().addOutEdge(nowNode, edge.getAction());
+                                currentNode = nowNode;
+                                continue main;
+                            }
                         }
                     } catch (Throwable e) {
                         e.printStackTrace();
@@ -267,34 +287,41 @@ public class DFSCrawler extends Crawler {
 //            driver.
 
             // 返回
-            verbose("Try back。");
-            UiAction.BACK.perform(driver);
-            var newNode = getCurrentNode();
-            if (newNode.equals(currentNode)) {
-                // 再次返回
-                verbose("Back not working. Try back again.");
+            if (!currentNode.getOutEdges().containsKey(UiAction.BACK)) {
+                // 如果没试过返回，就试试返回
+                verbose("Try back。");
                 UiAction.BACK.perform(driver);
-                newNode = getCurrentNode();
+                var newNode = getCurrentNode();
                 if (newNode.equals(currentNode)) {
-                    // 再次返回无效，算了算了
+                    verbose("Back not working.");
+                } else {
+                    verbose("Back to UI %s", newNode.getUi());
+                    handleNodeChange(newNode, UiAction.BACK);
+                    continue;
+                }
+            }
+
+
+            // 两次返回
+            if (!currentNode.getOutEdges().containsKey(UiAction.DOUBLE_BACK)) {
+                // 刚点了一次，先休息一会再点两次
+                sleep(1000);
+                verbose("Try double back.");
+                UiAction.DOUBLE_BACK.perform(driver);
+                var newNode = getCurrentNode();
+                if (newNode.equals(currentNode)) {
                     verbose("Double back not working.");
                 } else {
                     verbose("Double back to UI %s", newNode.getUi());
                     handleNodeChange(newNode, UiAction.DOUBLE_BACK);
                     continue;
                 }
-            } else {
-                verbose("Backed to UI %s", newNode.getUi());
-                handleNodeChange(newNode, UiAction.BACK);
-                continue;
             }
-
 
             verbose("State break failed. Exiting program");
             break;
         }
 
     }
-
 
 }

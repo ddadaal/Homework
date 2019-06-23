@@ -1,5 +1,6 @@
 package viccrubs.appautotesting.log;
 
+
 import java.time.LocalDateTime;
 
 public interface Logger {
@@ -8,7 +9,9 @@ public interface Logger {
     }
 
     default void log(String message, LogSeverity severity) {
-        System.out.println(String.format("[%s] [%s] [%s] %s", LocalDateTime.now().toString(), getLoggerTag(), severity, message));
+        System.out.println(String.format("[%s] [%s] [%s] %s",
+            LocalDateTime.now().toString(), getLoggerTag(), severity, message)
+        );
     }
 
     default void verbose(String message, Object... params) {

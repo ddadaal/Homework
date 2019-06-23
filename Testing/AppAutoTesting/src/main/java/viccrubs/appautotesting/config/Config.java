@@ -28,15 +28,23 @@ public class Config {
     }
 
     public static final List<Element> IGNORED_ELEMENTS = Arrays.asList(
+        // 状态栏和导航栏
         new Element("resource-id", "android:id/statusBarBackground"),
         new Element("resource-id", "android:id/navigationBarBackground"),
         new Element("class", "android.webkit.WebView"),
 
         // 输入框的清除按钮
-        new Element("resource-id", "name.gudong.translate:id/tv_clear")
+        new Element("resource-id", "name.gudong.translate:id/tv_clear"),
+        new Element("resource-id", "com.danmo.ithouse:id/iv_search_clear")
 
         // 回到上一级的按钮，不能忽略，有的app把划出侧边栏的也用Navigate up当做content-desc
 //        new Element("content-desc", "Navigate up")
+    );
+
+    // 回到上一级的按钮，把他和当前界面最后一个元素对调
+    public static final List<Element> NAVIGATE_UP_ELEMENTS = Arrays.asList(
+        new Element("content-desc", "Navigate up")
+//        new Element("resource-id", "com.danmo.ithouse:id/iv_search_back")
     );
 
     public static final List<String> INPUTS = Arrays.asList(

@@ -5,8 +5,10 @@ import lombok.Setter;
 import lombok.val;
 import org.w3c.dom.Node;
 import viccrubs.appautotesting.config.Config;
+import viccrubs.appautotesting.utils.Lazy;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class UiElement {
@@ -22,8 +24,6 @@ public class UiElement {
         hierarchy = new UiHierarchy(parentHierarchy, tagName, index);
         this.ui = ui;
         this.node = node;
-
-        this.hashCode = Objects.hash(getUi().getActivityName(), getHierarchy().getShortenedPath());
     }
 
     public String getXPath() {
@@ -34,6 +34,9 @@ public class UiElement {
         return getAttr(configElement.getKey()).equals(configElement.getValue());
     }
 
+    public boolean matchConfigElement(List<Config.Element> configElements) {
+        return configElements.stream().anyMatch(this::matchConfigElement);
+    }
 
     public int getIndex() {
         return hierarchy.getSelf().getIndex();
@@ -44,19 +47,19 @@ public class UiElement {
     }
 
     public boolean getClickable() {
-        return getAttrBoolean("clickable");
+        return getBooleanAttr("clickable");
     }
 
     public boolean getScrollable() {
-        return getAttrBoolean("scrollable");
+        return getBooleanAttr("scrollable");
     }
 
     public boolean getEnabled() {
-        return getAttrBoolean("enabled");
+        return getBooleanAttr("enabled");
     }
 
     public boolean getLongClickable() {
-        return getAttrBoolean("longClickable");
+        return getBooleanAttr("longClickable");
     }
 
     public String getResourceId() {
@@ -76,7 +79,7 @@ public class UiElement {
         return tagNames.stream().anyMatch(x -> getTagName().endsWith(x));
     }
 
-    private boolean getAttrBoolean(String key) {
+    private boolean getBooleanAttr(String key) {
         return Boolean.getBoolean(getAttr(key));
     }
 
@@ -101,10 +104,11 @@ public class UiElement {
             Objects.equals(hierarchy.getShortenedPath(), uiElement.hierarchy.getShortenedPath());
     }
 
-    private int hashCode;
+    private Lazy<Integer> hashCode = new Lazy<>(() ->
+        Objects.hash(getUi().getActivityName(), getHierarchy().getShortenedPath()));
 
     @Override
     public int hashCode() {
-        return hashCode;
+        return hashCode.get();
     }
 }

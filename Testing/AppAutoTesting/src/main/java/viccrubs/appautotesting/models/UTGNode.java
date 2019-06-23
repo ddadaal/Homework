@@ -15,7 +15,8 @@ public class UTGNode {
     public enum Type {
         NORMAL,
         CRASH, // 挂了的节点
-        SHARE // 分享面板
+        SHARE, // 分享面板
+        CALL_TO_OTHER_APP // 正常点击去的另一个界面，比如浏览器
     }
 
     private @Getter @Setter int id;

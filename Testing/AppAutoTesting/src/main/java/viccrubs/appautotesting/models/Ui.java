@@ -12,30 +12,34 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import viccrubs.appautotesting.config.Config;
 import viccrubs.appautotesting.log.Logger;
+import viccrubs.appautotesting.utils.XmlUtils;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class Ui implements Logger {
 
-    private @Getter final String activityName;
+    private @Getter
+    final String activityName;
 
-    private @Getter String xmlSource;
+    private @Getter
+    String xmlSource;
 
-    private @Getter String currentPackage;
+    private @Getter
+    String currentPackage;
 
     // xml source may change automatically
     // use more stable classname hierarchy as signature
-    private @Getter String signature = "";
+    private @Getter
+    String signature = "";
 
-    private @Getter Document xmlDocument;
+    private @Getter
+    Document xmlDocument;
 
-    private @Getter List<UiElement> leafElements;
+    private @Getter
+    List<UiElement> leafElements;
 
     public boolean completed() {
         return leafElements.stream().allMatch(UiElement::isAccessed);
@@ -45,21 +49,30 @@ public class Ui implements Logger {
         return new Ui(driver.currentActivity(), driver.getPageSource());
     }
 
+    // 亲测初始化一个UI只需要2-4ms
     public Ui(String activityName, String xmlSource) {
+//        long startTime = System.currentTimeMillis();
+
         this.activityName = activityName;
         this.xmlSource = xmlSource;
 
         // initialize
         initialize();
-    }
 
-    public UiElement getNextUnaccessedElement() {
-        for (val element: leafElements) {
-            if (!element.isAccessed()) {
-                return element;
-            }
+        // hack: if the first element is a navigate up, push it on the last one
+        if (!leafElements.isEmpty() && leafElements.get(0).matchConfigElement(Config.NAVIGATE_UP_ELEMENTS)) {
+            val element = leafElements.get(0);
+            leafElements.remove(0);
+            leafElements.add(element);
         }
-        return null;
+
+
+        // hack: if the first element is a navigate up, swap it with the last one
+//        if (!leafElements.isEmpty() && leafElements.get(0).matchConfigElement(Config.NAVIGATE_UP_ELEMENTS)) {
+//            Collections.swap(leafElements, 0, leafElements.size() - 1);
+//        }
+
+//        verbose("UI Created in %d", System.currentTimeMillis() - startTime);
     }
 
     public Optional<UiElement> findConfigElement(Config.Element configElement) {
@@ -76,12 +89,14 @@ public class Ui implements Logger {
         if (this == o) return true;
         if (!(o instanceof Ui)) return false;
         Ui ui = (Ui) o;
-        return getSignature().equals(ui.getSignature());
+        return hashCode() == ui.hashCode();
     }
+
+    private int hashCode;
 
     @Override
     public int hashCode() {
-        return Objects.hash(getSignature());
+        return hashCode;
     }
 
     // fill signature and leaf elements
@@ -90,13 +105,15 @@ public class Ui implements Logger {
 
         // https://stackoverflow.com/a/11264294/2725415
         // https://stackoverflow.com/questions/4237625/removing-invalid-xml-characters-from-a-string-in-java
-        xmlSource = xmlSource
-            .replaceFirst("<\\?xml version=\"1\\.0\" encoding=\"UTF-8\"\\?>", "<?xml version=\"1.1\" encoding=\"UTF-8\"?>")
-            .replaceAll("[^"
-                + "\u0001-\uD7FF"
-                + "\uE000-\uFFFD"
-                + "\ud800\udc00-\udbff\udfff"
-                + "]+", "");
+//        xmlSource = xmlSource
+//            .replaceFirst("<\\?xml version=\"1\\.0\" encoding=\"UTF-8\"\\?>", "<?xml version=\"1.1\" encoding=\"UTF-8\"?>")
+//            .replaceAll("[^"
+//                + "\u0001-\uD7FF"
+//                + "\uE000-\uFFFD"
+//                + "\ud800\udc00-\udbff\udfff"
+//                + "]+", "");
+
+        xmlSource = XmlUtils.getCleanedXml(xmlSource);
 
         leafElements = new ArrayList<>();
 
@@ -108,13 +125,17 @@ public class Ui implements Logger {
 
             Node root = xmlDocument.getFirstChild().getFirstChild(); // hierarchy is the first child
 
-            var rootElement = new UiElement(new UiHierarchy(), root.getNodeName(), 1, this, root);
+            var rootElement = new UiElement(new UiHierarchy(), XmlUtils.getNodeTagName(root), 1, this, root);
 
             // set package
             this.currentPackage = rootElement.getPackage();
 
             // dfs scan all leaf elements
             initializeRec(root, rootElement, leafElements);
+
+            // calculate hashcode
+            hashCode = Objects.hash(getSignature());
+
         } catch (SAXParseException e) {
             e.printStackTrace();
         }
@@ -142,17 +163,21 @@ public class Ui implements Logger {
             // generate all UIElement
             val childrenUiElements = new ArrayList<UiElement>();
             for (int i = 0; i < children.getLength(); i++) {
+
                 Node child = children.item(i);
+
+                val tagName = XmlUtils.getNodeTagName(child);
+
                 UiElement lastSameElement = null;
                 for (int j = childrenUiElements.size() - 1; j >= 0; j--) {
-                    if (childrenUiElements.get(j).getTagName().equals(child.getNodeName())) {
+                    if (childrenUiElements.get(j).getTagName().equals(tagName)) {
                         lastSameElement = childrenUiElements.get(j);
                         break;
                     }
                 }
 
                 childrenUiElements.add(
-                    new UiElement(rootElement.getHierarchy(), child.getNodeName(),
+                    new UiElement(rootElement.getHierarchy(), tagName,
                         lastSameElement == null ? 1 : lastSameElement.getIndex() + 1,
                         rootElement.getUi(),
                         child
@@ -161,7 +186,6 @@ public class Ui implements Logger {
 
             for (int i = 0; i < children.getLength(); i++) {
                 initializeRec(children.item(i), childrenUiElements.get(i), result);
-
             }
         }
     }

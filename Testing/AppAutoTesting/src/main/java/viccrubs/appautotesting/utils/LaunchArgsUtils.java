@@ -25,7 +25,7 @@ public class LaunchArgsUtils implements Logger {
 
     public LaunchArgs parseArgs(String[] args) {
 
-        var apkPath = new File(MOCK ? "assets/IThouse.apk" : args[0]).getAbsolutePath();
+        var apkPath = new File(MOCK ? "assets/GuDong.apk" : args[0]).getAbsolutePath();
 
         // parse output
         String appPackage = null;
@@ -40,7 +40,7 @@ public class LaunchArgsUtils implements Logger {
         }
 
         if (MOCK) {
-            return new LaunchArgs(apkPath, appPackage, mainActivity, "Android Emulator", "4723", 3600);
+            return new LaunchArgs(apkPath, appPackage, mainActivity, "Android Emulator", "4723", 1200);
         } else {
             return new LaunchArgs(apkPath, appPackage, mainActivity, args[1], args[2], Integer.parseInt(args[3]));
         }
