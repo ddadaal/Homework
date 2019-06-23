@@ -41,6 +41,8 @@ public class Config {
         // 输入框的清除按钮
         new Element("resource-id", "name.gudong.translate:id/tv_clear"),
         new Element("resource-id", "com.danmo.ithouse:id/iv_search_clear"),
+        new Element("resource-id", "com.hotbitmapgg.ohmybilibili:id/action_empty_btn"),
+        new Element("resource-id", "com.hotbitmapgg.ohmybilibili:id/search_text_clear"),
 
         // hack: Jiandou标签分类
         new Element("resource-id", "com.lhr.jiandou:id/pager_f_labelmovie")

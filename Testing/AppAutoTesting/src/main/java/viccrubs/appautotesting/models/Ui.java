@@ -48,11 +48,11 @@ public class Ui implements Logger {
     public static Ui create(AppiumDriver driver) {
         long startTime = System.currentTimeMillis();
         val ui = new Ui(driver.currentActivity(), driver.getPageSource());
-        System.out.println("UI created in " + (System.currentTimeMillis() - startTime));
+//        ui.verbose("UI created in " + (System.currentTimeMillis() - startTime));
         return ui;
     }
 
-    // 亲测初始化一个UI只需要2-4ms, 加上driver.currentActivity和pageSource就得花200ms+
+    // 亲测初始化一个UI只需要2-4ms, 加上driver.currentActivity和pageSource就得花100-300ms的样子，长的界面可能会上秒
     public Ui(String activityName, String xmlSource) {
 //        long startTime = System.currentTimeMillis();
 

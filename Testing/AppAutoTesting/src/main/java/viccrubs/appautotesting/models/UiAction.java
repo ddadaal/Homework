@@ -40,8 +40,11 @@ public class UiAction implements Logger {
                     continue trialLoop;
                 }
             }
+
+            // interval内都没有变，退出循环，继续
+            break;
         }
-        verbose("Ui stabled. Change time: %d, wait time: %d", trialTime, System.currentTimeMillis() - startTime);
+        verbose("Ui stabilized. Change time: %d, wait time: %d", trialTime, System.currentTimeMillis() - startTime);
     }
 
     // baseUi是作为判断界面有没有变化的标准
