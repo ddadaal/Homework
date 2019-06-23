@@ -1,9 +1,7 @@
 package viccrubs.appautotesting.config;
 
 
-import com.google.common.collect.Maps;
 import lombok.Data;
-import viccrubs.appautotesting.models.UiElement;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +25,13 @@ public class Config {
         private final Element loginBtn;
     }
 
+    @Data
+    public static class PermissionConfig {
+        private final String packageName;
+        private final String activityName;
+        private final Element btnLogin;
+    }
+
     public static final List<Element> IGNORED_ELEMENTS = Arrays.asList(
         // 状态栏和导航栏
         new Element("resource-id", "android:id/statusBarBackground"),
@@ -35,7 +40,10 @@ public class Config {
 
         // 输入框的清除按钮
         new Element("resource-id", "name.gudong.translate:id/tv_clear"),
-        new Element("resource-id", "com.danmo.ithouse:id/iv_search_clear")
+        new Element("resource-id", "com.danmo.ithouse:id/iv_search_clear"),
+
+        // hack: Jiandou标签分类
+        new Element("resource-id", "com.lhr.jiandou:id/pager_f_labelmovie")
 
         // 回到上一级的按钮，不能忽略，有的app把划出侧边栏的也用Navigate up当做content-desc
 //        new Element("content-desc", "Navigate up")
@@ -55,6 +63,12 @@ public class Config {
     public static final long REPORT_INTERVAL_MS = 20 * 1000;
 
     public static final Map<String, LoginInfo> LOGIN_INFO_MAP = new HashMap<>();
+
+    public static final List<PermissionConfig> PERMISSION_CONFIGS = Arrays.asList(
+        new PermissionConfig("com.android.packageinstaller", ".permission.ui.GrantPermissionsActivity",
+            new Element("resource-id", "com.android.packageinstaller:id/permission_allow_button")
+        )
+    );
 
     static {
         // bilibili

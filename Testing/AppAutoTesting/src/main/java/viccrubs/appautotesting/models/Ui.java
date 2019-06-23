@@ -46,10 +46,13 @@ public class Ui implements Logger {
     }
 
     public static Ui create(AppiumDriver driver) {
-        return new Ui(driver.currentActivity(), driver.getPageSource());
+        long startTime = System.currentTimeMillis();
+        val ui = new Ui(driver.currentActivity(), driver.getPageSource());
+        System.out.println("UI created in " + (System.currentTimeMillis() - startTime));
+        return ui;
     }
 
-    // 亲测初始化一个UI只需要2-4ms
+    // 亲测初始化一个UI只需要2-4ms, 加上driver.currentActivity和pageSource就得花200ms+
     public Ui(String activityName, String xmlSource) {
 //        long startTime = System.currentTimeMillis();
 
@@ -89,7 +92,7 @@ public class Ui implements Logger {
         if (this == o) return true;
         if (!(o instanceof Ui)) return false;
         Ui ui = (Ui) o;
-        return hashCode() == ui.hashCode();
+        return hashCode == ui.hashCode;
     }
 
     private int hashCode;
@@ -117,28 +120,24 @@ public class Ui implements Logger {
 
         leafElements = new ArrayList<>();
 
-        var dbFactory = DocumentBuilderFactory.newInstance();
+        val dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = dbFactory.newDocumentBuilder();
 
-        try {
-            xmlDocument = builder.parse(new InputSource(new StringReader(xmlSource)));
+        xmlDocument = builder.parse(new InputSource(new StringReader(xmlSource)));
 
-            Node root = xmlDocument.getFirstChild().getFirstChild(); // hierarchy is the first child
+        Node root = xmlDocument.getFirstChild().getFirstChild(); // hierarchy is the first child
 
-            var rootElement = new UiElement(new UiHierarchy(), XmlUtils.getNodeTagName(root), 1, this, root);
+        var rootElement = new UiElement(new UiHierarchy(), XmlUtils.getNodeTagName(root), 1, this, root);
 
-            // set package
-            this.currentPackage = rootElement.getPackage();
+        // set package
+        this.currentPackage = rootElement.getPackage();
 
-            // dfs scan all leaf elements
-            initializeRec(root, rootElement, leafElements);
+        // dfs scan all leaf elements
+        initializeRec(root, rootElement, leafElements);
 
-            // calculate hashcode
-            hashCode = Objects.hash(getSignature());
+        // calculate hashcode
+        hashCode = Objects.hash(getSignature());
 
-        } catch (SAXParseException e) {
-            e.printStackTrace();
-        }
     }
 
     private void initializeRec(Node root, UiElement rootElement, List<UiElement> result) {

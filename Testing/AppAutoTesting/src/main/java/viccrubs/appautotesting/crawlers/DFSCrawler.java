@@ -1,23 +1,16 @@
 package viccrubs.appautotesting.crawlers;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import io.appium.java_client.AppiumDriver;
 import lombok.Getter;
 import lombok.val;
 import lombok.var;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import viccrubs.appautotesting.config.Config;
 import viccrubs.appautotesting.models.*;
-import viccrubs.appautotesting.utils.AppiumUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 public class DFSCrawler extends Crawler {
 
@@ -53,7 +46,7 @@ public class DFSCrawler extends Crawler {
     private HashMap<String, HashSet<UiElement>> accessedElementMap = new HashMap<>();
 
     private void handleNodeChange(UTGNode newNode, UiAction action) {
-        currentNode.addOutEdge(newNode, action);
+        currentNode.setOutEdge(newNode, action);
         currentNode = newNode;
     }
 
@@ -128,20 +121,19 @@ public class DFSCrawler extends Crawler {
 
                     // 是分享界面，设置Node的类型，点击返回，设置新的当前Node
                     currentNode.setType(UTGNode.Type.SHARE);
-                    UiAction.BACK.perform(driver);
+                    UiAction.BACK.perform(driver, currentNode.getUi());
                     currentNode = getCurrentNode();
                     continue;
                 }
 
                 // 看能不能返回回来
-
                 verbose("Try back to app.");
-                UiAction.BACK.perform(driver);
+                UiAction.BACK.perform(driver, currentNode.getUi());
                 val nowNode = getCurrentNode();
                 if (!isOutOfApp(nowNode)) {
                     verbose("Back to app. Continue");
                     // 设置Node类型
-                    currentNode.setType(UTGNode.Type.CALL_TO_OTHER_APP);
+                    currentNode.setType(UTGNode.Type.EXTERNAL_APP);
                     currentNode = nowNode;
                     continue;
                 }
@@ -154,8 +146,9 @@ public class DFSCrawler extends Crawler {
 
                 // 等待启动
                 long startTime = System.currentTimeMillis();
-                new WebDriverWait(driver, 100).until((ExpectedCondition<Boolean>) d ->
-                    driver.currentActivity().equals(utg.getStartNode().getUi().getActivityName())
+                new WebDriverWait(driver, 10).until((ExpectedCondition<Boolean>) d ->
+//                    driver.currentActivity().equals(utg.getStartNode().getUi().getActivityName())
+                    getCurrentNode().equals(utg.getStartNode())
                 );
 
                 currentNode = getCurrentNode();
@@ -170,26 +163,23 @@ public class DFSCrawler extends Crawler {
                 // 查找各个元素并输入内容
                 currentNode.getUi().findConfigElement(loginInfo.getUsernameField())
                     .ifPresent(usernameField -> {
-                        new UiAction(UiAction.Type.INPUT, loginInfo.getUsername(), usernameField).perform(driver);
+                        new UiAction(UiAction.Type.INPUT, loginInfo.getUsername(), usernameField).perform(driver, currentNode.getUi());
                     });
 
                 currentNode.getUi().findConfigElement(loginInfo.getPasswordField())
                     .ifPresent(passwordField -> {
-                        new UiAction(UiAction.Type.INPUT, loginInfo.getPassword(), passwordField).perform(driver);
+                        new UiAction(UiAction.Type.INPUT, loginInfo.getPassword(), passwordField).perform(driver, currentNode.getUi());
                     });
 
                 currentNode.getUi().findConfigElement(loginInfo.getLoginBtn())
                     .ifPresent(loginBtn -> {
-                        new UiAction(UiAction.Type.CLICK, null, loginBtn).perform(driver);
+                        new UiAction(UiAction.Type.CLICK, null, loginBtn).perform(driver, currentNode.getUi());
                     });
 
-                // 等待登录成功
-                new WebDriverWait(driver, 10).until((ExpectedCondition<Boolean>) driver -> {
-                    if (driver instanceof AppiumDriver) {
-                        return !((AppiumDriver) driver).currentActivity().equals(utg.getStartNode().getUi().getActivityName());
-                    }
-                    return false;
-                });
+                // 等待登录成功，activity改变即认为登录完成
+                new WebDriverWait(driver, 10).until((ExpectedCondition<Boolean>) d ->
+                    !driver.currentActivity().equals(utg.getStartNode().getUi().getActivityName())
+                );
 
                 // 修改当前node的UI为现在的UI
                 currentNode.setUi(Ui.create(driver));
@@ -201,7 +191,7 @@ public class DFSCrawler extends Crawler {
                 setAccessed(element);
                 val action = getAction(element);
 
-                action.perform(driver);
+                action.perform(driver, currentNode.getUi());
 
                 UTGNode newNode = getCurrentNode();
 
@@ -223,13 +213,13 @@ public class DFSCrawler extends Crawler {
             for (val edge : currentNode.getOutEdges().entrySet()) {
                 if (!edge.getValue().completed()) {
                     verbose("To uncompleted UI %s with action %s", edge.getValue().getUi(), edge.getKey());
-                    edge.getKey().perform(driver);
+                    edge.getKey().perform(driver, currentNode.getUi());
 
                     // 路径已经改变了，修改路径
                     val nowNode = getCurrentNode();
                     if (!nowNode.equals(edge.getValue())) {
                         verbose("Edge changed, now to UI %s", currentNode);
-                        currentNode.addOutEdge(nowNode, edge.getKey());
+                        currentNode.setOutEdge(nowNode, edge.getKey());
                     }
                     currentNode = nowNode;
                     continue main;
@@ -238,7 +228,7 @@ public class DFSCrawler extends Crawler {
 
             // 这个界面能通过一步到的界面都结束了。
             // 尝试找一下从另一个界面能跳到未完成的界面
-            verbose("No direct jump to uncompleted UI possible. Try indirect jump to uncompleted UI.");
+            verbose("No direct jump to uncompleted UI. Try indirect jump to uncompleted UI.");
 
             for (val node : utg.getNodes()) {
                 if (!node.completed()) {
@@ -257,13 +247,14 @@ public class DFSCrawler extends Crawler {
 
                         verbose("Found a way to uncompleted node %s. Going to it.", node);
 
+                        var nowNode = currentNode;
                         // 依次进行每一步
                         for (val edge : path) {
-                            edge.getAction().perform(driver);
-                            val nowNode = getCurrentNode();
+                            edge.getAction().perform(driver, nowNode.getUi());
+                            nowNode = getCurrentNode();
                             if (!nowNode.equals(edge.getEndNode())) {
                                 // 路径已经改变了，修改记录值，并不要继续操作了，重新开始
-                                edge.getStartNode().addOutEdge(nowNode, edge.getAction());
+                                edge.getStartNode().setOutEdge(nowNode, edge.getAction());
                                 currentNode = nowNode;
                                 continue main;
                             }
@@ -290,7 +281,7 @@ public class DFSCrawler extends Crawler {
             if (!currentNode.getOutEdges().containsKey(UiAction.BACK)) {
                 // 如果没试过返回，就试试返回
                 verbose("Try back。");
-                UiAction.BACK.perform(driver);
+                UiAction.BACK.perform(driver, currentNode.getUi());
                 var newNode = getCurrentNode();
                 if (newNode.equals(currentNode)) {
                     verbose("Back not working.");
@@ -307,7 +298,7 @@ public class DFSCrawler extends Crawler {
                 // 刚点了一次，先休息一会再点两次
                 sleep(1000);
                 verbose("Try double back.");
-                UiAction.DOUBLE_BACK.perform(driver);
+                UiAction.DOUBLE_BACK.perform(driver, currentNode.getUi());
                 var newNode = getCurrentNode();
                 if (newNode.equals(currentNode)) {
                     verbose("Double back not working.");

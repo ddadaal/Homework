@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import lombok.var;
+import viccrubs.appautotesting.utils.Lazy;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,7 +17,7 @@ public class UTGNode {
         NORMAL,
         CRASH, // 挂了的节点
         SHARE, // 分享面板
-        CALL_TO_OTHER_APP // 正常点击去的另一个界面，比如浏览器
+        EXTERNAL_APP // 正常点击去的另一个界面，比如浏览器
     }
 
     private @Getter @Setter int id;
@@ -56,12 +57,14 @@ public class UTGNode {
         return getUi().equals(utgNode.getUi());
     }
 
+    public Lazy<Integer> hashCode = new Lazy<>(() -> Objects.hash(getUi()));
+
     @Override
     public int hashCode() {
-        return Objects.hash(getUi());
+        return hashCode.get();
     }
 
-    public void addOutEdge(UTGNode end, UiAction action) {
+    public void setOutEdge(UTGNode end, UiAction action) {
         outEdges.put(action, end);
     }
 }

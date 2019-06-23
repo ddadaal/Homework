@@ -4,10 +4,7 @@ import io.appium.java_client.AppiumDriver;
 import lombok.Data;
 import lombok.val;
 import lombok.var;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import viccrubs.appautotesting.log.Logger;
-import viccrubs.appautotesting.utils.AppiumUtils;
 
 @Data
 public class UiAction implements Logger {
@@ -16,7 +13,7 @@ public class UiAction implements Logger {
     private final String inputText;
     private final UiElement element;
 
-    private void sleep(AppiumDriver driver, Ui currentUi) {
+    private void waitForStable(AppiumDriver driver, Ui currentUi) {
         // 等1s，或者界面改变
 //        new WebDriverWait(driver, 1000).until((ExpectedCondition) driver -> {
 //
@@ -24,15 +21,14 @@ public class UiAction implements Logger {
 //    AppiumUtils.sleep(500);
 
 
-        // 每次等200ms，如果之间界面改变，就继续等；直到某个200ms内界面不变或者3s超时
+        // 每次等300ms，如果之间界面改变，就继续等；直到某个200ms内界面不变或者3s超时
         long startTime = System.currentTimeMillis();
-        verbose("Sleep start");
-        val interval = 200;
+        verbose("Wait for stable UI");
+        val interval = 300;
         val timeout = 3000;
         var trialTime = 0;
 
         trialLoop: while (System.currentTimeMillis() - startTime < timeout) {
-
             val baseTime = System.currentTimeMillis();
 
             while (System.currentTimeMillis() - baseTime < interval) {
@@ -44,15 +40,12 @@ public class UiAction implements Logger {
                     continue trialLoop;
                 }
             }
-            // 界面不变退出循环
-            break;
         }
-        verbose("Sleep end. trial time: %d, wait time: %d", trialTime, System.currentTimeMillis()-startTime);
+        verbose("Ui stabled. Change time: %d, wait time: %d", trialTime, System.currentTimeMillis() - startTime);
     }
 
-    public void perform(AppiumDriver driver) {
-
-        val baseUi = Ui.create(driver);
+    // baseUi是作为判断界面有没有变化的标准
+    public void perform(AppiumDriver driver, Ui baseUi) {
 
         if (type == Type.DOUBLE_BACK) {
             verbose("Execute double back.");
@@ -75,7 +68,7 @@ public class UiAction implements Logger {
             }
         }
 
-        sleep(driver, baseUi);
+        waitForStable(driver, baseUi);
     }
 
     public enum Type {
