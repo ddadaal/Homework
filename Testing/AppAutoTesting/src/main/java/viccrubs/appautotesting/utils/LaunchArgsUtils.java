@@ -25,7 +25,7 @@ public class LaunchArgsUtils implements Logger {
 
     public LaunchArgs parseArgs(String[] args) {
 
-        var apkPath = new File(MOCK ? "assets/Bilibili.apk" : args[0]).getAbsolutePath();
+        var apkPath = new File(MOCK ? "assets/SeeWeather.apk" : args[0]).getAbsolutePath();
 
         // parse output
         String appPackage = null;

@@ -41,6 +41,10 @@ public class Ui implements Logger {
     private @Getter
     List<UiElement> leafElements;
 
+    public List<UiElement> getElementsOfInterest() {
+        return leafElements;
+    }
+
     public boolean completed() {
         return leafElements.stream().allMatch(UiElement::isAccessed);
     }
@@ -152,6 +156,8 @@ public class Ui implements Logger {
 
         // get all children of element
         NodeList children = root.getChildNodes();
+
+
 
         if (children.getLength() == 0) {
             // is a leaf elements, add to list

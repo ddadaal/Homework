@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import viccrubs.appautotesting.config.Config;
 import viccrubs.appautotesting.crawlers.DFSCrawler;
 import viccrubs.appautotesting.log.Logger;
 import viccrubs.appautotesting.utils.AppiumUtils;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class App implements Logger {
 
-    private ExecutorService terminationThread;
+    private Thread terminationThread;
 
     private App(String[] args) {
         launch(args);
@@ -47,6 +48,7 @@ public final class App implements Logger {
         capabilities.setCapability("autoGrantPermissions", true);
         capabilities.setCapability("automationName", "UiAutomator1");
         capabilities.setCapability("app", props.getAppPath());
+//        capabilities.setCapability("androidCoverage", "com.android.emulator.smoketests/android.support.test.runner.AndroidJUnitRunner");
 
         //设置使用unicode键盘，支持输入中文和特殊字符
         capabilities.setCapability("unicodeKeyboard", "true");
@@ -56,7 +58,7 @@ public final class App implements Logger {
 
         val driver = new AppiumDriver(new URL(String.format("http://127.0.0.1:%s/wd/hub", props.getPort())), capabilities);
 
-        driver.manage().timeouts().implicitlyWait(5000, TimeUnit.MILLISECONDS);
+        driver.manage().timeouts().implicitlyWait(6000, TimeUnit.MILLISECONDS);
 
         verbose("Driver initialized.");
 
@@ -68,28 +70,27 @@ public final class App implements Logger {
 
         verbose("Wait for app launch...");
 
-        AppiumUtils.sleep(5000);
+        AppiumUtils.sleep(Config.LAUNCH_WAIT_MS);
 
         verbose("App launched.");
 
 
+        //  resource-id: com.xiecc.seeWeather:id/item_city
 
         // 开始遍历
         new DFSCrawler(driver, props.getAppPackage()).run();
 
         verbose("App completed. Shutting down");
-        terminationThread.shutdown();
 
-        System.exit(0);
+        new Thread().setDaemon(true);
+
 
     }
 
 
 
     private void startTerminationTimer(int maxRuntimeSeconds) {
-        terminationThread = Executors.newSingleThreadExecutor();
-
-        terminationThread.submit(() -> {
+        terminationThread = new Thread(() -> {
             try {
                 Thread.sleep(maxRuntimeSeconds * 1000);
                 System.exit(0);
@@ -97,6 +98,10 @@ public final class App implements Logger {
                 e.printStackTrace();
             }
         });
+
+        terminationThread.setDaemon(true);
+        terminationThread.start();
+
         verbose(String.format("Program will terminate after %d seconds", maxRuntimeSeconds));
     }
 

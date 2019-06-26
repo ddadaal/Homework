@@ -11,6 +11,7 @@ import viccrubs.appautotesting.models.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.function.Function;
 
 public class DFSCrawler extends Crawler {
 
@@ -52,7 +53,7 @@ public class DFSCrawler extends Crawler {
 
     private UiElement getNextUnaccessedElement() {
         val accessed = accessedElementMap.computeIfAbsent(currentNode.getUi().getActivityName(), k -> new HashSet<>());
-        for (val element : currentNode.getUi().getLeafElements()) {
+        for (val element : currentNode.getUi().getElementsOfInterest()) {
             if (!element.isAccessed()) {
                 if (accessed.contains(element)) {
                     element.setAccessed(true);
@@ -102,6 +103,40 @@ public class DFSCrawler extends Crawler {
     }
 
 
+    private void performActionOnConfigElement(Function<UiElement, UiAction> actionFunc, Config.Element configElement) {
+        currentNode.getUi().findConfigElement(configElement)
+            .ifPresent(element -> actionFunc.apply(element).perform(driver, currentNode.getUi()));
+    }
+
+    private void handleExternalApp() {
+        UiAction.BACK.perform(driver, currentNode.getUi());
+        currentNode = getCurrentNode();
+        if (!isOutOfApp(currentNode)) {
+            verbose("Back to app. Continue");
+            // 设置Node类型
+        }
+    }
+
+    private void handleAppCrash() {
+        driver.closeApp();
+        driver.launchApp();
+
+        // 等待启动
+        long startTime = System.currentTimeMillis();
+        new WebDriverWait(driver, 10).until((ExpectedCondition<Boolean>) d ->
+                    driver.currentActivity().equals(utg.getStartNode().getUi().getActivityName())
+//                getCurrentNode().equals(utg.getStartNode())
+        );
+
+
+        currentNode = getCurrentNode();
+        verbose("App relaunched. Took %d ms. wait for %d ms more", System.currentTimeMillis() - startTime, Config.LAUNCH_WAIT_MS);
+
+        sleep(Config.LAUNCH_WAIT_MS);
+        verbose("Wait complete. Continue.");
+
+    }
+
     @Override
     public void doCrawl() {
 
@@ -113,7 +148,21 @@ public class DFSCrawler extends Crawler {
                 val currentPackage = currentNode.getUi().getCurrentPackage();
                 val currentActivity = currentNode.getUi().getActivityName();
 
-                verbose("On package %s activity %s.", currentPackage, currentActivity);
+                verbose("Out of app. On package %s activity %s.", currentPackage, currentActivity);
+
+                // 看是不是权限
+                val permissionConfig = Config.PERMISSION_CONFIGS.stream()
+                    .filter(config ->
+                        config.getPackageName().equals(currentPackage)
+                            && config.getActivityName().equals(currentActivity))
+                    .findFirst();
+
+                if (permissionConfig.isPresent()) {
+                    verbose("On permission dialog. Grant the permission.");
+                    performActionOnConfigElement(UiAction::createClickActionOnElement, permissionConfig.get().getBtnGrant());
+                    currentNode = getCurrentNode();
+                    continue;
+                }
 
                 // 看是不是分享界面
                 if (currentPackage.equals("android") && currentActivity.equals("com.android.internal.app.ChooserActivity")) {
@@ -126,33 +175,31 @@ public class DFSCrawler extends Crawler {
                     continue;
                 }
 
-                // 看能不能返回回来
-                verbose("Try back to app.");
-                UiAction.BACK.perform(driver, currentNode.getUi());
-                val nowNode = getCurrentNode();
-                if (!isOutOfApp(nowNode)) {
-                    verbose("Back to app. Continue");
-                    // 设置Node类型
-                    currentNode.setType(UTGNode.Type.EXTERNAL_APP);
-                    currentNode = nowNode;
-                    continue;
+                // 看之前有没有到过这里。如果到过这里，就按相同的方法处理
+                if (!currentNode.getType().equals(UTGNode.Type.NORMAL)) {
+                    if (currentNode.getType().equals(UTGNode.Type.EXTERNAL_APP)) {
+                        verbose("On previously recognized external ui. Execute back.");
+                        handleExternalApp();
+                    } else if (currentNode.getType().equals(UTGNode.Type.CRASH)) {
+                        verbose("On previously recognized crashed ui. Restart the app.");
+                        handleAppCrash();
+
+                    }
+                } else {
+                    // 之前没到过这里。首先看能不能返回回来
+                    verbose("Try back to app.");
+                    handleExternalApp();
+                    if (!isOutOfApp(currentNode)) {
+                        // 回来了，设置节点类型
+                        currentNode.setType(UTGNode.Type.EXTERNAL_APP);
+                    }
+
+                    // 都不能返回回来，那应该是挂了，重启试试
+                    verbose("Can not back to app. App might have crashed. Relaunch it and set back to the start node.");
+                    currentNode.setType(UTGNode.Type.CRASH);
+                    handleAppCrash();
                 }
 
-                // 都不能返回回来，那应该是挂了，重启试试
-                verbose("Can not back to app. App might have crashed. Relaunch it and set back to the start node.");
-                currentNode.setType(UTGNode.Type.CRASH);
-                driver.closeApp();
-                driver.launchApp();
-
-                // 等待启动
-                long startTime = System.currentTimeMillis();
-                new WebDriverWait(driver, 10).until((ExpectedCondition<Boolean>) d ->
-//                    driver.currentActivity().equals(utg.getStartNode().getUi().getActivityName())
-                    getCurrentNode().equals(utg.getStartNode())
-                );
-
-                currentNode = getCurrentNode();
-                verbose("App relaunched. Took %d ms", System.currentTimeMillis() - startTime);
             }
 
             // 处理登录界面
@@ -161,6 +208,7 @@ public class DFSCrawler extends Crawler {
                 verbose("Login activity '%s' detected. Inputting credentials.", activityName);
                 val loginInfo = Config.LOGIN_INFO_MAP.get(activityName);
                 // 查找各个元素并输入内容
+
                 currentNode.getUi().findConfigElement(loginInfo.getUsernameField())
                     .ifPresent(usernameField -> {
                         new UiAction(UiAction.Type.INPUT, loginInfo.getUsername(), usernameField).perform(driver, currentNode.getUi());
@@ -171,10 +219,7 @@ public class DFSCrawler extends Crawler {
                         new UiAction(UiAction.Type.INPUT, loginInfo.getPassword(), passwordField).perform(driver, currentNode.getUi());
                     });
 
-                currentNode.getUi().findConfigElement(loginInfo.getLoginBtn())
-                    .ifPresent(loginBtn -> {
-                        new UiAction(UiAction.Type.CLICK, null, loginBtn).perform(driver, currentNode.getUi());
-                    });
+                performActionOnConfigElement(UiAction::createClickActionOnElement, loginInfo.getLoginBtn());
 
                 // 等待登录成功，activity改变即认为登录完成
                 new WebDriverWait(driver, 10).until((ExpectedCondition<Boolean>) d ->
@@ -191,7 +236,17 @@ public class DFSCrawler extends Crawler {
                 setAccessed(element);
                 val action = getAction(element);
 
-                action.perform(driver, currentNode.getUi());
+                try {
+                    action.perform(driver, currentNode.getUi());
+                } catch (Exception e) {
+//                  // 有个元素没找到，可能当前并不是在预想的界面的上。重新获取UI
+                    verbose("Error finding element. Regetting UI.");
+                    currentNode = getCurrentNode();
+                    continue main;
+//                    error("Error finding element. Ignoring");
+
+                }
+
 
                 UTGNode newNode = getCurrentNode();
 
@@ -202,6 +257,7 @@ public class DFSCrawler extends Crawler {
                     handleNodeChange(newNode, action);
                     continue main;
                 }
+
 
             }
 
@@ -218,7 +274,7 @@ public class DFSCrawler extends Crawler {
                     // 路径已经改变了，修改路径
                     val nowNode = getCurrentNode();
                     if (!nowNode.equals(edge.getValue())) {
-                        verbose("Edge changed, now to UI %s", currentNode);
+                        verbose("Transition changed, now to UI %s", currentNode);
                         currentNode.setOutEdge(nowNode, edge.getKey());
                     }
                     currentNode = nowNode;
@@ -235,32 +291,27 @@ public class DFSCrawler extends Crawler {
                     // 有一个未完成的界面，找一条路径过去
 //                    verbose("Finding a way to UI %s", node);
 
-                    try {
+                    val path = utg.findPath(currentNode, node);
 
-                        val path = utg.findPath(currentNode, node);
-
-                        if (path.isEmpty()) {
+                    if (path.isEmpty()) {
 //                            verbose("Can not find such a way. Retry another UI.");
-                            // 找不到过去的路，找其他没完成的UI。继续找
-                            continue;
-                        }
+                        // 找不到过去的路，找其他没完成的UI。继续找
+                        continue;
+                    }
 
-                        verbose("Found a way to uncompleted node %s. Going to it.", node);
+                    verbose("Found a way to uncompleted node %s. Going to it.", node);
 
-                        var nowNode = currentNode;
-                        // 依次进行每一步
-                        for (val edge : path) {
-                            edge.getAction().perform(driver, nowNode.getUi());
-                            nowNode = getCurrentNode();
-                            if (!nowNode.equals(edge.getEndNode())) {
-                                // 路径已经改变了，修改记录值，并不要继续操作了，重新开始
-                                edge.getStartNode().setOutEdge(nowNode, edge.getAction());
-                                currentNode = nowNode;
-                                continue main;
-                            }
+                    var nowNode = currentNode;
+                    // 依次进行每一步
+                    for (val edge : path) {
+                        edge.getAction().perform(driver, nowNode.getUi());
+                        nowNode = getCurrentNode();
+                        if (!nowNode.equals(edge.getEndNode())) {
+                            // 路径已经改变了，修改记录值，并不要继续操作了，重新开始
+                            edge.getStartNode().setOutEdge(nowNode, edge.getAction());
+                            currentNode = nowNode;
+                            continue main;
                         }
-                    } catch (Throwable e) {
-                        e.printStackTrace();
                     }
 
                     // 继续

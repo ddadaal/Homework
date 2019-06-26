@@ -17,3 +17,17 @@
 | SeeWeather | 多城市里添加城市会强退; 选择城市点击后界面没有变化 | 
 | Jiandou | 没有数据；点击“电影榜单”会强退 |
 
+# 进度 
+
+| 应用 | 6.0进度 | 4.4进度 | 5.0进度 | 7.0进度 | 
+| -- | -- | -- | -- | -- |
+| bihudaily | 100% |  |  | |
+| Bilibili |  |  | | |
+| GeekNews | 点了详情里面全部和主页的第一个列表，没能点击其他子菜单 |  | | |
+| GuDong | 100%, 5min |  | | |
+| ITHouse | | | | |
+| Jiandou | 没点搜索  | | | |
+| Jianshi | N/A | | | |
+| Leafpic  | | | | |
+| Odyssey | | | | |
+| SeeWeather | | | | |

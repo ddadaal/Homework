@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.val;
 import lombok.var;
 import viccrubs.appautotesting.log.Logger;
+import viccrubs.appautotesting.utils.AppiumUtils;
 
 @Data
 public class UiAction implements Logger {
@@ -20,7 +21,7 @@ public class UiAction implements Logger {
 //        });
 //    AppiumUtils.sleep(500);
 
-
+        AppiumUtils.sleep(100);
         // 每次等300ms，如果之间界面改变，就继续等；直到某个200ms内界面不变或者3s超时
         long startTime = System.currentTimeMillis();
         verbose("Wait for stable UI");
@@ -61,6 +62,11 @@ public class UiAction implements Logger {
             verbose("Find element %s.", element, element.getXPath());
             val androidElement = driver.findElementByXPath(element.getXPath());
 
+            if (!androidElement.isEnabled()) {
+                verbose("Element not enabled. Perform no action.");
+                return;
+            }
+
             if (type == Type.CLICK) {
                 verbose("Click the found element.");
                 androidElement.click();
@@ -85,5 +91,13 @@ public class UiAction implements Logger {
     public static UiAction BACK = new UiAction(Type.BACK, null, null);
 
     public static UiAction DOUBLE_BACK = new UiAction(Type.DOUBLE_BACK, null, null);
+
+    public static UiAction createClickActionOnElement(UiElement element) {
+        return new UiAction(Type.CLICK, null, element);
+    }
+
+    public static UiAction createInputActionOnElement(UiElement element, String input) {
+        return new UiAction(Type.INPUT, input, element);
+    }
 
 }

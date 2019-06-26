@@ -29,7 +29,7 @@ public class Config {
     public static class PermissionConfig {
         private final String packageName;
         private final String activityName;
-        private final Element btnLogin;
+        private final Element btnGrant;
     }
 
     public static final List<Element> IGNORED_ELEMENTS = Arrays.asList(
@@ -43,6 +43,7 @@ public class Config {
         new Element("resource-id", "com.danmo.ithouse:id/iv_search_clear"),
         new Element("resource-id", "com.hotbitmapgg.ohmybilibili:id/action_empty_btn"),
         new Element("resource-id", "com.hotbitmapgg.ohmybilibili:id/search_text_clear"),
+        new Element("resource-id", "com.codeest.geeknews:id/action_empty_btn"),
 
         // hack: Jiandou标签分类
         new Element("resource-id", "com.lhr.jiandou:id/pager_f_labelmovie")
@@ -53,7 +54,8 @@ public class Config {
 
     // 回到上一级的按钮，把他和当前界面最后一个元素对调
     public static final List<Element> NAVIGATE_UP_ELEMENTS = Arrays.asList(
-        new Element("content-desc", "Navigate up")
+        new Element("content-desc", "Navigate up"),
+        new Element("resource-id", "com.codeest.geeknews:id/action_up_btn")
 //        new Element("resource-id", "com.danmo.ithouse:id/iv_search_back")
     );
 
@@ -63,6 +65,8 @@ public class Config {
     );
 
     public static final long REPORT_INTERVAL_MS = 20 * 1000;
+
+    public static final int LAUNCH_WAIT_MS = 7000;
 
     public static final Map<String, LoginInfo> LOGIN_INFO_MAP = new HashMap<>();
 

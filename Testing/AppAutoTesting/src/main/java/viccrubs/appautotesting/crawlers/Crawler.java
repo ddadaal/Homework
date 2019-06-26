@@ -46,11 +46,15 @@ public abstract class Crawler implements Logger {
 
     public void run() {
         startReport();
-        try {
-            doCrawl();
-        } catch (Throwable e) {
-            e.printStackTrace();
+
+        while (true) {
+            try {
+                doCrawl();
+            } catch (Throwable e) {
+                error("Error occurred. " + e.getMessage());
+            }
         }
+
     }
 
     public abstract void doCrawl();
