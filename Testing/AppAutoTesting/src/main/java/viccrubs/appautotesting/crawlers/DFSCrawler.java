@@ -102,12 +102,6 @@ public class DFSCrawler extends Crawler {
         return !node.getUi().getCurrentPackage().equals(appPackage);
     }
 
-
-    private void performActionOnConfigElement(Function<UiElement, UiAction> actionFunc, Config.Element configElement) {
-        currentNode.getUi().findConfigElement(configElement)
-            .ifPresent(element -> actionFunc.apply(element).perform(driver, currentNode.getUi()));
-    }
-
     private void handleExternalApp() {
         UiAction.BACK.perform(driver, currentNode.getUi());
         currentNode = getCurrentNode();
@@ -118,22 +112,12 @@ public class DFSCrawler extends Crawler {
     }
 
     private void handleAppCrash() {
-        driver.closeApp();
-        driver.launchApp();
-
-        // 等待启动
-        long startTime = System.currentTimeMillis();
-        new WebDriverWait(driver, 10).until((ExpectedCondition<Boolean>) d ->
-                    driver.currentActivity().equals(utg.getStartNode().getUi().getActivityName())
-//                getCurrentNode().equals(utg.getStartNode())
-        );
-
-
-        currentNode = getCurrentNode();
-        verbose("App relaunched. Took %d ms. wait for %d ms more", System.currentTimeMillis() - startTime, Config.LAUNCH_WAIT_MS);
+        driver.resetApp();
 
         sleep(Config.LAUNCH_WAIT_MS);
-        verbose("Wait complete. Continue.");
+        currentNode = getCurrentNode();
+
+        verbose("App relaunched. Continue.");
 
     }
 
@@ -159,7 +143,11 @@ public class DFSCrawler extends Crawler {
 
                 if (permissionConfig.isPresent()) {
                     verbose("On permission dialog. Grant the permission.");
-                    performActionOnConfigElement(UiAction::createClickActionOnElement, permissionConfig.get().getBtnGrant());
+
+                    new UiAction(UiAction.Type.CLICK, null,
+                        currentNode.getUi().findConfigElement(permissionConfig.get().getBtnGrant())
+                    ).perform(driver, currentNode.getUi());
+
                     currentNode = getCurrentNode();
                     continue;
                 }
@@ -187,17 +175,17 @@ public class DFSCrawler extends Crawler {
                     }
                 } else {
                     // 之前没到过这里。首先看能不能返回回来
+                    currentNode.setType(UTGNode.Type.EXTERNAL_APP);
                     verbose("Try back to app.");
                     handleExternalApp();
-                    if (!isOutOfApp(currentNode)) {
-                        // 回来了，设置节点类型
-                        currentNode.setType(UTGNode.Type.EXTERNAL_APP);
+                    if (isOutOfApp(currentNode)) {
+                        // 都不能返回回来，那应该是挂了，重启
+                        currentNode.setType(UTGNode.Type.CRASH);
+                        verbose("Can not back to app. App might have crashed. Relaunch it and set back to the start node.");
+                        handleAppCrash();
                     }
 
-                    // 都不能返回回来，那应该是挂了，重启试试
-                    verbose("Can not back to app. App might have crashed. Relaunch it and set back to the start node.");
-                    currentNode.setType(UTGNode.Type.CRASH);
-                    handleAppCrash();
+
                 }
 
             }
@@ -209,17 +197,19 @@ public class DFSCrawler extends Crawler {
                 val loginInfo = Config.LOGIN_INFO_MAP.get(activityName);
                 // 查找各个元素并输入内容
 
-                currentNode.getUi().findConfigElement(loginInfo.getUsernameField())
-                    .ifPresent(usernameField -> {
-                        new UiAction(UiAction.Type.INPUT, loginInfo.getUsername(), usernameField).perform(driver, currentNode.getUi());
-                    });
 
-                currentNode.getUi().findConfigElement(loginInfo.getPasswordField())
-                    .ifPresent(passwordField -> {
-                        new UiAction(UiAction.Type.INPUT, loginInfo.getPassword(), passwordField).perform(driver, currentNode.getUi());
-                    });
+                new UiAction(UiAction.Type.INPUT, loginInfo.getUsername(),
+                    currentNode.getUi().findConfigElement(loginInfo.getUsernameField())
+                ).perform(driver, currentNode.getUi());
 
-                performActionOnConfigElement(UiAction::createClickActionOnElement, loginInfo.getLoginBtn());
+
+                new UiAction(UiAction.Type.INPUT, loginInfo.getPassword(),
+                    currentNode.getUi().findConfigElement(loginInfo.getPasswordField())
+                ).perform(driver, currentNode.getUi());
+
+                new UiAction(UiAction.Type.CLICK, null,
+                    currentNode.getUi().findConfigElement(loginInfo.getLoginBtn())
+                ).perform(driver, currentNode.getUi());
 
                 // 等待登录成功，activity改变即认为登录完成
                 new WebDriverWait(driver, 10).until((ExpectedCondition<Boolean>) d ->
@@ -227,7 +217,7 @@ public class DFSCrawler extends Crawler {
                 );
 
                 // 修改当前node的UI为现在的UI
-                currentNode.setUi(Ui.create(driver));
+                currentNode = getCurrentNode();
             }
 
             UiElement element;

@@ -82,8 +82,9 @@ public class Ui implements Logger {
 //        verbose("UI Created in %d", System.currentTimeMillis() - startTime);
     }
 
-    public Optional<UiElement> findConfigElement(Config.Element configElement) {
-        return leafElements.stream().filter(x -> x.matchConfigElement(configElement)).findFirst();
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    public UiElement findConfigElement(Config.Element configElement) {
+        return leafElements.stream().filter(x -> x.matchConfigElement(configElement)).findFirst().get();
     }
 
     @Override

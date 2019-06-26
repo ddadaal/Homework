@@ -92,12 +92,4 @@ public class UiAction implements Logger {
 
     public static UiAction DOUBLE_BACK = new UiAction(Type.DOUBLE_BACK, null, null);
 
-    public static UiAction createClickActionOnElement(UiElement element) {
-        return new UiAction(Type.CLICK, null, element);
-    }
-
-    public static UiAction createInputActionOnElement(UiElement element, String input) {
-        return new UiAction(Type.INPUT, input, element);
-    }
-
 }
