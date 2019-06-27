@@ -350,7 +350,9 @@ public class DFSCrawler extends Crawler {
                 }
             }
 
-            verbose("State break failed. Exiting program");
+            verbose("State break failed. Restarting program");
+
+            handleAppCrash();
             break;
         }
 

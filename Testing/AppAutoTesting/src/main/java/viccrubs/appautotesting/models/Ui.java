@@ -9,7 +9,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
 import viccrubs.appautotesting.config.Config;
 import viccrubs.appautotesting.log.Logger;
 import viccrubs.appautotesting.utils.XmlUtils;
@@ -66,8 +65,19 @@ public class Ui implements Logger {
         // initialize
         initialize();
 
-        // hack: if the first element is a navigate up, push it on the last one
-        if (!leafElements.isEmpty() && leafElements.get(0).matchConfigElement(Config.NAVIGATE_UP_ELEMENTS)) {
+        // hack: push delayed elements to the last one
+
+        val delayedElements = new ArrayList<UiElement>();
+        for (int i=0;i<leafElements.size();i++) {
+            if (leafElements.get(i).matchConfigElement(Config.DELAYED_ELEMENTS)) {
+                delayedElements.add(leafElements.get(i));
+                leafElements.remove(i);
+                i--;
+            }
+        }
+        leafElements.addAll(delayedElements);
+
+        if (!leafElements.isEmpty() && leafElements.get(0).matchConfigElement(Config.DELAYED_ELEMENTS)) {
             val element = leafElements.get(0);
             leafElements.remove(0);
             leafElements.add(element);
@@ -75,7 +85,7 @@ public class Ui implements Logger {
 
 
         // hack: if the first element is a navigate up, swap it with the last one
-//        if (!leafElements.isEmpty() && leafElements.get(0).matchConfigElement(Config.NAVIGATE_UP_ELEMENTS)) {
+//        if (!leafElements.isEmpty() && leafElements.get(0).matchConfigElement(Config.DELAYED_ELEMENTS)) {
 //            Collections.swap(leafElements, 0, leafElements.size() - 1);
 //        }
 
@@ -158,13 +168,21 @@ public class Ui implements Logger {
         // get all children of element
         NodeList children = root.getChildNodes();
 
+        int count = children.getLength();
 
 
-        if (children.getLength() == 0) {
+        if (count == 0) {
             // is a leaf elements, add to list
             result.add(rootElement);
         } else {
             // is not, continue recurse
+
+            // 如果这个是需要限制子女数量的元素，就修改count为指定数量
+            val limitedElement = Config.LIMITED_CHILDREN_ELEMENTS.stream().filter(x -> rootElement.matchConfigElement(x.getElement())).findFirst();
+
+            if (limitedElement.isPresent()) {
+                count = Math.min(count, limitedElement.get().getChildLimit());
+            }
 
             // generate all UIElement
             val childrenUiElements = new ArrayList<UiElement>();
@@ -190,7 +208,34 @@ public class Ui implements Logger {
                     ));
             }
 
-            for (int i = 0; i < children.getLength(); i++) {
+            // 处理列表
+            // 标准：如果子元素有连续多个resource-id非空且相同而且tagName是相同的的元素，则只保留第一个
+
+//            boolean[] ignored = new boolean[count];
+//
+//            int i = 0, j = 0;
+//            while (i < count) {
+//                while (i < count && childrenUiElements.get(i).getResourceId().length()== 0) {
+//                    i++;
+//                }
+//                if (i == count) {
+//                    break;
+//                }
+//                j = i+1;
+//                val iResourceId = childrenUiElements.get(i).getResourceId();
+//                val iTagName = childrenUiElements.get(i).getTagName();
+//                while (j < count
+//                    && childrenUiElements.get(j).getResourceId().equals(iResourceId)
+//                    && childrenUiElements.get(j).getTagName().equals(iTagName)) {
+//                    ignored[j] = true;
+//                    j++;
+//                }
+//                i = j;
+//            }
+
+
+            for (int i = 0; i < count; i++) {
+//                if (ignored[i]) { continue; }
                 initializeRec(children.item(i), childrenUiElements.get(i), result);
             }
         }

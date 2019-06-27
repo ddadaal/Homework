@@ -1,6 +1,7 @@
 package viccrubs.appautotesting.config;
 
 
+import com.sun.org.apache.xalan.internal.utils.XMLSecurityManager;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -32,6 +33,41 @@ public class Config {
         private final Element btnGrant;
     }
 
+    @Data
+    public static class LimitedChildrenElement {
+        private final Element element;
+        private final int childLimit;
+
+        public LimitedChildrenElement(String key, String value, int childLimit) {
+            this.element = new Element(key, value);
+            this.childLimit = childLimit;
+        }
+    }
+
+    // 这些元素只取其前n个子元素
+    public static final List<LimitedChildrenElement> LIMITED_CHILDREN_ELEMENTS = Arrays.asList(
+
+        // IT之家社区列表和文章列表
+        new LimitedChildrenElement("resource-id", "com.danmo.ithouse:id/recycler_view", 2),
+
+
+        // GeedNews
+        new LimitedChildrenElement("resource-id", "com.codeest.geeknews:id/rv_content", 1),
+        new LimitedChildrenElement("resource-id", "com.codeest.geeknews:id/rv_tech_content", 1),
+        new LimitedChildrenElement("resource-id", "com.codeest.geeknews:id/rv_comment_list", 2),
+
+        new LimitedChildrenElement("resource-id", "com.white.bihudaily:id/rv_stories", 3),
+
+        new LimitedChildrenElement("resource-id", "com.white.bihudaily:id/rv_comment", 4),
+
+
+        // Bilibili 视频主页
+        new LimitedChildrenElement("resource-id", "com.hotbitmapgg.ohmybilibili:id/recycle", 3)
+
+
+
+    );
+
     public static final List<Element> IGNORED_ELEMENTS = Arrays.asList(
         // 状态栏和导航栏
         new Element("resource-id", "android:id/statusBarBackground"),
@@ -46,17 +82,37 @@ public class Config {
         new Element("resource-id", "com.codeest.geeknews:id/action_empty_btn"),
 
         // hack: Jiandou标签分类
-        new Element("resource-id", "com.lhr.jiandou:id/pager_f_labelmovie")
+        new Element("resource-id", "com.lhr.jiandou:id/pager_f_labelmovie"),
+
+        // IT之家畅谈界面，忽略掉除了头像之外的的所有可用来进入文章界面的元素
+        new Element("resource-id", "com.danmo.ithouse:id/community_item_c"),
+        new Element("resource-id", "com.danmo.ithouse:id/community_item_t"),
+        new Element("resource-id", "com.danmo.ithouse:id/community_item_un"),
+        new Element("resource-id", "com.danmo.ithouse:id/community_item_pt"),
+        new Element("resource-id", "com.danmo.ithouse:id/community_item_rn"),
+        new Element("resource-id", "com.danmo.ithouse:id/community_item_rt"),
+        new Element("resource-id", "com.danmo.ithouse:id/community_item_cn"),
+        new Element("resource-id", "com.danmo.ithouse:id/community_item_vc"),
+        new Element("resource-id", "com.danmo.ithouse:id/community_item_rc"),
+
+        // IT之家栏目自定义按钮，不点开
+        new Element("resource-id", "com.danmo.ithouse:id/icon_toolbar_custom"),
+
+        // GeekNews 微信列表，只保留一个入口
+        new Element("resource-id", "com.codeest.geeknews:id/tv_wechat_item_title"),
+        new Element("resource-id", "com.codeest.geeknews:id/tv_wechat_item_from"),
+        new Element("resource-id", "com.codeest.geeknews:id/tv_wechat_item_time")
+
 
         // 回到上一级的按钮，不能忽略，有的app把划出侧边栏的也用Navigate up当做content-desc
 //        new Element("content-desc", "Navigate up")
     );
 
-    // 回到上一级的按钮，把他和当前界面最后一个元素对调
-    public static final List<Element> NAVIGATE_UP_ELEMENTS = Arrays.asList(
+    // 把这里的元素和当前界面最后一个元素对调
+    public static final List<Element> DELAYED_ELEMENTS = Arrays.asList(
         new Element("content-desc", "Navigate up"),
-        new Element("resource-id", "com.codeest.geeknews:id/action_up_btn")
-//        new Element("resource-id", "com.danmo.ithouse:id/iv_search_back")
+        new Element("resource-id", "com.codeest.geeknews:id/action_up_btn"),
+        new Element("content-desc", "打开")
     );
 
     public static final List<String> INPUTS = Arrays.asList(

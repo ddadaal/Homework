@@ -23,11 +23,11 @@
 | -- | -- | -- | -- | -- |
 | bihudaily | 100% |  |  | |
 | Bilibili |  |  | | |
-| GeekNews | 点了详情里面全部和主页的第一个列表，没能点击其他子菜单 |  | | |
+| GeekNews |  |  | | |
 | GuDong | 100%, 5min |  | | |
-| ITHouse | | | | |
-| Jiandou | 没点搜索  | | | |
-| Jianshi | N/A | | | |
-| Leafpic  | | | | |
-| Odyssey | | | | |
-| SeeWeather | | | | |
+| ITHouse | 95%, 没有进行搜索 |  | | |
+| Jiandou | 85%, 没点搜索，几个界面的tab没点  | | | |
+| Jianshi | 登录不了 | | | |
+| Leafpic  | 进不去 | | | |
+| Odyssey | 进不去 | | | |
+| SeeWeather | 在选城市界面疯狂崩溃，或者直接进不去 | | | |
