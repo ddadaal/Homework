@@ -12,12 +12,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 @UtilityClass
-public class LaunchArgsUtils implements Logger {
+public class LaunchArgsUtils  {
 
 
     private static final boolean MOCK = true;
 
     private static final String AAPT_TOOL_PATH = MOCK
+//        ? "assets/aapt"
         ? "C:\\Users\\viccrubs\\AppData\\Local\\Android\\Sdk\\build-tools\\29.0.0\\aapt.exe"
         : "assets/aapt"
         ;
@@ -25,7 +26,7 @@ public class LaunchArgsUtils implements Logger {
 
     public LaunchArgs parseArgs(String[] args) {
 
-        var apkPath = new File(MOCK ? "assets/GeekNews.apk" : args[0]).getAbsolutePath();
+        var apkPath = new File(MOCK ? "assets/IThouse.apk" : args[0]).getAbsolutePath();
 
         // parse output
         String appPackage = null;
@@ -58,23 +59,32 @@ public class LaunchArgsUtils implements Logger {
 
     @SneakyThrows
     private ArrayList<String> getAaptDumpOutput(String apkPath) {
-        Process process = Runtime.getRuntime().exec(String.format("\"%s\" dump badging \"%s\"", AAPT_TOOL_PATH, apkPath),
-                null, new File("."));
+        Process process = Runtime.getRuntime().exec(new String[] {
+                AAPT_TOOL_PATH, "dump", "badging", apkPath
+            }, null, new File("."));
 
         var output = new ArrayList<String>();
 
-        var reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        var stdOut = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        var stdError = new BufferedReader(new
+            InputStreamReader(process.getErrorStream()));
 
         String line;
-        while ((line = reader.readLine()) != null) {
+        while ((line = stdOut.readLine()) != null) {
             output.add(line);
+        }
+
+        var errOut = new ArrayList<String>();
+        while ((line = stdError.readLine()) != null) {
+            errOut.add(line);
         }
 
         int exitVal = process.waitFor();
         if (exitVal == 0) {
             return output;
         }
-        throw new RuntimeException("aapt execution failed\n" + String.join("\n", output));
+        throw new RuntimeException("aapt execution failed. stderr: \n" + String.join("\n", String.join(System.lineSeparator(), errOut)));
     }
 
 
