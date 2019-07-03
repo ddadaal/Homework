@@ -43,11 +43,28 @@ public class Config {
         }
     }
 
+    @Data
+    public static class Activity {
+        private final String packageName;
+        private final String activityName;
+    }
+
+
+    public static final List<Activity> DOWN_SCROLLABLE_ACTIVITIES = Arrays.asList(
+        new Activity("name.gudong.translate", ".ui.activitys.SettingActivity")
+    );
+
+    // 不取这些元素的子元素
+    public static final List<Element> NO_CHILDREN_ELEMENTS = Arrays.asList(
+        new Element("resource-id", "com.danmo.ithouse:id/item_container")
+    );
+
     // 这些元素只取其前n个子元素
     public static final List<LimitedChildrenElement> LIMITED_CHILDREN_ELEMENTS = Arrays.asList(
 
-        // IT之家社区列表和文章列表
+        // IT之家社区列表和文章和广告列表
         new LimitedChildrenElement("resource-id", "com.danmo.ithouse:id/recycler_view", 2),
+        new LimitedChildrenElement("resource-id", "com.danmo.ithouse:id/recycler_view_rank", 2),
 
 
         // GeedNews
@@ -62,6 +79,7 @@ public class Config {
 
         // Bilibili 视频主页
         new LimitedChildrenElement("resource-id", "com.hotbitmapgg.ohmybilibili:id/recycle", 3)
+
 
 
 

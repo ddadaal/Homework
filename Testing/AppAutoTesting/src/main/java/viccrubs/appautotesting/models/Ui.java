@@ -170,6 +170,11 @@ public class Ui implements Logger {
 
         int count = children.getLength();
 
+        // 如果是不取子元素的，设置count = 0
+        if (Config.NO_CHILDREN_ELEMENTS.stream().anyMatch(rootElement::matchConfigElement)) {
+            count = 0;
+        }
+
 
         if (count == 0) {
             // is a leaf elements, add to list

@@ -125,12 +125,15 @@ public class DFSCrawler extends Crawler {
     public void doCrawl() {
 
         main:
+
         while (true) {
+
+            val currentPackage = currentNode.getUi().getCurrentPackage();
+            val currentActivity = currentNode.getUi().getActivityName();
 
             // 如果意外退出了应用，就依次处理
             if (isOutOfApp(currentNode)) {
-                val currentPackage = currentNode.getUi().getCurrentPackage();
-                val currentActivity = currentNode.getUi().getActivityName();
+
 
                 verbose("Out of app. On package %s activity %s.", currentPackage, currentActivity);
 
@@ -317,6 +320,20 @@ public class DFSCrawler extends Crawler {
             // 尝试右滑
 //            verbose("Try right swipe");
 //            driver.
+
+            // 如果当前用户的activity可以滚动，就向下滚动一次
+            if (Config.DOWN_SCROLLABLE_ACTIVITIES.stream().anyMatch(x -> x.getActivityName().equals(currentActivity) && x.getPackageName().equals(currentPackage))) {
+                verbose("Down scrollable activity. Try scroll down.");
+                UiAction.SCROLL_DOWN.perform(driver, currentNode.getUi());
+                var newNode = getCurrentNode();
+                if (newNode.equals(currentNode)) {
+                    verbose("Scroll complete.");
+                } else {
+                    verbose("Scroll to UI %s", newNode.getUi());
+                    handleNodeChange(newNode, UiAction.SCROLL_DOWN);
+                    continue;
+                }
+            }
 
             // 返回
             if (!currentNode.getOutEdges().containsKey(UiAction.BACK)) {

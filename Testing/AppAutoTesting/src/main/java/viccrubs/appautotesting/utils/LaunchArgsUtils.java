@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class LaunchArgsUtils  {
 
 
-    private static final boolean MOCK = false;
+    private static final boolean MOCK = true;
 
     private static final String AAPT_TOOL_PATH = MOCK
 //        ? "assets/aapt"
@@ -26,7 +26,7 @@ public class LaunchArgsUtils  {
 
     public LaunchArgs parseArgs(String[] args) {
 
-        var apkPath = new File(MOCK ? "assets/IThouse.apk" : args[0]).getAbsolutePath();
+        var apkPath = new File(MOCK ? "assets/GuDong.apk" : args[0]).getAbsolutePath();
 
         // parse output
         String appPackage = null;

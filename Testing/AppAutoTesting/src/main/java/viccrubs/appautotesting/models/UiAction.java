@@ -58,6 +58,14 @@ public class UiAction implements Logger {
         } else if (type == Type.BACK) {
             verbose("Execute back.");
             driver.navigate().back();
+        } else if (type == Type.SCROLL_DOWN) {
+            verbose("Scroll down.");
+            val dimension = driver.manage().window().getSize();
+            driver.swipe(dimension.getWidth() / 2,
+                dimension.getHeight() /2,
+                dimension.getWidth() / 2,
+                dimension.getHeight() /4,
+                500);
         } else {
             verbose("Find element %s.", element, element.getXPath());
             val androidElement = driver.findElementByXPath(element.getXPath());
@@ -85,11 +93,13 @@ public class UiAction implements Logger {
         BACK,
         DOUBLE_BACK,
         INPUT,
-        SCROLL
+        SCROLL_DOWN
     }
 
     public static UiAction BACK = new UiAction(Type.BACK, null, null);
 
     public static UiAction DOUBLE_BACK = new UiAction(Type.DOUBLE_BACK, null, null);
+
+    public static UiAction SCROLL_DOWN = new UiAction(Type.SCROLL_DOWN, null, null);
 
 }
