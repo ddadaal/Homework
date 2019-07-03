@@ -41,10 +41,10 @@ public final class App implements Logger {
         capabilities.setCapability("deviceName", props.getDeviceUdid());
         capabilities.setCapability("appPackage", props.getAppPackage());
         capabilities.setCapability("appActivity", props.getMainActivity());
-        if (!props.getDeviceUdid().equals("Android Emulator")) {
-            capabilities.setCapability("udid", props.getDeviceUdid());
-        } else {
+        if (props.isMock()) {
             capabilities.setCapability("avd", "Pixel_3_API_23");
+        } else {
+            capabilities.setCapability("udid", props.getDeviceUdid());
         }
         capabilities.setCapability("noSign", "true");
         capabilities.setCapability("autoGrantPermissions", true);

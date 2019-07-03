@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class LaunchArgsUtils  {
 
 
-    private static final boolean MOCK = true;
+    private static final boolean MOCK = false;
 
     private static final String AAPT_TOOL_PATH = MOCK
 //        ? "assets/aapt"
@@ -41,14 +41,15 @@ public class LaunchArgsUtils  {
         }
 
         if (MOCK) {
-            return new LaunchArgs(apkPath, appPackage, mainActivity, "Android Emulator", "4723", 3600);
+            return new LaunchArgs(true, apkPath, appPackage, mainActivity, "Android Emulator", "4723", 3600);
         } else {
-            return new LaunchArgs(apkPath, appPackage, mainActivity, args[1], args[2], Integer.parseInt(args[3]));
+            return new LaunchArgs(false, apkPath, appPackage, mainActivity, args[1], args[2], Integer.parseInt(args[3]));
         }
     }
 
     @Data
     public class LaunchArgs {
+        private final boolean mock;
         private final String appPath;
         private final String appPackage;
         private final String mainActivity;

@@ -1,7 +1,6 @@
 package viccrubs.appautotesting.config;
 
 
-import com.sun.org.apache.xalan.internal.utils.XMLSecurityManager;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -95,8 +94,6 @@ public class Config {
         new Element("resource-id", "com.danmo.ithouse:id/community_item_vc"),
         new Element("resource-id", "com.danmo.ithouse:id/community_item_rc"),
 
-        // IT之家栏目自定义按钮，不点开
-        new Element("resource-id", "com.danmo.ithouse:id/icon_toolbar_custom"),
 
         // GeekNews 微信列表，只保留一个入口
         new Element("resource-id", "com.codeest.geeknews:id/tv_wechat_item_title"),
@@ -112,8 +109,12 @@ public class Config {
     public static final List<Element> DELAYED_ELEMENTS = Arrays.asList(
         new Element("content-desc", "Navigate up"),
         new Element("resource-id", "com.codeest.geeknews:id/action_up_btn"),
-        new Element("content-desc", "打开")
-    );
+        new Element("content-desc", "打开"),
+
+        // IT之家栏目自定义按钮
+        new Element("resource-id", "com.danmo.ithouse:id/icon_toolbar_custom")
+
+        );
 
     public static final List<String> INPUTS = Arrays.asList(
         "Hello",
