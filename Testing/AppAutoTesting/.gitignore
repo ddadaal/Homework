@@ -28,3 +28,7 @@ buildNumber.properties
 
 !assets/ITHouse.apk
 !log/
+
+# AutoTest
+
+AutoTest.jar
