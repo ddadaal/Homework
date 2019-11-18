@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>WinImage 9.0 KeyGen</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body style="text-align: center;">
+        <h1>WinImage 9.0 KeyGen</h1>
+        <h4>
+            base on 
+            <a href="https://onedrive.live.com/?cid=EBF98104367345AF&id=EBF98104367345AF!273">
+                Marcelo Carvalho KeyGen
+            </a>
+        </h4>
+        <hr>
+        <form id="key-gen">
+            <input id="name" type="text" placeholder="Name">
+            <button id="generate" type="submit">Generate</button>
+        </form>
+        <h2>Registration Code</h2>
+        <div id="code"></div>
+        <script>
+            function shift8b(name) {
+                return name.replace(/[8B]/, function (match) {
+                    return match == '8' ? 'B' : '8';
+                });
+            }
+            
+            function getCode(name) {
+                var professionals_code = [0x10051981, 0x4011995, 0x2061997, 0x12091999, 0x16062004, 0x21042002, 0x13062004, 0x9112005, 0x24112005],
+                    codes = [],
+                    length = name.length,
+                    v = length,
+                    code = 0x47694C; // Magic String Standard Version
+                
+                name = name.toUpperCase();
+                
+                for (var i = 0; i < length; i++) {
+                    if ((i % 14) == 0) {
+                        v = 39;
+                    }
+                    code += v * name.charCodeAt(i);
+                    v *= ((i + 3) % 14) ? 3 : 7;
+                }
+                
+                // standard registration code
+                // codes.push(shift8b(code.toString(16).toUpperCase()));
+
+                for (var i = 0; i < professionals_code.length; i++) {
+                    // Magic String Professional Version
+                    codes.push(shift8b(
+                        (code + professionals_code[i]).toString(16).toUpperCase()
+                    ));
+                }
+                
+                return codes;
+            }
+            
+            function onClickKeyGen(e) {
+                var nameNode = document.getElementById('name'),
+                    codeNode = document.getElementById('code');
+                
+                codeNode.innerHTML = getCode(nameNode.value).join('<br>');
+                
+                // for IE
+                if (!e) return false;
+                
+                e.preventDefault();
+            }
+            
+            var keyGenNode = document.getElementById('key-gen');
+            if (document.addEventListener) {
+                keyGenNode.addEventListener('submit', onClickKeyGen);
+            } else {
+                // for IE
+                keyGenNode.onsubmit = onClickKeyGen;
+            }
+        </script>
+    </body>
+</html>
